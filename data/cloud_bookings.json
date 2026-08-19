@@ -1,5 +1,6 @@
 {
-  "lastSync": "2026-08-19T13:59:50.071Z",
+  "lastUpdated": "2026-08-19T14:00:53.148Z",
+  "count": 2,
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -12,6 +13,30 @@
       "deposit_amount": 195,
       "currency": "SAR",
       "status": "CONFIRMED"
+    },
+    {
+      "booking_code": "MDN-2026-0002",
+      "client_name": "aham dalhan",
+      "client_email": "aham@example.com",
+      "client_phone": "+628123456789",
+      "client_country": "Indonesia",
+      "service_id": 2,
+      "service_name": "Couple Session",
+      "package_id": 6,
+      "package_name": "Premium",
+      "location_id": 1,
+      "location_name": "Masjid Nabawi Area",
+      "date": "2026-08-27",
+      "start_time": "18:00",
+      "end_time": "19:30",
+      "total_price": 950,
+      "deposit_amount": 285,
+      "currency": "SAR",
+      "status": "PENDING",
+      "payment_status": "DEPOSIT_PAID",
+      "occasion": "Umrah",
+      "number_of_people": 2,
+      "created_at": "2026-08-19T14:00:52.575Z"
     }
   ]
 }
