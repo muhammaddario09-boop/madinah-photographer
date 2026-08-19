@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bookings — Al-Madani Photography Admin</title>
+<title>Bookings — UMROH LENS Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -14,11 +14,18 @@
 <script>
 const STATUSES = ['PENDING','AWAITING_PAYMENT','CONFIRMED','RESCHEDULE_REQUESTED','COMPLETED','CANCELLED','NO_SHOW'];
 async function loadBookings(status) {
-  const url = status ? `/api/admin/bookings?status=${status}` : '/api/admin/bookings';
-  return adminFetch(url).then(r => r.json());
+  try {
+    const url = status ? `/api/admin/bookings?status=${status}` : '/api/admin/bookings';
+    const res = await adminFetch(url);
+    const data = res.ok ? await res.json() : [];
+    return Array.isArray(data) ? data : [];
+  } catch(e) {
+    return [];
+  }
 }
 async function draw(status) {
   const main = document.getElementById('admin-main');
+  main.innerHTML = `<h1 class="admin-h1">Bookings</h1><p class="admin-sub">Loading reservations...</p>`;
   const bookings = await loadBookings(status);
   main.innerHTML = `
     <h1 class="admin-h1">Bookings</h1>

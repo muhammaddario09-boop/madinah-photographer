@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Calendar — Al-Madani Photography</title>
+<title>Admin Calendar — UMROH LENS</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -11,7 +11,7 @@
   .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
   .cal-day-col { background:#fff; border:1px solid var(--line); min-height:220px; padding:10px; }
   .cal-day-head { font-size:0.76rem; color:var(--charcoal-soft); margin-bottom:8px; }
-  .cal-booking { background:var(--ivory); border-left:3px solid var(--gold); padding:6px 8px; font-size:0.76rem; margin-bottom:6px; }
+  .cal-booking { background:var(--ivory); border-left:3px solid var(--gold); padding:6px 8px; font-size:0.76rem; margin-bottom:6px; border-radius:2px; }
 </style>
 </head>
 <body class="admin">
@@ -25,32 +25,40 @@
   function fmt(d) { return d.toISOString().slice(0,10); }
 
   async function draw() {
+    main.innerHTML = `<h1 class="admin-h1">Calendar</h1><p class="admin-sub">Loading schedule...</p>`;
     const end = new Date(start); end.setDate(end.getDate() + 6);
-    const bookings = await adminFetch(`/api/admin/calendar?from=${fmt(start)}&to=${fmt(end)}`).then(r => r.json());
-    const days = Array.from({length:7}).map((_,i) => { const d = new Date(start); d.setDate(d.getDate()+i); return d; });
-    main.innerHTML = `
-      <h1 class="admin-h1">Calendar</h1>
-      <p class="admin-sub">Week of ${fmt(start)} — ${fmt(end)}</p>
-      <div class="admin-toolbar">
-        <button class="btn btn-ghost" id="prev" style="padding:8px 16px;">← Previous Week</button>
-        <button class="btn btn-ghost" id="next" style="padding:8px 16px;">Next Week →</button>
-      </div>
-      <div class="cal-week">
-        ${days.map(d => {
-          const key = fmt(d);
-          const dayBookings = bookings.filter(b => b.date === key);
-          return `<div class="cal-day-col">
-            <div class="cal-day-head">${d.toLocaleDateString('en',{weekday:'short', day:'numeric'})}</div>
-            ${dayBookings.map(b => `<div class="cal-booking"><strong>${b.start_time}</strong> ${b.service_name}<br>${b.client_name} · ${b.photographer_name}</div>`).join('') || '<div style="color:var(--charcoal-soft); font-size:0.76rem;">—</div>'}
-          </div>`;
-        }).join('')}
-      </div>
-    `;
-    document.getElementById('prev').addEventListener('click', () => { start.setDate(start.getDate()-7); draw(); });
-    document.getElementById('next').addEventListener('click', () => { start.setDate(start.getDate()+7); draw(); });
+    try {
+      const res = await adminFetch(`/api/admin/calendar?from=${fmt(start)}&to=${fmt(end)}`);
+      const data = res.ok ? await res.json() : [];
+      const bookings = Array.isArray(data) ? data : [];
+      const days = Array.from({length:7}).map((_,i) => { const d = new Date(start); d.setDate(d.getDate()+i); return d; });
+      main.innerHTML = `
+        <h1 class="admin-h1">Calendar &amp; Schedule</h1>
+        <p class="admin-sub">Week of ${fmt(start)} — ${fmt(end)}</p>
+        <div class="admin-toolbar">
+          <button class="btn btn-ghost" id="prev" style="padding:8px 16px;">← Previous Week</button>
+          <button class="btn btn-ghost" id="next" style="padding:8px 16px;">Next Week →</button>
+        </div>
+        <div class="cal-week">
+          ${days.map(d => {
+            const key = fmt(d);
+            const dayBookings = bookings.filter(b => b.date === key);
+            return `<div class="cal-day-col">
+              <div class="cal-day-head"><strong>${d.toLocaleDateString('en',{weekday:'short', day:'numeric'})}</strong></div>
+              ${dayBookings.map(b => `<div class="cal-booking"><strong>${b.start_time}</strong> ${b.service_name || 'Photoshoot'}<br><span style="color:var(--charcoal-soft);">${b.client_name} (${b.photographer_name || 'UMROH LENS'})</span></div>`).join('') || '<div style="color:var(--charcoal-soft); font-size:0.76rem;">—</div>'}
+            </div>`;
+          }).join('')}
+        </div>
+      `;
+      document.getElementById('prev').addEventListener('click', () => { start.setDate(start.getDate()-7); draw(); });
+      document.getElementById('next').addEventListener('click', () => { start.setDate(start.getDate()+7); draw(); });
+    } catch(err) {
+      main.innerHTML = `<div class="alert-error" style="display:block;">Failed to load calendar: ${err.message}</div>`;
+    }
   }
   draw();
 })();
+</script>
 </script>
 </body>
 </html>

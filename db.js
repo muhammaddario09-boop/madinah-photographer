@@ -143,6 +143,23 @@ function seed() {
   db.prepare(`INSERT INTO settings (key, value) VALUES ('min_booking_notice_hours', '12')`).run();
   db.prepare(`INSERT INTO settings (key, value) VALUES ('max_booking_window_days', '90')`).run();
   db.prepare(`INSERT INTO settings (key, value) VALUES ('cancellation_deadline_hours', '48')`).run();
+
+  // Seed sample client & booking
+  const insertClient = db.prepare(`INSERT INTO clients (name, email, phone, country) VALUES (?,?,?,?)`);
+  const clientInfo = insertClient.run('Ahmad Dahlan', 'ahmad@example.com', '+628123456789', 'Indonesia');
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const insertBooking = db.prepare(
+    `INSERT INTO bookings (booking_code, photographer_id, client_id, service_id, package_id, location_id, date, start_time, end_time, total_price, deposit_amount, currency, status, payment_status, occasion, number_of_people)
+     VALUES (?, 1, ?, 1, 1, 1, ?, '16:00', '17:00', 650, 195, 'SAR', 'CONFIRMED', 'DEPOSIT_PAID', 'Umrah', 2)`
+  );
+  const bInfo = insertBooking.run('MDN-2026-0001', clientInfo.lastInsertRowid, todayStr);
+
+  db.prepare(
+    `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference)
+     VALUES (?, 195, 'SAR', 'BANK_TRANSFER', 'DEPOSIT', 'PAID', 'DP Transfer BSI')`
+  ).run(bInfo.lastInsertRowid);
+
   db.prepare(`INSERT INTO settings (key, value) VALUES ('buffer_minutes', '30')`).run();
   db.prepare(`INSERT INTO settings (key, value) VALUES ('max_sessions_per_day', '8')`).run();
 
