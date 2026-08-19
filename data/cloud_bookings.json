@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:15:25.066Z",
+  "lastUpdated": "2026-08-19T14:16:57.436Z",
   "count": 2,
   "bookings": [
     {
@@ -33,7 +33,7 @@
       "total_price": 950,
       "deposit_amount": 285,
       "currency": "SAR",
-      "status": "RESCHEDULE_REQUESTED",
+      "status": "CANCELLED",
       "payment_status": "DEPOSIT_PAID",
       "occasion": "Umrah",
       "number_of_people": 2,
