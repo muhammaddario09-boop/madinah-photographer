@@ -6,6 +6,12 @@
 <title>Services &amp; Packages — Madinah Photographer</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
+<style>
+  .service-row { display:grid; grid-template-columns: 320px 1fr; gap:44px; padding:44px 0; border-bottom:1px solid var(--line); }
+  @media (max-width: 768px) {
+    .service-row { grid-template-columns: 1fr; gap: 20px; padding: 28px 0; }
+  }
+</style>
 </head>
 <body>
 <nav class="nav">
@@ -52,7 +58,7 @@ fetch('/api/services').then(r => r.json()).then(async services => {
   const blocks = await Promise.all(services.map(async s => {
     const detail = await fetch(`/api/services/${s.slug}`).then(r => r.json());
     return `
-      <div style="display:grid; grid-template-columns: 320px 1fr; gap:44px; padding:44px 0; border-bottom:1px solid var(--line);">
+      <div class="service-row">
         <div class="service-thumb" style="height:220px; margin-bottom:0; ${s.cover_image ? `background-image:url('${s.cover_image}'); background-size:cover; background-position:center;` : ''}"></div>
         <div>
           <h2 style="font-size:1.7rem;">${s.name}</h2>

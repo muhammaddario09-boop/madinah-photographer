@@ -87,7 +87,49 @@ function ensureSampleBooking() {
     ).run(bRes.lastInsertRowid);
   }
 }
-ensureSampleBooking();
+function ensureExtendedServicesAndLocations() {
+  const extraServices = [
+    ['Cinematic Video & Reels', 'cinematic-video-reels', '4K Video Reels (60s) for Instagram & TikTok with cinematic sound grading and color tone.', '/img/service-reels.jpg', 60, 750, 'SAR', 25, 7],
+    ['Drone & Landmark Perspective', 'drone-landmark-perspective', 'Aerial 4K drone cinematography and wide landmark photography across Madinah & historic sites.', '/img/service-drone.jpg', 90, 1200, 'SAR', 35, 8],
+  ];
+
+  const insertService = db.prepare(
+    `INSERT INTO services (name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order)
+     VALUES (?,?,?,?,?,?,?,?,?)`
+  );
+  const insertPackage = db.prepare(
+    `INSERT INTO packages (service_id, name, description, price, currency, duration_minutes, edited_photos, raw_photos_included, deposit_percentage, cancellation_policy)
+     VALUES (?,?,?,?,?,?,?,?,?,?)`
+  );
+
+  extraServices.forEach(s => {
+    const exists = db.prepare(`SELECT id FROM services WHERE slug=?`).get(s[1]);
+    if (!exists) {
+      const info = insertService.run(...s);
+      const serviceId = info.lastInsertRowid;
+      insertPackage.run(serviceId, 'Essential Reels', '45 minutes, 1 Cinematic Reel (60s) + 15 edited photos', 650, 'SAR', 45, 15, 1, 30, 'Full refund up to 48 hours before the session.');
+      insertPackage.run(serviceId, 'Signature Creator', '75 minutes, 2 Cinematic Reels (60s) + 30 edited photos + Drone', 1100, 'SAR', 75, 30, 1, 30, 'Full refund up to 48 hours before the session.');
+      insertPackage.run(serviceId, 'VVIP Complete Story', '120 minutes, 3 Cinematic Reels + Full Drone + All RAW + 50 photos', 1600, 'SAR', 120, 50, 1, 30, '50% refund up to 48 hours before the session.');
+    }
+  });
+
+  const extraLocations = [
+    ['Bir Ali & Qiblatain Area', 'Historic miqat and two-qibla heritage mosque.', 25],
+    ['AlUla Heritage Expedition', 'Exclusive desert rock heritage expedition in Hegra & Elephant Rock.', 60],
+    ['Makkah Al-Mukarramah (Special Request)', 'Private pilgrimage documentation in Holy Makkah.', 60],
+  ];
+
+  const insertLocation = db.prepare(
+    `INSERT OR IGNORE INTO locations (name, description, travel_buffer_minutes) VALUES (?,?,?)`
+  );
+  extraLocations.forEach(l => {
+    const exists = db.prepare(`SELECT id FROM locations WHERE name=?`).get(l[0]);
+    if (!exists) {
+      insertLocation.run(...l);
+    }
+  });
+}
+ensureExtendedServicesAndLocations();
 
 function seed() {
   const insertPhotographer = db.prepare(
