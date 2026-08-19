@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookings — Al-Madani Photography Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+<script src="/js/admin-nav.js"></script>
+<script>renderAdminNav('bookings');</script>
+<script>
+const STATUSES = ['PENDING','AWAITING_PAYMENT','CONFIRMED','RESCHEDULE_REQUESTED','COMPLETED','CANCELLED','NO_SHOW'];
+async function loadBookings(status) {
+  const url = status ? `/api/admin/bookings?status=${status}` : '/api/admin/bookings';
+  return fetch(url).then(r => r.json());
+}
+async function draw(status) {
+  const main = document.getElementById('admin-main');
+  const bookings = await loadBookings(status);
+  main.innerHTML = `
+    <h1 class="admin-h1">Bookings</h1>
+    <p class="admin-sub">${bookings.length} booking(s)</p>
+    <div class="admin-toolbar">
+      <select id="status-filter">
+        <option value="">All statuses</option>
+        ${STATUSES.map(s => `<option value="${s}" ${s===status?'selected':''}>${s.replace('_',' ')}</option>`).join('')}
+      </select>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>Booking</th><th>Date</th><th>Client</th><th>Service</th><th>Photographer</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${bookings.map(b => `
+          <tr>
+            <td>${b.booking_code}</td>
+            <td>${b.date} ${b.start_time}</td>
+            <td>${b.client_name}<br><span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.client_phone}</span></td>
+            <td>${b.service_name}</td>
+            <td>${b.photographer_name}</td>
+            <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
+            <td>
+              <select data-id="${b.id}" data-current="${b.status}" class="status-select">
+                <option value="">Change status…</option>
+                ${STATUSES.map(s => `<option value="${s}">${s.replace('_',' ')}</option>`).join('')}
+              </select>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  document.getElementById('status-filter').addEventListener('change', (e) => draw(e.target.value));
+  document.querySelectorAll('.status-select').forEach(sel => {
+    sel.addEventListener('change', async (e) => {
+      if (!e.target.value) return;
+      const res = await fetch(`/api/admin/bookings/${e.target.dataset.id}/status`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ status: e.target.value }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error); }
+      draw(status);
+    });
+  });
+}
+draw();
+</script>
+</body>
+</html>

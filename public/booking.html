@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Session — Madinah Photographer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .booking-wrap { max-width: 760px; margin: 0 auto; padding: 48px 28px 120px; }
+  .steps { display:flex; gap:6px; margin-bottom:44px; }
+  .step-dot { flex:1; height:2px; background:var(--line); }
+  .step-dot.done { background: var(--gold); }
+  .step-dot.active { background: var(--charcoal); }
+  .step-label { font-size:0.74rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--charcoal-soft); margin-bottom:10px; }
+  .option-card { border:1px solid var(--line); padding:20px 22px; margin-bottom:10px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition: border-color .15s, background .15s; }
+  .option-card:hover { border-color: var(--gold-soft); }
+  .option-card.selected { border-color: var(--charcoal); background: var(--white); }
+  .field { margin-bottom:20px; }
+  .field label { display:block; font-size:0.8rem; color:var(--charcoal-soft); margin-bottom:8px; }
+  .field input, .field select, .field textarea {
+    width:100%; padding:13px 14px; border:1px solid var(--line); background:var(--white);
+    font-family: var(--font-body); font-size:0.95rem; border-radius:2px;
+  }
+  .field textarea { min-height:90px; resize:vertical; }
+  .cal-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:28px; }
+  .cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:0.86rem; border:1px solid var(--line); cursor:pointer; position:relative; }
+  .cal-day.disabled { opacity:0.3; pointer-events:none; }
+  .cal-day.off { background:#eee7d8; opacity:0.5; pointer-events:none; }
+  .cal-day.limited::after { content:''; position:absolute; bottom:5px; width:5px; height:5px; border-radius:50%; background:var(--status-limited); }
+  .cal-day.available::after { content:''; position:absolute; bottom:5px; width:5px; height:5px; border-radius:50%; background:var(--status-available); }
+  .cal-day.booked { opacity:0.35; pointer-events:none; }
+  .cal-day.selected { background:var(--charcoal); color:#fff; border-color:var(--charcoal); }
+  .cal-dow { text-align:center; font-size:0.7rem; color:var(--charcoal-soft); letter-spacing:0.05em; }
+  .actions-row { display:flex; justify-content:space-between; margin-top:36px; }
+  .summary-line { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:0.92rem; }
+  .error-msg { background:#f6e4de; border:1px solid var(--status-booked); color:#7a2e1e; padding:14px 18px; margin-bottom:20px; font-size:0.88rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
+    <div class="nav-links"></div>
+    <a class="nav-cta" href="/">Exit Booking</a>
+  </div>
+</nav>
+
+<div class="booking-wrap">
+  <div class="steps" id="steps"></div>
+  <div id="step-content"></div>
+</div>
+
+<script src="/js/booking.js"></script>
+</body>
+</html>

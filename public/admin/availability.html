@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Availability — Al-Madani Photography Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+<script src="/js/admin-nav.js"></script>
+<script>renderAdminNav('availability');</script>
+<script>
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const PHOTOGRAPHER_ID = 1; // single-photographer seed; extend with a picker for multi-photographer studios
+
+async function draw() {
+  const main = document.getElementById('admin-main');
+  const [rules, overrides] = await Promise.all([
+    fetch(`/api/admin/availability/rules?photographerId=${PHOTOGRAPHER_ID}`).then(r => r.json()),
+    fetch(`/api/admin/availability/overrides?photographerId=${PHOTOGRAPHER_ID}`).then(r => r.json()),
+  ]);
+  main.innerHTML = `
+    <h1 class="admin-h1">Availability Manager</h1>
+    <p class="admin-sub">Weekly working hours, plus date-specific overrides that always take priority.</p>
+
+    <h2 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Weekly Schedule</h2>
+    <div style="background:#fff; border:1px solid var(--line); margin-bottom:40px;">
+      ${rules.map(r => `
+        <div class="week-row">
+          <div class="week-day-label">${DOW[r.day_of_week]}</div>
+          <div class="week-slots" data-rule="${r.id}">
+            <label style="font-size:0.8rem; display:flex; align-items:center; gap:6px;">
+              <input type="checkbox" class="off-check" ${r.is_off ? 'checked' : ''}> Off
+            </label>
+            <input type="time" class="start-time" value="${r.start_time || ''}" ${r.is_off ? 'disabled' : ''} style="padding:6px;">
+            <input type="time" class="end-time" value="${r.end_time || ''}" ${r.is_off ? 'disabled' : ''} style="padding:6px;">
+            <button class="btn btn-ghost save-rule" style="padding:6px 12px; font-size:0.72rem;">Save</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <h2 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Date Overrides</h2>
+    <div class="admin-toolbar">
+      <input type="date" id="ov-date">
+      <label style="font-size:0.85rem; display:flex; align-items:center; gap:6px;"><input type="checkbox" id="ov-off"> Mark as OFF</label>
+      <input type="time" id="ov-start">
+      <input type="time" id="ov-end">
+      <input type="text" id="ov-reason" placeholder="Reason (optional)">
+      <button class="btn btn-primary" id="ov-add" style="padding:9px 18px; font-size:0.78rem;">Add Override</button>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>Date</th><th>Status</th><th>Hours</th><th>Reason</th><th></th></tr></thead>
+      <tbody>
+        ${overrides.map(o => `
+          <tr>
+            <td>${o.date}</td>
+            <td>${o.is_off ? 'OFF' : 'OPEN'}</td>
+            <td>${o.is_off ? '—' : `${o.start_time} – ${o.end_time}`}</td>
+            <td>${o.reason || '—'}</td>
+            <td><button class="btn btn-ghost del-override" data-id="${o.id}" style="padding:5px 12px; font-size:0.7rem;">Remove</button></td>
+          </tr>
+        `).join('') || '<tr><td colspan="5" style="color:var(--charcoal-soft);">No overrides yet.</td></tr>'}
+      </tbody>
+    </table>
+  `;
+
+  document.querySelectorAll('.week-slots').forEach(row => {
+    const offCheck = row.querySelector('.off-check');
+    offCheck.addEventListener('change', () => {
+      row.querySelector('.start-time').disabled = offCheck.checked;
+      row.querySelector('.end-time').disabled = offCheck.checked;
+    });
+    row.querySelector('.save-rule').addEventListener('click', async () => {
+      const id = row.dataset.rule;
+      await fetch(`/api/admin/availability/rules/${id}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          isOff: offCheck.checked,
+          startTime: row.querySelector('.start-time').value,
+          endTime: row.querySelector('.end-time').value,
+        }),
+      });
+      draw();
+    });
+  });
+
+  document.getElementById('ov-add').addEventListener('click', async () => {
+    const date = document.getElementById('ov-date').value;
+    if (!date) return alert('Pick a date first.');
+    await fetch('/api/admin/availability/overrides', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        photographerId: PHOTOGRAPHER_ID,
+        date,
+        isOff: document.getElementById('ov-off').checked,
+        startTime: document.getElementById('ov-start').value,
+        endTime: document.getElementById('ov-end').value,
+        reason: document.getElementById('ov-reason').value,
+      }),
+    });
+    draw();
+  });
+
+  document.querySelectorAll('.del-override').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await fetch(`/api/admin/availability/overrides/${btn.dataset.id}`, { method: 'DELETE' });
+      draw();
+    });
+  });
+}
+draw();
+</script>
+</body>
+</html>

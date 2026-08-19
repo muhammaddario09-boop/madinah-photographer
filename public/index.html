@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Madinah Photographer — Editorial Photography &amp; Booking</title>
+<meta name="description" content="Professional photography sessions in Madinah, Saudi Arabia. Portrait, couple, family, Umrah memory, and golden hour sessions. Book online.">
+<meta property="og:title" content="Madinah Photographer">
+<meta property="og:description" content="Capture your Madinah moments — professional photography, booked online.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
+    <div class="nav-links">
+      <a href="/portfolio.html">Portfolio</a>
+      <a href="/services.html">Services</a>
+      <a href="/index.html#about">About</a>
+      <a href="/index.html#faq">FAQ</a>
+    </div>
+    <a class="nav-cta" href="/booking.html">Book a Session</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-loc">📍 Madinah, Saudi Arabia</div>
+    <h1>Capture your<br>Madinah moments</h1>
+    <p>Professional photography experiences in Madinah, created to preserve your most meaningful moments — from pilgrimage to portrait.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/booking.html">Book a Session</a>
+      <a class="btn btn-ghost" href="/portfolio.html">View Portfolio</a>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="about">
+  <div class="container" style="max-width:720px;">
+    <p class="eyebrow">About the studio</p>
+    <h2 style="margin-top:14px;">A quiet, editorial approach to a city full of meaning.</h2>
+    <p style="margin-top:22px; color:var(--charcoal-soft); font-size:1.05rem;">
+      Based in Madinah, Yusuf Al-Madani photographs pilgrims, families, and couples with a
+      documentary sensibility — unobtrusive, patient, and attentive to the light the city
+      offers at dawn and dusk. Every session is booked and scheduled online, with a real-time
+      calendar kept accurate to the minute.
+    </p>
+  </div>
+</section>
+
+<hr class="hairline">
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Services</p>
+    <h2 style="margin-top:14px; margin-bottom:44px;">Six ways to be photographed in Madinah.</h2>
+  </div>
+  <div class="container">
+    <div class="grid-3" id="services-grid"></div>
+  </div>
+  <div class="container" style="margin-top:36px;">
+    <a class="btn btn-ghost" href="/services.html">View all services &amp; packages</a>
+  </div>
+</section>
+
+<hr class="hairline">
+
+<section class="section" id="faq">
+  <div class="container" style="max-width:760px;">
+    <p class="eyebrow">FAQ</p>
+    <h2 style="margin-top:14px; margin-bottom:36px;">Good to know before you book.</h2>
+    <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
+      <h3>Do I need to create an account?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">No — booking is guest-friendly. You can create an account after your session to manage future bookings.</p>
+    </div>
+    <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
+      <h3>How much is the deposit?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Most packages require a 30% deposit to confirm your slot. The remainder is due at the session.</p>
+    </div>
+    <div class="faq-item" style="padding:20px 0;">
+      <h3>Can I reschedule?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Yes, from your booking confirmation page, subject to the cancellation policy on your package.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div>
+      <h3>Al-Madani Photography</h3>
+      <p style="opacity:0.7; margin-top:10px; max-width:280px; font-size:0.9rem;">Editorial photography sessions across Madinah, Saudi Arabia.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <a href="/portfolio.html">Portfolio</a>
+        <a href="/services.html">Services</a>
+        <a href="/booking.html">Book a Session</a>
+      </div>
+      <div class="footer-col">
+        <a href="#">WhatsApp</a>
+        <a href="#">Email</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© 2026 Al-Madani Photography, Madinah</span>
+    <span>Asia/Riyadh</span>
+  </div>
+</footer>
+
+<script>
+fetch('/api/services').then(r => r.json()).then(services => {
+  const grid = document.getElementById('services-grid');
+  grid.innerHTML = services.slice(0,6).map(s => `
+    <a class="service-card" href="/booking.html?service=${s.slug}" style="display:block;">
+      <div class="service-thumb"></div>
+      <h3>${s.name}</h3>
+      <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px;">${s.description}</p>
+      <div class="service-meta">
+        <span>${s.duration_minutes} min</span>
+        <span class="service-price">from ${s.currency} ${s.starting_price}</span>
+      </div>
+    </a>
+  `).join('');
+});
+</script>
+</body>
+</html>

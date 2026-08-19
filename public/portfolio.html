@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Madinah Photographer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
+    <div class="nav-links">
+      <a href="/portfolio.html">Portfolio</a>
+      <a href="/services.html">Services</a>
+      <a href="/index.html#about">About</a>
+      <a href="/index.html#faq">FAQ</a>
+    </div>
+    <a class="nav-cta" href="/booking.html">Book a Session</a>
+  </div>
+</nav>
+
+<section class="section-tight">
+  <div class="container">
+    <p class="eyebrow">Selected Work</p>
+    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;">Portfolio</h1>
+  </div>
+</section>
+
+<div class="portfolio-grid" id="portfolio-grid">
+  <!-- Populated from /api/portfolio; falls back to labeled placeholders if empty (CMS not yet seeded with images) -->
+</div>
+
+<footer class="footer" style="margin-top:0;">
+  <div class="container footer-bottom" style="border-top:none; margin-top:0;">
+    <span>© 2026 Al-Madani Photography, Madinah</span>
+    <a href="/">Back to home</a>
+  </div>
+</footer>
+
+<script>
+const categories = ['Portrait','Couple','Family','Umrah','Golden Hour','Heritage','Nabawi','Quba'];
+fetch('/api/portfolio').then(r => r.json()).then(items => {
+  const grid = document.getElementById('portfolio-grid');
+  const list = items.length ? items : Array.from({length: 12}).map((_,i) => ({ title: categories[i % categories.length] }));
+  grid.innerHTML = list.map(p => `<div class="portfolio-item"><span>${p.title || p.category || ''}</span></div>`).join('');
+});
+</script>
+</body>
+</html>

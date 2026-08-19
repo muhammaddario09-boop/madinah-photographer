@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services &amp; Packages — Madinah Photographer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
+    <div class="nav-links">
+      <a href="/portfolio.html">Portfolio</a>
+      <a href="/services.html">Services</a>
+      <a href="/index.html#about">About</a>
+      <a href="/index.html#faq">FAQ</a>
+    </div>
+    <a class="nav-cta" href="/booking.html">Book a Session</a>
+  </div>
+</nav>
+
+<section class="section-tight">
+  <div class="container">
+    <p class="eyebrow">Services &amp; Packages</p>
+    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;">Choose your session</h1>
+  </div>
+</section>
+
+<section class="section" style="padding-top:20px;">
+  <div class="container" id="services-list"></div>
+</section>
+
+<footer class="footer" style="margin-top:0;">
+  <div class="container footer-bottom" style="border-top:none; margin-top:0;">
+    <span>© 2026 Al-Madani Photography, Madinah</span>
+    <a href="/">Back to home</a>
+  </div>
+</footer>
+
+<script>
+fetch('/api/services').then(r => r.json()).then(async services => {
+  const container = document.getElementById('services-list');
+  const blocks = await Promise.all(services.map(async s => {
+    const detail = await fetch(`/api/services/${s.slug}`).then(r => r.json());
+    return `
+      <div style="display:grid; grid-template-columns: 320px 1fr; gap:44px; padding:44px 0; border-bottom:1px solid var(--line);">
+        <div class="service-thumb" style="height:220px; margin-bottom:0;"></div>
+        <div>
+          <h2 style="font-size:1.7rem;">${s.name}</h2>
+          <p style="color:var(--charcoal-soft); margin-top:10px; max-width:560px;">${s.description}</p>
+          <div style="display:flex; gap:10px; margin-top:24px; flex-wrap:wrap;">
+            ${detail.packages.map(p => `
+              <div style="border:1px solid var(--line); padding:18px 20px; min-width:180px;">
+                <div class="eyebrow" style="color:var(--charcoal-soft);">${p.name}</div>
+                <div style="font-family:var(--font-display); font-size:1.3rem; margin-top:8px;">${p.currency} ${p.price}</div>
+                <div style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:6px;">${p.duration_minutes} min · ${p.edited_photos} edited photos</div>
+                <a class="btn btn-ghost" style="margin-top:14px; padding:9px 16px; font-size:0.72rem;" href="/booking.html?service=${s.slug}&package=${p.id}">Book Now</a>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }));
+  container.innerHTML = blocks.join('');
+});
+</script>
+</body>
+</html>

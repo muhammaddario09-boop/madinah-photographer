@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Booking — Madinah Photographer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .wrap { max-width: 640px; margin: 0 auto; padding: 60px 28px 100px; }
+  .field input { width:100%; padding:13px 14px; border:1px solid var(--line); font-family:var(--font-body); }
+  .summary-line { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:0.92rem; }
+  .status-pill { display:inline-block; padding:4px 12px; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; border:1px solid var(--charcoal); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
+    <div class="nav-links"></div>
+    <a class="nav-cta" href="/">Home</a>
+  </div>
+</nav>
+<div class="wrap">
+  <p class="eyebrow">My Booking</p>
+  <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;">Find your reservation</h1>
+  <div class="field" style="display:flex; gap:10px;">
+    <input id="code-input" placeholder="Booking ID, e.g. MDN-2026-0001">
+    <button class="btn btn-primary" id="lookup-btn">Find</button>
+  </div>
+  <div id="result" style="margin-top:32px;"></div>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+async function lookup(code) {
+  const result = document.getElementById('result');
+  result.innerHTML = 'Searching…';
+  const res = await fetch(`/api/bookings/${code}`);
+  if (!res.ok) { result.innerHTML = `<div style="color:var(--status-booked);">Booking not found. Check your Booking ID and try again.</div>`; return; }
+  const data = await res.json();
+  const b = data.booking;
+  result.innerHTML = `
+    <span class="status-pill">${b.status.replace('_',' ')}</span>
+    <h2 style="margin-top:14px;">${b.booking_code}</h2>
+    <div style="margin-top:18px;">
+      <div class="summary-line"><span>Service</span><span>${data.service.name}</span></div>
+      <div class="summary-line"><span>Package</span><span>${data.package.name}</span></div>
+      <div class="summary-line"><span>Date</span><span>${b.date}</span></div>
+      <div class="summary-line"><span>Time</span><span>${b.start_time} – ${b.end_time}</span></div>
+      <div class="summary-line"><span>Location</span><span>${data.location ? data.location.name : '—'}</span></div>
+      <div class="summary-line"><span>Photographer</span><span>${data.photographer.name}</span></div>
+      <div class="summary-line"><span>Payment</span><span>${b.payment_status.replace('_',' ')} — deposit ${b.currency} ${b.deposit_amount}</span></div>
+    </div>
+    ${['CONFIRMED','PENDING','AWAITING_PAYMENT'].includes(b.status) ? `
+      <div style="margin-top:28px;">
+        <p class="eyebrow" style="margin-bottom:10px;">Need a different time?</p>
+        <div style="display:flex; gap:10px;">
+          <input id="new-date" type="date" style="padding:11px; border:1px solid var(--line);">
+          <input id="new-time" type="time" style="padding:11px; border:1px solid var(--line);">
+          <button class="btn btn-ghost" id="reschedule-btn">Request Reschedule</button>
+        </div>
+      </div>
+    ` : ''}
+  `;
+  document.getElementById('reschedule-btn')?.addEventListener('click', async () => {
+    const date = document.getElementById('new-date').value;
+    const startTime = document.getElementById('new-time').value;
+    const r = await fetch(`/api/bookings/${b.booking_code}/reschedule`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ date, startTime }),
+    });
+    const rd = await r.json();
+    if (!r.ok) { alert(rd.error); return; }
+    lookup(b.booking_code);
+  });
+}
+document.getElementById('lookup-btn').addEventListener('click', () => lookup(document.getElementById('code-input').value.trim()));
+if (params.get('code')) { document.getElementById('code-input').value = params.get('code'); lookup(params.get('code')); }
+</script>
+</body>
+</html>

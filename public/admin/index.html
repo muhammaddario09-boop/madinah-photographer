@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Al-Madani Photography</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+<script src="/js/admin-nav.js"></script>
+<script>renderAdminNav('dashboard');</script>
+<script>
+(async function () {
+  const main = document.getElementById('admin-main');
+  main.innerHTML = `
+    <h1 class="admin-h1">Dashboard</h1>
+    <p class="admin-sub">Today, Asia/Riyadh time.</p>
+    <div class="kpi-row" id="kpis"></div>
+    <h2 style="font-family:var(--font-display); font-size:1.2rem; margin-bottom:14px;">Today's shoots</h2>
+    <table class="admin-table" id="today-table"><tbody></tbody></table>
+  `;
+  const kpis = await fetch('/api/admin/dashboard').then(r => r.json());
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Today's Shoots</div><div class="kpi-value">${kpis.todayShoots}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Upcoming Bookings</div><div class="kpi-value">${kpis.upcoming}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pending Payments</div><div class="kpi-value">${kpis.pendingPayments}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Revenue</div><div class="kpi-value">SAR ${kpis.revenue}</div></div>
+  `;
+  const today = new Date().toISOString().slice(0,10);
+  const bookings = await fetch(`/api/admin/bookings?from=${today}&to=${today}`).then(r => r.json());
+  const tbody = document.querySelector('#today-table tbody');
+  tbody.innerHTML = bookings.length ? bookings.map(b => `
+    <tr>
+      <td>${b.start_time} – ${b.end_time}</td>
+      <td>${b.service_name}</td>
+      <td>${b.client_name}</td>
+      <td>${b.photographer_name}</td>
+      <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
+    </tr>
+  `).join('') : `<tr><td style="color:var(--charcoal-soft);">No sessions scheduled today.</td></tr>`;
+})();
+</script>
+</body>
+</html>
