@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:54:14.667Z",
+  "lastUpdated": "2026-08-19T14:54:16.073Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -11,7 +11,7 @@
       "end_time": "17:45",
       "deposit_amount": 195,
       "currency": "SAR",
-      "status": "RESCHEDULE_REQUESTED",
+      "status": "CONFIRMED",
       "payment_status": "DEPOSIT_PAID",
       "client_email": "persist.tester@example.com",
       "client_country": "Indonesia",
