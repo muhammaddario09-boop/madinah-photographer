@@ -1,12 +1,19 @@
-// Admin Authentication & Navigation Helper
+// Admin Authentication & Navigation Helper — Safari & WebKit Compatible
 
 function getAdminToken() {
-  return localStorage.getItem('admin_token');
+  const raw = localStorage.getItem('admin_token');
+  if (!raw) return null;
+  return String(raw).replace(/^["']|["']$/g, '').trim();
 }
 
 function setAdminToken(token, user) {
-  localStorage.setItem('admin_token', token);
-  if (user) localStorage.setItem('admin_user', JSON.stringify(user));
+  if (token) {
+    const clean = String(token).replace(/^["']|["']$/g, '').trim();
+    localStorage.setItem('admin_token', clean);
+  }
+  if (user) {
+    localStorage.setItem('admin_user', typeof user === 'string' ? user : JSON.stringify(user));
+  }
 }
 
 function clearAdminToken() {
@@ -16,7 +23,8 @@ function clearAdminToken() {
 
 function getAdminUser() {
   try {
-    return JSON.parse(localStorage.getItem('admin_user') || '{}');
+    const raw = localStorage.getItem('admin_user');
+    return raw ? JSON.parse(raw) : {};
   } catch (e) {
     return {};
   }
@@ -25,12 +33,17 @@ function getAdminUser() {
 // Global fetch wrapper for admin API calls
 async function adminFetch(url, options = {}) {
   const token = getAdminToken();
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {}),
-  };
+  const headers = {};
 
-  if (token) {
+  if (options.body && typeof options.body === 'string') {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  if (options.headers) {
+    Object.assign(headers, options.headers);
+  }
+
+  if (token && /^[A-Za-z0-9_\-\.]+$/.test(token)) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
@@ -41,7 +54,7 @@ async function adminFetch(url, options = {}) {
       if (!window.location.pathname.endsWith('/admin/login.html')) {
         window.location.href = '/admin/login.html?redirect=' + encodeURIComponent(window.location.pathname);
       }
-      throw new Error('Unauthorized');
+      throw new Error('Session expired. Please login again.');
     }
     return res;
   } catch (err) {

@@ -136,11 +136,19 @@ async function loadData() {
   main.innerHTML = `<h1 class="admin-h1">Services & Price List Manager</h1><p class="admin-sub">Loading catalog...</p>`;
 
   try {
-    const [services, photographer, settings] = await Promise.all([
-      adminFetch('/api/admin/services-full').then(r => r.json()),
-      adminFetch('/api/admin/photographer').then(r => r.json()),
-      adminFetch('/api/admin/settings').then(r => r.json()).catch(() => ({}))
+    const [svcRes, photoRes, setRes] = await Promise.all([
+      adminFetch('/api/admin/services-full'),
+      adminFetch('/api/admin/photographer'),
+      adminFetch('/api/admin/settings').catch(() => null)
     ]);
+
+    const services = svcRes.ok ? await svcRes.json() : [];
+    const photographer = photoRes.ok ? await photoRes.json() : {};
+    const settings = (setRes && setRes.ok) ? await setRes.json() : {};
+
+    if (!Array.isArray(services)) {
+      throw new Error('Invalid services catalog format');
+    }
 
     main.innerHTML = `
       <h1 class="admin-h1">Services, Pricing & Payment Settings</h1>
