@@ -5,6 +5,7 @@ const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
 const { todayRiyadhISODate } = require('../lib/timezone');
+const { recordBookingToCloud, syncCloudBookingsToDb } = require('../lib/cloudStore');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
@@ -165,8 +166,6 @@ router.post('/bookings', (req, res) => {
     ].join('\n');
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
-
-const { recordBookingToCloud, syncCloudBookingsToDb } = require('../lib/cloudStore');
 
     // Record to central cloud datastore
     recordBookingToCloud({
