@@ -17,23 +17,28 @@
   <div class="nav-inner">
     <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
     <div class="nav-links">
-      <a href="/portfolio.html">Portfolio</a>
-      <a href="/services.html">Services</a>
-      <a href="/index.html#about">About</a>
-      <a href="/index.html#faq">FAQ</a>
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
+      <a href="/index.html#about" data-i18n="nav_about">About</a>
+      <a href="/index.html#faq" data-i18n="nav_faq">FAQ</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
     </div>
-    <a class="nav-cta" href="/booking.html">Book a Session</a>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <script src="/js/i18n.js"></script>
+      <script>document.write(renderLanguageSwitcher());</script>
+      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
+    </div>
   </div>
 </nav>
 
 <header class="hero">
   <div class="hero-content">
-    <div class="hero-loc">📍 Madinah, Saudi Arabia</div>
-    <h1>Capture your<br>Madinah moments</h1>
-    <p>Professional photography experiences in Madinah, created to preserve your most meaningful moments — from pilgrimage to portrait.</p>
+    <div class="hero-loc" data-i18n="hero_eyebrow">📍 Madinah, Saudi Arabia</div>
+    <h1 data-i18n="hero_title">Capture your<br>Madinah moments</h1>
+    <p data-i18n="hero_sub">Professional photography experiences in Madinah, created to preserve your most meaningful moments — from pilgrimage to portrait.</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="/booking.html">Book a Session</a>
-      <a class="btn btn-ghost" href="/portfolio.html">View Portfolio</a>
+      <a class="btn btn-primary" href="/booking.html" data-i18n="hero_cta_book">Book a Session</a>
+      <a class="btn btn-ghost" href="/portfolio.html" data-i18n="hero_cta_view">View Portfolio</a>
     </div>
   </div>
 </header>

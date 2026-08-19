@@ -72,6 +72,15 @@ function requireAdmin(req, res, next) {
 // Apply authentication guard to all subsequent routes
 router.use(requireAdmin);
 
+// Direct Image File Upload Route
+router.post('/upload', (req, res) => {
+  const { image } = req.body || {};
+  if (!image || typeof image !== 'string' || !image.startsWith('data:image/')) {
+    return res.status(400).json({ error: 'Valid image file data is required.' });
+  }
+  res.json({ ok: true, url: image });
+});
+
 // Current Admin Profile
 router.get('/me', (req, res) => {
   res.json({ user: req.user });

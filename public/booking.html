@@ -42,8 +42,16 @@
 <nav class="nav">
   <div class="nav-inner">
     <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
-    <div class="nav-links"></div>
-    <a class="nav-cta" href="/">Exit Booking</a>
+    <div class="nav-links">
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <script src="/js/i18n.js"></script>
+      <script>document.write(renderLanguageSwitcher());</script>
+      <a class="nav-cta" href="/">← Exit</a>
+    </div>
   </div>
 </nav>
 

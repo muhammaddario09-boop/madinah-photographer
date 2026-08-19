@@ -12,19 +12,24 @@
   <div class="nav-inner">
     <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
     <div class="nav-links">
-      <a href="/portfolio.html">Portfolio</a>
-      <a href="/services.html">Services</a>
-      <a href="/index.html#about">About</a>
-      <a href="/index.html#faq">FAQ</a>
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
+      <a href="/index.html#about" data-i18n="nav_about">About</a>
+      <a href="/index.html#faq" data-i18n="nav_faq">FAQ</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
     </div>
-    <a class="nav-cta" href="/booking.html">Book a Session</a>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <script src="/js/i18n.js"></script>
+      <script>document.write(renderLanguageSwitcher());</script>
+      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
+    </div>
   </div>
 </nav>
 
 <section class="section-tight">
   <div class="container">
-    <p class="eyebrow">Services &amp; Packages</p>
-    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;">Choose your session</h1>
+    <p class="eyebrow" data-i18n="nav_services">Services &amp; Packages</p>
+    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="sec_services_title">Choose your session</h1>
   </div>
 </section>
 

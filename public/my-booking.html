@@ -17,16 +17,24 @@
 <nav class="nav">
   <div class="nav-inner">
     <a class="nav-mark" href="/">Al-Madani <span>Photography</span></a>
-    <div class="nav-links"></div>
-    <a class="nav-cta" href="/">Home</a>
+    <div class="nav-links">
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <script src="/js/i18n.js"></script>
+      <script>document.write(renderLanguageSwitcher());</script>
+      <a class="nav-cta" href="/">Home</a>
+    </div>
   </div>
 </nav>
 <div class="wrap">
-  <p class="eyebrow">My Booking</p>
-  <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;">Find your reservation</h1>
+  <p class="eyebrow" data-i18n="nav_my_booking">My Booking</p>
+  <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;" data-i18n="btn_lookup">Find your reservation</h1>
   <div class="field" style="display:flex; gap:10px;">
     <input id="code-input" placeholder="Booking ID, e.g. MDN-2026-0001">
-    <button class="btn btn-primary" id="lookup-btn">Find</button>
+    <button class="btn btn-primary" id="lookup-btn" data-i18n="btn_lookup">Find</button>
   </div>
   <div id="result" style="margin-top:32px;"></div>
 </div>
