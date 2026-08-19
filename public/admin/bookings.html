@@ -73,14 +73,7 @@ async function draw(status) {
     </div>
   `;
 
-  window.showProof = function(code, encodedUrl) {
-    const modal = document.getElementById('proof-modal');
-    document.getElementById('modal-title').textContent = `Payment Proof — ${code}`;
-    document.getElementById('modal-img').src = decodeURIComponent(encodedUrl);
-    modal.style.display = 'flex';
-  };
-  `;
-  document.getElementById('status-filter').addEventListener('change', (e) => draw(e.target.value));
+  document.getElementById('status-filter')?.addEventListener('change', (e) => draw(e.target.value));
   document.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async (e) => {
       if (!e.target.value) return;
@@ -94,6 +87,14 @@ async function draw(status) {
     });
   });
 }
+
+function showProof(code, encodedUrl) {
+  const modal = document.getElementById('proof-modal');
+  document.getElementById('modal-title').textContent = `Payment Proof — ${code}`;
+  document.getElementById('modal-img').src = decodeURIComponent(encodedUrl);
+  modal.style.display = 'flex';
+}
+
 draw();
 </script>
 </body>
