@@ -3,9 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio — Madinah Photographer</title>
+<title>Portfolio — UMROH LENS Madinah</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
+<style>
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+    margin-top: 24px;
+  }
+  .portfolio-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+  }
+  .portfolio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+  }
+  .portfolio-img {
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .portfolio-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(28, 25, 23, 0.85);
+    backdrop-filter: blur(4px);
+    color: #F8F6F0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .portfolio-info {
+    padding: 20px;
+  }
+  .portfolio-info h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+    color: var(--charcoal);
+  }
+  .portfolio-info p {
+    font-size: 0.88rem;
+    color: var(--charcoal-soft);
+    line-height: 1.5;
+  }
+  .filter-btn {
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--charcoal);
+    color: #fff;
+    border-color: var(--charcoal);
+  }
+
+  /* Lightbox Modal */
+  .lightbox {
+    display: none;
+    position: fixed;
+    top:0; left:0; width:100vw; height:100vh;
+    background: rgba(0,0,0,0.9);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .lightbox.active {
+    display: flex;
+  }
+  .lightbox-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 <nav class="nav">
@@ -28,19 +126,36 @@
 
 <section class="section-tight">
   <div class="container">
-    <p class="eyebrow" data-i18n="sec_portfolio_title">Selected Work</p>
-    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="nav_portfolio">Portfolio</h1>
+    <p class="eyebrow" data-i18n="sec_portfolio_title">Koleksi Foto Terpilih</p>
+    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="nav_portfolio">Portofolio</h1>
   </div>
 </section>
 
 <section class="section" style="padding-top:10px;">
   <div class="container">
-    <div class="pills" id="filters"></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px;" id="filter-pills">
+      <button class="filter-btn active" data-filter="all">Semua Foto</button>
+      <button class="filter-btn" data-filter="Masjid Nabawi">Masjid Nabawi</button>
+      <button class="filter-btn" data-filter="Couple">Couple</button>
+      <button class="filter-btn" data-filter="Portrait">Portrait</button>
+      <button class="filter-btn" data-filter="Family">Family</button>
+      <button class="filter-btn" data-filter="Umrah">Umrah</button>
+      <button class="filter-btn" data-filter="Uhud">Uhud</button>
+      <button class="filter-btn" data-filter="Cinematic">Cinematic Reels</button>
+      <button class="filter-btn" data-filter="Drone">Drone</button>
+    </div>
   </div>
-  <div class="container" style="margin-top:32px;">
-    <div class="gallery" id="gallery"></div>
+
+  <div class="container">
+    <div class="gallery-grid" id="gallery"></div>
   </div>
 </section>
+
+<!-- Lightbox Modal -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">&times;</span>
+  <img class="lightbox-img" id="lightbox-img" src="" alt="Full Preview" onclick="event.stopPropagation()">
+</div>
 
 <footer class="footer">
   <div class="container footer-bottom">
@@ -50,16 +165,65 @@
 </footer>
 
 <script>
-const categories = ['Portrait','Couple','Family','Umrah','Golden Hour','Heritage','Nabawi','Quba'];
-fetch('/api/portfolio').then(r => r.json()).then(items => {
-  const grid = document.getElementById('portfolio-grid');
-  const list = items.length ? items : Array.from({length: 12}).map((_,i) => ({ title: categories[i % categories.length] }));
-  grid.innerHTML = list.map(p => `
-    <div class="portfolio-item" style="${p.image_url ? `background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, transparent 100%), url('${p.image_url}'); background-size: cover; background-position: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);` : ''}">
-      <span>${p.title || p.category || ''}</span>
+let allItems = [];
+
+function openLightbox(url) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  img.src = url;
+  lb.classList.add('active');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+
+function renderGallery(items) {
+  const container = document.getElementById('gallery');
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:48px 0; color:var(--charcoal-soft);">Tidak ada foto dalam kategori ini.</div>';
+    return;
+  }
+
+  container.innerHTML = items.map(p => `
+    <div class="portfolio-card" onclick="openLightbox('${p.image_url}')">
+      <div class="portfolio-img" style="background-image: url('${p.image_url}');">
+        <span class="portfolio-badge">${p.category || 'Madinah'}</span>
+      </div>
+      <div class="portfolio-info">
+        <h3>${p.title}</h3>
+        <p>${p.description || ''}</p>
+        <div style="margin-top:10px; font-size:0.78rem; color:var(--gold); font-weight:600;">📍 ${p.location || 'Madinah Al-Munawwarah'}</div>
+      </div>
     </div>
   `).join('');
-});
+}
+
+fetch('/api/portfolio')
+  .then(r => r.json())
+  .then(items => {
+    allItems = items;
+    renderGallery(allItems);
+
+    // Setup filter listeners
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.getAttribute('data-filter');
+        if (filter === 'all') {
+          renderGallery(allItems);
+        } else {
+          const filtered = allItems.filter(p => (p.category || '').toLowerCase().includes(filter.toLowerCase()));
+          renderGallery(filtered);
+        }
+      });
+    });
+  })
+  .catch(err => {
+    document.getElementById('gallery').innerHTML = `<div style="grid-column:1/-1; color:var(--status-booked);">Gagal memuat portofolio: ${err.message}</div>`;
+  });
 </script>
 </body>
 </html>

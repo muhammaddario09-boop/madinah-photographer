@@ -131,6 +131,31 @@ function ensureExtendedServicesAndLocations() {
 }
 ensureExtendedServicesAndLocations();
 
+function ensurePortfolio() {
+  const count = db.prepare(`SELECT COUNT(*) n FROM portfolio`).get().n;
+  if (count < 8) {
+    const insert = db.prepare(
+      `INSERT INTO portfolio (image_url, title, category, description, location, featured, sort_order)
+       VALUES (?,?,?,?,?,?,?)`
+    );
+    const items = [
+      ['/img/service-golden-hour.jpg', 'Golden Hour at Masjid Nabawi', 'Masjid Nabawi', 'Sublime golden sunset lighting reflecting across the white marble courtyard.', 'Masjid Nabawi Area', 1, 1],
+      ['/img/service-couple.jpg', 'Serene Couple Portrait', 'Couple', 'Harmonious couple session with architectural backdrops of the Holy City.', 'Masjid Nabawi Area', 1, 2],
+      ['/img/service-portrait.jpg', 'Individual Editorial Portrait', 'Portrait', 'Timeless individual portrait capturing personal devotion and serenity.', 'Heritage Area', 1, 3],
+      ['/img/service-family.jpg', 'Joyful Family Pilgrimage', 'Family', 'Multi-generational family moments documented during sacred journey.', 'Masjid Nabawi Area', 1, 4],
+      ['/img/service-umrah.jpg', 'Moments of Quiet Reflection', 'Umrah', 'Candid documentation of pilgrims engaged in peaceful contemplation.', 'Masjid Nabawi Area', 1, 5],
+      ['/img/service-tour.jpg', 'Historic Mount Uhud Expedition', 'Uhud', 'Dramatic mountain terrain and historical battlefield storytelling.', 'Uhud Area', 1, 6],
+      ['/img/service-reels.jpg', 'Cinematic 4K Moments', 'Cinematic', 'Dynamic 4K vertical footage crafted for social media reels and stories.', 'Madinah Heritage', 1, 7],
+      ['/img/service-drone.jpg', 'Grand Aerial Landmark Perspective', 'Drone', 'Stunning bird-eye view of landmark landscapes and historic minarets.', 'Quba & Uhud Area', 1, 8],
+    ];
+    items.forEach(it => {
+      const exists = db.prepare(`SELECT id FROM portfolio WHERE title=?`).get(it[1]);
+      if (!exists) insert.run(...it);
+    });
+  }
+}
+ensurePortfolio();
+
 function seed() {
   const insertPhotographer = db.prepare(
     `INSERT INTO photographers (name, bio, avatar_url) VALUES (?,?,?)`
