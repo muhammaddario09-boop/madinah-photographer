@@ -117,7 +117,14 @@ router.get('/dashboard', (req, res) => {
   res.json({ todayShoots, upcoming, pendingPayments, revenue });
 });
 
-const { syncCloudBookingsToDb, recordBookingToCloud } = require('../lib/cloudStore');
+const {
+  syncCloudBookingsToDb,
+  recordBookingToCloud,
+  recordSettingsToCloud,
+  recordPortfolioToCloud,
+  recordServicesToCloud,
+  syncCloudSettingsToDb
+} = require('../lib/cloudStore');
 
 router.get('/bookings', async (req, res) => {
   try {
@@ -231,15 +238,16 @@ router.get('/services-full', (req, res) => {
   res.json(full);
 });
 
-router.put('/services/:id', (req, res) => {
+router.put('/services/:id', async (req, res) => {
   const { name, description, cover_image, starting_price, currency, edited_photos } = req.body;
   db.prepare(
     `UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=? WHERE id=?`
   ).run(name, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, req.params.id);
+  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.put('/packages/:id', (req, res) => {
+router.put('/packages/:id', async (req, res) => {
   const { name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
   db.prepare(
     `UPDATE packages SET name=?, description=?, price=?, currency=?, duration_minutes=?, edited_photos=?, deposit_percentage=?, cancellation_policy=? WHERE id=?`
@@ -249,24 +257,28 @@ router.put('/packages/:id', (req, res) => {
     Number(deposit_percentage) || 30, cancellation_policy || '',
     req.params.id
   );
+  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.post('/packages', (req, res) => {
+router.post('/packages', async (req, res) => {
   const { service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
   const info = db.prepare(
     `INSERT INTO packages (service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy)
      VALUES (?,?,?,?,?,?,?,?,?)`
-  ).run(
+  );
+  const result = info.run(
     service_id, name, description, Number(price) || 0, currency || 'SAR',
     Number(duration_minutes) || 30, Number(edited_photos) || 10,
     Number(deposit_percentage) || 30, cancellation_policy || ''
   );
-  res.json({ ok: true, id: info.lastInsertRowid });
+  await recordServicesToCloud(db).catch(() => {});
+  res.json({ ok: true, id: result.lastInsertRowid });
 });
 
-router.delete('/packages/:id', (req, res) => {
+router.delete('/packages/:id', async (req, res) => {
   db.prepare(`DELETE FROM packages WHERE id=?`).run(req.params.id);
+  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -275,38 +287,42 @@ router.get('/portfolio', (req, res) => {
   res.json(db.prepare(`SELECT * FROM portfolio ORDER BY sort_order, id DESC`).all());
 });
 
-router.post('/portfolio', (req, res) => {
+router.post('/portfolio', async (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   if (!image_url) return res.status(400).json({ error: 'Image URL is required.' });
   const info = db.prepare(
     `INSERT INTO portfolio (image_url, title, category, description, location, featured, sort_order)
      VALUES (?,?,?,?,?,?,?)`
   ).run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
+  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true, id: info.lastInsertRowid });
 });
 
-router.put('/portfolio/:id', (req, res) => {
+router.put('/portfolio/:id', async (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   db.prepare(
     `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
   ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
+  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.delete('/portfolio/:id', (req, res) => {
+router.delete('/portfolio/:id', async (req, res) => {
   db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
+  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 // --- Settings Manager (WhatsApp & Bank Accounts) ---
-router.get('/settings', (req, res) => {
+router.get('/settings', async (req, res) => {
+  try { await syncCloudSettingsToDb(db); } catch (e) {}
   const rows = db.prepare(`SELECT key, value FROM settings`).all();
   const map = {};
   rows.forEach(r => { map[r.key] = r.value; });
   res.json(map);
 });
 
-router.put('/settings', (req, res) => {
+router.put('/settings', async (req, res) => {
   const settings = req.body || {};
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (?, ?)
@@ -315,6 +331,7 @@ router.put('/settings', (req, res) => {
   for (const [key, val] of Object.entries(settings)) {
     upsert.run(key, String(val));
   }
+  await recordSettingsToCloud(settings);
   res.json({ ok: true });
 });
 

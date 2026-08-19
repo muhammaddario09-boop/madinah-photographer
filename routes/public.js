@@ -4,8 +4,7 @@ const db = require('../db');
 const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
-const { todayRiyadhISODate } = require('../lib/timezone');
-const { recordBookingToCloud, syncCloudBookingsToDb } = require('../lib/cloudStore');
+const { recordBookingToCloud, syncCloudBookingsToDb, syncCloudSettingsToDb } = require('../lib/cloudStore');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
@@ -71,7 +70,8 @@ router.get('/availability/month', (req, res) => {
 });
 
 // GET /api/payment-info — returns bank account details and WhatsApp numbers
-router.get('/payment-info', (req, res) => {
+router.get('/payment-info', async (req, res) => {
+  try { await syncCloudSettingsToDb(db); } catch(e) {}
   const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
   const s = {};
   settingsRows.forEach(r => { s[r.key] = r.value; });
