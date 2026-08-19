@@ -243,13 +243,51 @@ router.get('/bookings/:code', async (req, res) => {
   }
 });
 
-router.post('/bookings/:code/reschedule', (req, res) => {
+router.post('/bookings/:code/reschedule', async (req, res) => {
   try {
     const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
     const buffer = bufferMinutes(db);
     const updated = reschedule(db, booking.id, { date: req.body.date, startTime: req.body.startTime, bufferMinutes: buffer }, 'client');
-    res.json({ ok: true, booking: updated });
+
+    const client = db.prepare(`SELECT * FROM clients WHERE id=?`).get(booking.client_id);
+    const service = db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id);
+
+    // Sync to cloud datastore
+    recordBookingToCloud({
+      booking_code: booking.booking_code,
+      date: req.body.date,
+      start_time: req.body.startTime,
+      end_time: updated.end_time,
+      status: 'RESCHEDULE_REQUESTED'
+    }).catch(() => {});
+
+    // Generate WhatsApp Notification Template for Reschedule
+    const waSetting = db.prepare(`SELECT value FROM settings WHERE key='admin_whatsapp'`).get();
+    const waNumber = (waSetting ? waSetting.value : '+966501234567').replace(/[^0-9]/g, '');
+
+    const waText = [
+      `Assalamu'alaikum UMROH LENS,`,
+      `Saya ingin mengajukan *Perubahan Jadwal (Reschedule)* sesi foto saya di Madinah:`,
+      ``,
+      `📋 *Booking Code*: ${booking.booking_code}`,
+      `👤 *Nama*: ${client ? client.name : 'Klien'}`,
+      `📸 *Layanan*: ${service ? service.name : 'Sesi Foto'}`,
+      `📅 *Jadwal Baru*: ${req.body.date}`,
+      `⏰ *Waktu Baru*: ${req.body.startTime} (Waktu Madinah)`,
+      ``,
+      `Mohon konfirmasi dan persetujuan perubahan jadwal ini. Terima kasih!`
+    ].join('\n');
+
+    const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
+
+    res.json({
+      ok: true,
+      booking: updated,
+      status: 'RESCHEDULE_REQUESTED',
+      whatsappUrl,
+      whatsappMessage: waText
+    });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.status ? e.message : 'Reschedule failed. Please try again.' });
   }

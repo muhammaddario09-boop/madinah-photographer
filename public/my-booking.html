@@ -3,14 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Booking — Madinah Photographer</title>
+<title>My Booking — UMROH LENS Madinah</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  .wrap { max-width: 640px; margin: 0 auto; padding: 60px 28px 100px; }
-  .field input { width:100%; padding:13px 14px; border:1px solid var(--line); font-family:var(--font-body); }
-  .summary-line { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:0.92rem; }
-  .status-pill { display:inline-block; padding:4px 12px; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; border:1px solid var(--charcoal); }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 50px 24px 100px; }
+  .field input { width:100%; padding:13px 14px; border:1px solid var(--line); font-family:var(--font-body); border-radius:4px; }
+  .summary-line { display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--line); font-size:0.92rem; }
+  .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; border-radius:20px; }
+  .status-CONFIRMED { background:#E2F0D9; color:#276A3C; border:1px solid #c2e0b3; }
+  .status-RESCHEDULE_REQUESTED { background:#FFF2CC; color:#B25E00; border:1px solid #FFE082; }
+  .status-PENDING, .status-AWAITING_PAYMENT { background:#FFF8E1; color:#8D6E00; border:1px solid #FFE57F; }
+  .status-COMPLETED { background:#E1F5FE; color:#0277BD; border:1px solid #B3E5FC; }
+  .status-CANCELLED { background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2; }
 </style>
 </head>
 <body>
@@ -29,6 +34,7 @@
     </div>
   </div>
 </nav>
+
 <div class="wrap">
   <p class="eyebrow" data-i18n="nav_my_booking">My Booking</p>
   <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;" data-i18n="btn_lookup">Find your reservation</h1>
@@ -38,52 +44,125 @@
   </div>
   <div id="result" style="margin-top:32px;"></div>
 </div>
+
 <script>
 const params = new URLSearchParams(location.search);
+
+function getStatusInfo(status) {
+  switch(status) {
+    case 'CONFIRMED':
+      return { label: '🟢 Terkonfirmasi (Confirmed)', desc: 'Jadwal sesi foto Anda telah dikonfirmasi dan terkunci di jadwal fotografer.' };
+    case 'RESCHEDULE_REQUESTED':
+      return { label: '🟡 Menunggu Persetujuan Reschedule', desc: 'Permintaan perubahan jadwal Anda telah diterima dan sedang menunggu peninjauan admin.' };
+    case 'PENDING':
+    case 'AWAITING_PAYMENT':
+      return { label: '⏳ Menunggu Verifikasi Admin', desc: 'Reservasi Anda sedang dalam antrean verifikasi pembayaran deposit oleh tim admin.' };
+    case 'COMPLETED':
+      return { label: '🔵 Selesai (Completed)', desc: 'Sesi foto telah selesai. File foto sedang dalam proses kurasi dan pengeditan.' };
+    case 'CANCELLED':
+      return { label: '🔴 Dibatalkan (Cancelled)', desc: 'Reservasi ini telah dibatalkan.' };
+    default:
+      return { label: status.replace('_',' '), desc: '' };
+  }
+}
+
 async function lookup(code) {
   const result = document.getElementById('result');
-  result.innerHTML = 'Searching…';
-  const res = await fetch(`/api/bookings/${code}`);
-  if (!res.ok) { result.innerHTML = `<div style="color:var(--status-booked);">Booking not found. Check your Booking ID and try again.</div>`; return; }
-  const data = await res.json();
-  const b = data.booking;
-  result.innerHTML = `
-    <span class="status-pill">${b.status.replace('_',' ')}</span>
-    <h2 style="margin-top:14px;">${b.booking_code}</h2>
-    <div style="margin-top:18px;">
-      <div class="summary-line"><span>Service</span><span>${data.service.name}</span></div>
-      <div class="summary-line"><span>Package</span><span>${data.package.name}</span></div>
-      <div class="summary-line"><span>Date</span><span>${b.date}</span></div>
-      <div class="summary-line"><span>Time</span><span>${b.start_time} – ${b.end_time}</span></div>
-      <div class="summary-line"><span>Location</span><span>${data.location ? data.location.name : '—'}</span></div>
-      <div class="summary-line"><span>Photographer</span><span>${data.photographer.name}</span></div>
-      <div class="summary-line"><span>Payment</span><span>${b.payment_status.replace('_',' ')} — deposit ${b.currency} ${b.deposit_amount}</span></div>
-    </div>
-    ${['CONFIRMED','PENDING','AWAITING_PAYMENT'].includes(b.status) ? `
-      <div style="margin-top:28px;">
-        <p class="eyebrow" style="margin-bottom:10px;">Need a different time?</p>
-        <div style="display:flex; gap:10px;">
-          <input id="new-date" type="date" style="padding:11px; border:1px solid var(--line);">
-          <input id="new-time" type="time" style="padding:11px; border:1px solid var(--line);">
-          <button class="btn btn-ghost" id="reschedule-btn">Request Reschedule</button>
+  result.innerHTML = '<p style="color:var(--charcoal-soft);">Mencari data reservasi...</p>';
+  try {
+    const res = await fetch(`/api/bookings/${code}`);
+    if (!res.ok) {
+      result.innerHTML = `<div style="padding:16px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.9rem;">Booking tidak ditemukan. Pastikan Booking ID Anda benar (Contoh: MDN-2026-0001).</div>`;
+      return;
+    }
+    const data = await res.json();
+    const b = data.booking;
+    const sInfo = getStatusInfo(b.status);
+
+    result.innerHTML = `
+      <div style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
+          <div>
+            <span class="status-badge status-${b.status}">${sInfo.label}</span>
+            <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-top:10px;">${b.booking_code}</h2>
+          </div>
+        </div>
+        ${sInfo.desc ? `<p style="font-size:0.86rem; color:var(--charcoal-soft); margin-bottom:20px; padding:10px 14px; background:var(--ivory); border-radius:4px;">ℹ️ ${sInfo.desc}</p>` : ''}
+
+        <div style="margin-top:18px;">
+          <div class="summary-line"><span>Nama Klien</span><strong style="color:var(--charcoal);">${b.client_name || '—'}</strong></div>
+          <div class="summary-line"><span>Layanan</span><span>${data.service.name}</span></div>
+          <div class="summary-line"><span>Paket</span><span>${data.package.name}</span></div>
+          <div class="summary-line"><span>Tanggal Sesi</span><strong>${b.date}</strong></div>
+          <div class="summary-line"><span>Waktu Sesi</span><strong>${b.start_time} – ${b.end_time}</strong></div>
+          <div class="summary-line"><span>Lokasi</span><span>${data.location ? data.location.name : 'Madinah Area'}</span></div>
+          <div class="summary-line"><span>Studio Fotografer</span><span>${data.photographer.name}</span></div>
+          <div class="summary-line"><span>Status Pembayaran</span><span>${b.payment_status.replace('_',' ')} (Deposit: ${b.currency} ${b.deposit_amount})</span></div>
+        </div>
+
+        <div id="reschedule-box" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--line);">
+          <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:8px;">Ajukan Perubahan Jadwal (Reschedule)</h3>
+          <p style="color:var(--charcoal-soft); font-size:0.85rem; margin-bottom:16px;">Pilih tanggal dan jam baru jika Anda berhalangan pada jadwal sebelumnya:</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <input id="new-date" type="date" value="${b.date}" style="flex:1; min-width:140px; padding:11px; border:1px solid var(--line); border-radius:4px;">
+            <input id="new-time" type="time" value="${b.start_time}" style="flex:1; min-width:120px; padding:11px; border:1px solid var(--line); border-radius:4px;">
+            <button class="btn btn-primary" id="reschedule-btn" style="padding:11px 20px;">Ajukan Perubahan</button>
+          </div>
+          <div id="reschedule-alert" style="margin-top:16px; display:none;"></div>
         </div>
       </div>
-    ` : ''}
-  `;
-  document.getElementById('reschedule-btn')?.addEventListener('click', async () => {
-    const date = document.getElementById('new-date').value;
-    const startTime = document.getElementById('new-time').value;
-    const r = await fetch(`/api/bookings/${b.booking_code}/reschedule`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ date, startTime }),
+    `;
+
+    document.getElementById('reschedule-btn')?.addEventListener('click', async () => {
+      const date = document.getElementById('new-date').value;
+      const startTime = document.getElementById('new-time').value;
+      if (!date || !startTime) {
+        alert('Silakan pilih tanggal dan jam baru terlebih dahulu.');
+        return;
+      }
+
+      const alertBox = document.getElementById('reschedule-alert');
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '<p style="color:var(--charcoal-soft);">Mengirim permintaan reschedule...</p>';
+
+      const r = await fetch(`/api/bookings/${b.booking_code}/reschedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, startTime }),
+      });
+      const rd = await r.json();
+
+      if (!r.ok) {
+        alertBox.innerHTML = `<div style="padding:12px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.88rem;">${rd.error}</div>`;
+        return;
+      }
+
+      alertBox.innerHTML = `
+        <div style="padding:16px; background:#EBF5EC; border:1px solid #C3E6CB; border-radius:6px; color:#155724; font-size:0.9rem;">
+          <h4 style="font-weight:600; margin-bottom:6px;">✅ Permintaan Berhasil Diajukan!</h4>
+          <p style="margin-bottom:12px;">Status booking Anda kini <strong>Menunggu Persetujuan Reschedule</strong> untuk tanggal <strong>${date}</strong> pukul <strong>${startTime}</strong>.</p>
+          ${rd.whatsappUrl ? `
+            <a href="${rd.whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#fff; border-color:#25D366; text-decoration:none; padding:10px 18px; font-size:0.85rem;">
+              <span>💬 Kirim Notifikasi ke WhatsApp Admin</span>
+            </a>
+          ` : ''}
+        </div>
+      `;
+
+      // Refresh data lookup
+      setTimeout(() => lookup(b.booking_code), 2500);
     });
-    const rd = await r.json();
-    if (!r.ok) { alert(rd.error); return; }
-    lookup(b.booking_code);
-  });
+
+  } catch(err) {
+    result.innerHTML = `<div style="color:var(--status-booked);">Terjadi kesalahan koneksi: ${err.message}</div>`;
+  }
 }
+
 document.getElementById('lookup-btn').addEventListener('click', () => lookup(document.getElementById('code-input').value.trim()));
-if (params.get('code')) { document.getElementById('code-input').value = params.get('code'); lookup(params.get('code')); }
+if (params.get('code')) {
+  document.getElementById('code-input').value = params.get('code');
+  lookup(params.get('code'));
+}
 </script>
 </body>
 </html>
