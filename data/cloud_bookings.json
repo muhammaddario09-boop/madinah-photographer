@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:55:41.330Z",
+  "lastUpdated": "2026-08-19T14:56:40.960Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -112,5 +112,6 @@
     "bank_idr_name": "Bank Syariah Indonesia (BSI) / BCA"
   },
   "services": [],
-  "portfolio": []
+  "portfolio": [],
+  "count": 4
 }
