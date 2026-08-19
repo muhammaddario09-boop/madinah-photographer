@@ -12,6 +12,37 @@ const { hashPassword } = require('./lib/auth');
 const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
 db.exec(schema);
 
+// Migration: add proof_url column to payments if not present
+try {
+  db.exec(`ALTER TABLE payments ADD COLUMN proof_url TEXT;`);
+} catch (e) {
+  // column already exists
+}
+
+function ensureSettings() {
+  const defaults = {
+    'min_booking_notice_hours': '12',
+    'max_booking_window_days': '90',
+    'cancellation_deadline_hours': '48',
+    'buffer_minutes': '30',
+    'max_sessions_per_day': '8',
+    'admin_whatsapp': process.env.ADMIN_WHATSAPP || '+966501234567',
+    'bank_sar_name': 'Al Rajhi Bank (Saudi Arabia)',
+    'bank_sar_account': 'SA84 8000 0123 4567 8901 2345',
+    'bank_sar_holder': 'Al-Madani Photography Studio',
+    'bank_idr_name': 'Bank Syariah Indonesia (BSI) / BCA',
+    'bank_idr_account': '7123456789 (BSI) / 5420123456 (BCA)',
+    'bank_idr_holder': 'Al-Madani Photography',
+    'idr_sar_rate': '4200'
+  };
+
+  const insertOrIgnore = db.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`);
+  for (const [k, v] of Object.entries(defaults)) {
+    insertOrIgnore.run(k, v);
+  }
+}
+ensureSettings();
+
 function ensureAdminUser() {
   const adminCount = db.prepare(`SELECT COUNT(*) as count FROM users WHERE role='ADMIN'`).get().count;
   if (adminCount === 0) {

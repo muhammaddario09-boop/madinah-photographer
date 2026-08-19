@@ -69,6 +69,27 @@ router.get('/availability/month', (req, res) => {
   res.json({ year, month, days });
 });
 
+// GET /api/payment-info — returns bank account details and WhatsApp numbers
+router.get('/payment-info', (req, res) => {
+  const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
+  const s = {};
+  settingsRows.forEach(r => { s[r.key] = r.value; });
+  res.json({
+    whatsappNumber: s.admin_whatsapp || '+966501234567',
+    bankSAR: {
+      name: s.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)',
+      account: s.bank_sar_account || 'SA84 8000 0123 4567 8901 2345',
+      holder: s.bank_sar_holder || 'Al-Madani Photography Studio'
+    },
+    bankIDR: {
+      name: s.bank_idr_name || 'Bank Syariah Indonesia (BSI) / BCA',
+      account: s.bank_idr_account || '7123456789 (BSI) / 5420123456 (BCA)',
+      holder: s.bank_idr_holder || 'Al-Madani Photography',
+      rate: Number(s.idr_sar_rate) || 4200
+    }
+  });
+});
+
 // POST /api/bookings — creates a booking with full server-side re-validation.
 router.post('/bookings', (req, res) => {
   try {
@@ -104,6 +125,16 @@ router.post('/bookings', (req, res) => {
       currency: pkg.currency,
     });
 
+    // Record Payment Proof if uploaded
+    if (b.paymentProof) {
+      db.prepare(
+        `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference, proof_url)
+         VALUES (?, ?, ?, 'BANK_TRANSFER', 'DEPOSIT', 'PENDING', ?, ?)`
+      ).run(result.id, depositAmount, pkg.currency, 'Screenshot Transfer', b.paymentProof);
+
+      db.prepare(`UPDATE bookings SET payment_status = 'DEPOSIT_PAID' WHERE id = ?`).run(result.id);
+    }
+
     const location = b.locationId ? db.prepare(`SELECT * FROM locations WHERE id=?`).get(b.locationId) : null;
     const photographer = db.prepare(`SELECT * FROM photographers WHERE id=?`).get(photographerId);
     const message = renderConfirmation(
@@ -113,6 +144,27 @@ router.post('/bookings', (req, res) => {
     queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'CONFIRMATION', payload: message });
     queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'REMINDER_24H', payload: null, scheduledFor: null });
     queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'REMINDER_3H', payload: null, scheduledFor: null });
+
+    // WhatsApp Direct URL Generation
+    const waSetting = db.prepare(`SELECT value FROM settings WHERE key='admin_whatsapp'`).get();
+    const waNumber = (waSetting ? waSetting.value : '+966501234567').replace(/[^0-9]/g, '');
+
+    const waText = [
+      `Assalamu'alaikum Al-Madani Photography,`,
+      `Saya ingin konfirmasi reservasi sesi foto di Madinah:`,
+      ``,
+      `📋 *Booking Code*: ${result.bookingCode}`,
+      `👤 *Nama*: ${b.clientName}`,
+      `📸 *Layanan*: ${service.name} (${pkg.name})`,
+      `📅 *Tanggal*: ${b.date}`,
+      `⏰ *Waktu*: ${b.startTime} - ${result.endTime} (Waktu Madinah)`,
+      `📍 *Lokasi*: ${location ? location.name : 'Madinah'}`,
+      `💵 *Deposit*: ${pkg.currency} ${depositAmount} (Bukti Transfer Terlampir)`,
+      ``,
+      `Mohon verifikasi dan konfirmasi jadwal sesi saya. Terima kasih!`
+    ].join('\n');
+
+    const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
     res.status(201).json({
       bookingCode: result.bookingCode,
@@ -125,6 +177,7 @@ router.post('/bookings', (req, res) => {
       startTime: b.startTime,
       endTime: result.endTime,
       whatsappMessage: message,
+      whatsappUrl,
     });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.status ? e.message : 'Your booking could not be completed. Please try again.' });

@@ -1,6 +1,5 @@
-// BOOKING FLOW — spec section 9 state machine:
-// SERVICE -> PACKAGE -> DATE -> TIME -> DETAILS -> PAYMENT -> CONFIRMATION
-// Guest booking only (spec section 38) — no account required.
+// BOOKING FLOW — Full State Machine & Payment Handling:
+// SERVICE -> PACKAGE -> DATE -> TIME -> DETAILS -> PAYMENT (Bank Details & Receipt Upload) -> CONFIRMATION (Direct WhatsApp)
 
 const STEPS = ['SERVICE', 'PACKAGE', 'DATE', 'TIME', 'DETAILS', 'PAYMENT', 'CONFIRMATION'];
 const state = {
@@ -10,6 +9,7 @@ const state = {
   package: null,
   locations: [],
   photographerId: null,
+  paymentInfo: null,
   calMonth: null, calYear: null,
   monthDays: {},
   date: null,
@@ -18,6 +18,7 @@ const state = {
   client: {},
   photoshoot: {},
   locationId: null,
+  paymentProof: '',
   result: null,
   error: null,
 };
@@ -25,14 +26,16 @@ const state = {
 const params = new URLSearchParams(location.search);
 
 async function init() {
-  const [services, photographers, locations] = await Promise.all([
+  const [services, photographers, locations, paymentInfo] = await Promise.all([
     fetch('/api/services').then(r => r.json()),
     fetch('/api/photographers').then(r => r.json()),
     fetch('/api/locations').then(r => r.json()),
+    fetch('/api/payment-info').then(r => r.json()).catch(() => ({})),
   ]);
   state.services = services;
   state.locations = locations;
-  state.photographerId = photographers[0].id;
+  state.photographerId = photographers[0]?.id || 1;
+  state.paymentInfo = paymentInfo;
 
   const presetSlug = params.get('service');
   if (presetSlug) {
@@ -88,7 +91,7 @@ function renderService() {
 }
 
 function renderPackage() {
-  const pkgs = state.service.packages || [];
+  const pkgs = state.service?.packages || [];
   return `
     <div class="step-label">Step 2 — Select Package</div>
     <h2 style="margin-bottom:24px;">${state.service.name}</h2>
@@ -200,12 +203,12 @@ function renderDetails() {
   return `
     <div class="step-label">Step 5 — Your Details</div>
     <h2 style="margin-bottom:24px;">Tell us about the session</h2>
-    <div class="field"><label>Full name</label><input id="f-name" value="${state.client.name || ''}"></div>
-    <div class="field"><label>WhatsApp / phone</label><input id="f-phone" value="${state.client.phone || ''}"></div>
-    <div class="field"><label>Email (optional)</label><input id="f-email" value="${state.client.email || ''}"></div>
-    <div class="field"><label>Country</label><input id="f-country" value="${state.client.country || ''}"></div>
+    <div class="field"><label>Full Name *</label><input id="f-name" value="${state.client.name || ''}" placeholder="e.g. Ahmad Fauzi"></div>
+    <div class="field"><label>WhatsApp / Phone Number *</label><input id="f-phone" value="${state.client.phone || ''}" placeholder="+62 812 3456 7890 / +966 50 123 4567"></div>
+    <div class="field"><label>Email (optional)</label><input id="f-email" value="${state.client.email || ''}" placeholder="name@example.com"></div>
+    <div class="field"><label>Country of Residence</label><input id="f-country" value="${state.client.country || ''}" placeholder="Indonesia / Malaysia / Saudi Arabia"></div>
     <div class="field">
-      <label>Location</label>
+      <label>Location in Madinah</label>
       <select id="f-location">
         ${state.locations.map(l => `<option value="${l.id}" ${state.locationId == l.id ? 'selected' : ''}>${l.name}</option>`).join('')}
       </select>
@@ -216,59 +219,152 @@ function renderDetails() {
         ${['Umrah','Anniversary','Honeymoon','Family Trip','Birthday','Couple Trip','Personal Memories','Other'].map(o => `<option ${state.photoshoot.occasion===o?'selected':''}>${o}</option>`).join('')}
       </select>
     </div>
-    <div class="field"><label>Number of people</label><input id="f-people" type="number" min="1" value="${state.photoshoot.people || 1}"></div>
+    <div class="field"><label>Number of People</label><input id="f-people" type="number" min="1" value="${state.photoshoot.people || 1}"></div>
     <div class="field">
-      <label>Preferred style</label>
+      <label>Preferred Style</label>
       <select id="f-style">
         ${['Editorial','Natural','Cinematic','Candid','Traditional'].map(o => `<option ${state.photoshoot.style===o?'selected':''}>${o}</option>`).join('')}
       </select>
     </div>
-    <div class="field"><label>Special request</label><textarea id="f-request">${state.photoshoot.request || ''}</textarea></div>
+    <div class="field"><label>Special Requests / Notes</label><textarea id="f-request" placeholder="Hotel pickup, specific timing, or props needed...">${state.photoshoot.request || ''}</textarea></div>
     <div class="actions-row"><button class="btn btn-ghost" id="back">Back</button><button class="btn btn-primary" id="next">Continue to Payment</button></div>
   `;
+}
+
+function compressReceiptImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width, height = img.height;
+        if (width > 1200) {
+          height = Math.round((height * 1200) / width);
+          width = 1200;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => resolve(e.target.result);
+    };
+    reader.onerror = () => resolve('');
+  });
 }
 
 function renderPayment() {
   const p = state.package;
   const deposit = Math.round(p.price * p.deposit_percentage / 100);
+  const info = state.paymentInfo || {};
+  const rate = info.bankIDR?.rate || 4200;
+  const depositIDR = (deposit * rate).toLocaleString('id-ID');
+
   return `
-    <div class="step-label">Step 6 — Payment</div>
-    <h2 style="margin-bottom:24px;">Review &amp; confirm</h2>
+    <div class="step-label">Step 6 — Payment & Verification</div>
+    <h2 style="margin-bottom:24px;">Review &amp; Transfer Deposit</h2>
+    
     <div class="summary-line"><span>Service</span><span>${state.service.name}</span></div>
-    <div class="summary-line"><span>Package</span><span>${p.name}</span></div>
-    <div class="summary-line"><span>Date</span><span>${state.date}</span></div>
-    <div class="summary-line"><span>Time</span><span>${state.time}</span></div>
-    <div class="summary-line"><span>Total</span><span>${p.currency} ${p.price}</span></div>
-    <div class="summary-line" style="font-weight:600;"><span>Deposit due now (${p.deposit_percentage}%)</span><span>${p.currency} ${deposit}</span></div>
-    <div class="field" style="margin-top:24px;">
-      <label>Payment method</label>
-      <select id="f-payment-method">
-        <option value="BANK_TRANSFER">Manual Bank Transfer</option>
-        <option value="GATEWAY">Payment Gateway (demo)</option>
-      </select>
+    <div class="summary-line"><span>Package</span><span>${p.name} (${p.duration_minutes} min)</span></div>
+    <div class="summary-line"><span>Date &amp; Time</span><span>${state.date} at ${state.time}</span></div>
+    <div class="summary-line"><span>Total Investment</span><span>${p.currency} ${p.price}</span></div>
+    <div class="summary-line" style="font-weight:600; color:var(--charcoal); background:rgba(212,175,55,0.08); padding:12px 10px;">
+      <span>Deposit Due Now (${p.deposit_percentage}%)</span>
+      <span style="font-size:1.15rem; color:#8A5A1E;">${p.currency} ${deposit} <span style="font-size:0.85rem; font-weight:normal;">(~Rp ${depositIDR})</span></span>
     </div>
-    <p style="font-size:0.78rem; color:var(--charcoal-soft); margin-top:8px;">This is a prototype checkout — no real payment is processed. See README for gateway integration notes.</p>
-    <div class="actions-row"><button class="btn btn-ghost" id="back">Back</button><button class="btn btn-primary" id="confirm">Confirm Booking</button></div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.15rem; margin:28px 0 12px;">Bank Transfer Details</h3>
+    <p style="font-size:0.84rem; color:var(--charcoal-soft); margin-bottom:16px;">Silakan transfer uang muka (deposit) ke salah satu rekening resmi di bawah ini:</p>
+
+    <!-- Bank Accounts Grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:28px;">
+      <!-- Saudi Bank Account -->
+      <div style="background:#fff; border:1px solid var(--line); border-left:4px solid var(--gold); padding:16px; border-radius:4px;">
+        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇸🇦 Saudi Arabia / SAR (Al Rajhi)</div>
+        <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankSAR?.name || 'Al Rajhi Bank'}</strong>
+        <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
+          <span>${info.bankSAR?.account || 'SA8480000123456789012345'}</span>
+          <button type="button" onclick="copyText('${info.bankSAR?.account || 'SA8480000123456789012345'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:var(--gold-soft);">📋 Copy</button>
+        </div>
+        <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankSAR?.holder || 'Al-Madani Photography'}</div>
+      </div>
+
+      <!-- Indonesian Bank Account -->
+      <div style="background:#fff; border:1px solid var(--line); border-left:4px solid #3E5B2A; padding:16px; border-radius:4px;">
+        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇮🇩 Indonesia / Rupiah (BSI / BCA)</div>
+        <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankIDR?.name || 'Bank Syariah Indonesia (BSI) / BCA'}</strong>
+        <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
+          <span>${info.bankIDR?.account || '7123456789 (BSI)'}</span>
+          <button type="button" onclick="copyText('${info.bankIDR?.account || '7123456789'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:#3E5B2A;">📋 Copy</button>
+        </div>
+        <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankIDR?.holder || 'Al-Madani Photography'}</div>
+      </div>
+    </div>
+
+    <!-- Upload Screenshot Transfer Proof -->
+    <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Upload Bukti Transfer (Screenshot)</h3>
+    <div style="border:2px dashed rgba(212,175,55,0.4); background:#fff; padding:20px; text-align:center; border-radius:6px; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('proof-file-input').click()">
+      <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
+      <div style="font-size:1.8rem; margin-bottom:4px;">📸</div>
+      <strong style="display:block; font-size:0.92rem; color:var(--charcoal);">Klik untuk memilih screenshot / bukti transfer dari HP/Laptop</strong>
+      <span style="font-size:0.78rem; color:var(--charcoal-soft);">Format JPG, PNG, atau WEBP</span>
+      <div>
+        <img id="proof-preview" src="${state.paymentProof || ''}" style="max-height:160px; max-width:100%; border-radius:4px; margin-top:10px; display:${state.paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-ghost" id="back">Back</button>
+      <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:600;">Confirm Booking &amp; Continue →</button>
+    </div>
   `;
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text);
+  const old = btn.textContent;
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => { btn.textContent = old; }, 2000);
 }
 
 function renderConfirmation() {
   if (!state.result) return `<div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">Processing…</div>`;
   const r = state.result;
+  const waUrl = r.whatsappUrl || '#';
+
   return `
     <div style="text-align:center; margin-bottom:36px;">
-      <p class="eyebrow">Booking Confirmed</p>
-      <h1 style="font-size:2.2rem; margin-top:10px;">${r.bookingCode}</h1>
+      <div style="display:inline-block; background:#DCE8D0; color:#3E5B2A; font-size:0.76rem; font-weight:600; padding:4px 14px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;">Booking Received</div>
+      <h1 style="font-size:2.4rem; margin-top:4px; color:var(--charcoal);">${r.bookingCode}</h1>
+      <p style="color:var(--charcoal-soft); font-size:0.95rem; margin-top:8px;">Terima kasih ${state.client.name || ''}, reservasi sesi foto Anda telah terdata di sistem kami.</p>
     </div>
-    <div class="manifest">
-      <div class="manifest-row"><span>Service</span><span></span><span>${state.service.name}</span></div>
-      <div class="manifest-row"><span>Date</span><span></span><span>${r.date}</span></div>
-      <div class="manifest-row"><span>Time</span><span></span><span>${r.startTime} – ${r.endTime}</span></div>
-      <div class="manifest-row"><span>Payment</span><span></span><span>Deposit ${r.currency} ${r.depositAmount} due</span></div>
+
+    <div class="manifest" style="margin-bottom:32px;">
+      <div class="manifest-row"><span>Service</span><span></span><span>${state.service.name} (${state.package.name})</span></div>
+      <div class="manifest-row"><span>Date &amp; Time</span><span></span><span>${r.date} · ${r.startTime} – ${r.endTime}</span></div>
+      <div class="manifest-row"><span>Deposit</span><span></span><span>${r.currency} ${r.depositAmount}</span></div>
+      <div class="manifest-row"><span>Status</span><span></span><span style="color:#8A5A1E; font-weight:600;">Menunggu Verifikasi Admin</span></div>
     </div>
+
+    <!-- Direct WhatsApp CTA Box -->
+    <div style="background: linear-gradient(135deg, #128C7E 0%, #075E54 100%); color:#fff; padding:28px 24px; border-radius:8px; text-align:center; margin-bottom:32px; box-shadow: 0 10px 25px rgba(18,140,126,0.25);">
+      <div style="font-size:2rem; margin-bottom:6px;">💬</div>
+      <h3 style="color:#fff; font-size:1.3rem; margin-bottom:8px;">Kirim Konfirmasi Langsung ke WhatsApp</h3>
+      <p style="color:rgba(255,255,255,0.85); font-size:0.88rem; max-width:500px; margin:0 auto 20px;">
+        Klik tombol hijau di bawah ini untuk membuka WhatsApp otomatis dengan format konfirmasi booking &amp; konfirmasi bukti transfer kepada fotografer.
+      </p>
+      <a class="btn" href="${waUrl}" target="_blank" style="background:#25D366; color:#121210; font-weight:700; padding:14px 28px; font-size:1rem; border-radius:4px; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+        <span style="font-size:1.2rem;">📱</span> Buka WhatsApp &amp; Kirim Bukti
+      </a>
+    </div>
+
     <div class="actions-row" style="justify-content:center; gap:14px;">
-      <a class="btn btn-ghost" href="/my-booking.html?code=${r.bookingCode}">View Booking</a>
-      <a class="btn btn-primary" href="/">Return Home</a>
+      <a class="btn btn-ghost" href="/my-booking.html?code=${r.bookingCode}">View Booking Details</a>
+      <a class="btn btn-ghost" href="/">Return to Homepage</a>
     </div>
   `;
 }
@@ -306,10 +402,10 @@ function bindStep(stepName) {
   if (stepName === 'DETAILS') {
     document.getElementById('next')?.addEventListener('click', () => {
       state.client = {
-        name: document.getElementById('f-name').value,
-        phone: document.getElementById('f-phone').value,
-        email: document.getElementById('f-email').value,
-        country: document.getElementById('f-country').value,
+        name: document.getElementById('f-name').value.trim(),
+        phone: document.getElementById('f-phone').value.trim(),
+        email: document.getElementById('f-email').value.trim(),
+        country: document.getElementById('f-country').value.trim(),
       };
       state.locationId = document.getElementById('f-location').value;
       state.photoshoot = {
@@ -319,7 +415,7 @@ function bindStep(stepName) {
         request: document.getElementById('f-request').value,
       };
       if (!state.client.name || !state.client.phone) {
-        state.error = 'Please provide your name and phone number.';
+        state.error = 'Please provide your full name and WhatsApp / phone number.';
         render();
         return;
       }
@@ -328,9 +424,21 @@ function bindStep(stepName) {
   }
 
   if (stepName === 'PAYMENT') {
+    const proofInput = document.getElementById('proof-file-input');
+    const proofPreview = document.getElementById('proof-preview');
+
+    proofInput?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const dataUrl = await compressReceiptImage(file);
+      state.paymentProof = dataUrl;
+      proofPreview.src = dataUrl;
+      proofPreview.style.display = 'inline-block';
+    });
+
     document.getElementById('confirm')?.addEventListener('click', async () => {
       const btn = document.getElementById('confirm');
-      btn.disabled = true; btn.textContent = 'Booking…';
+      btn.disabled = true; btn.textContent = 'Processing Reservation…';
       try {
         const res = await fetch('/api/bookings', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -348,13 +456,13 @@ function bindStep(stepName) {
             numberOfPeople: state.photoshoot.people,
             stylePreference: state.photoshoot.style,
             specialRequest: state.photoshoot.request,
+            paymentProof: state.paymentProof,
           }),
         });
         const data = await res.json();
         if (!res.ok) {
           state.error = data.error;
           if (data.error && data.error.includes('no longer available')) {
-            // Slot was taken between selection and submit — bounce back to TIME.
             goto(3);
           } else {
             render();

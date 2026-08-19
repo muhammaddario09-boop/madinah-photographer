@@ -119,7 +119,8 @@ router.get('/dashboard', (req, res) => {
 
 router.get('/bookings', (req, res) => {
   const { status, from, to } = req.query;
-  let sql = `SELECT b.*, c.name AS client_name, c.phone AS client_phone, s.name AS service_name, p.name AS photographer_name
+  let sql = `SELECT b.*, c.name AS client_name, c.phone AS client_phone, s.name AS service_name, p.name AS photographer_name,
+             (SELECT proof_url FROM payments WHERE booking_id=b.id AND proof_url IS NOT NULL ORDER BY id DESC LIMIT 1) AS proof_url
              FROM bookings b
              JOIN clients c ON c.id=b.client_id
              JOIN services s ON s.id=b.service_id
@@ -276,15 +277,23 @@ router.delete('/portfolio/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// --- Photographer Profile Manager ---
-router.get('/photographer', (req, res) => {
-  const p = db.prepare(`SELECT * FROM photographers LIMIT 1`).get();
-  res.json(p || {});
+// --- Settings Manager (WhatsApp & Bank Accounts) ---
+router.get('/settings', (req, res) => {
+  const rows = db.prepare(`SELECT key, value FROM settings`).all();
+  const map = {};
+  rows.forEach(r => { map[r.key] = r.value; });
+  res.json(map);
 });
 
-router.put('/photographer', (req, res) => {
-  const { name, bio, avatar_url } = req.body;
-  db.prepare(`UPDATE photographers SET name=?, bio=?, avatar_url=? WHERE id=1`).run(name, bio, avatar_url);
+router.put('/settings', (req, res) => {
+  const settings = req.body || {};
+  const upsert = db.prepare(
+    `INSERT INTO settings (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value=excluded.value`
+  );
+  for (const [key, val] of Object.entries(settings)) {
+    upsert.run(key, String(val));
+  }
   res.json({ ok: true });
 });
 

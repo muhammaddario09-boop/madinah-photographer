@@ -30,18 +30,21 @@ async function draw(status) {
       </select>
     </div>
     <table class="admin-table">
-      <thead><tr><th>Booking</th><th>Date</th><th>Client</th><th>Service</th><th>Photographer</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th>Booking</th><th>Date</th><th>Client</th><th>Service</th><th>Payment</th><th>Status</th><th></th></tr></thead>
       <tbody>
         ${bookings.map(b => `
           <tr>
-            <td>${b.booking_code}</td>
-            <td>${b.date} ${b.start_time}</td>
+            <td><strong>${b.booking_code}</strong></td>
+            <td>${b.date}<br><span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.start_time} - ${b.end_time}</span></td>
             <td>${b.client_name}<br><span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.client_phone}</span></td>
             <td>${b.service_name}</td>
-            <td>${b.photographer_name}</td>
+            <td>
+              <div>${b.currency} ${b.deposit_amount} <span style="font-size:0.72rem; color:var(--charcoal-soft);">(Deposit)</span></div>
+              ${b.proof_url ? `<button type="button" onclick="showProof('${b.booking_code}', '${encodeURIComponent(b.proof_url)}')" style="margin-top:4px; padding:3px 8px; font-size:0.7rem; background:#DCE8D0; color:#3E5B2A; border:1px solid #c0d8ac; border-radius:2px; cursor:pointer;">📸 View Proof</button>` : '<span style="font-size:0.72rem; color:var(--charcoal-soft);">No proof</span>'}
+            </td>
             <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
             <td>
-              <select data-id="${b.id}" data-current="${b.status}" class="status-select">
+              <select data-id="${b.id}" data-current="${b.status}" class="status-select" style="font-size:0.8rem; padding:4px 6px;">
                 <option value="">Change status…</option>
                 ${STATUSES.map(s => `<option value="${s}">${s.replace('_',' ')}</option>`).join('')}
               </select>
@@ -50,6 +53,25 @@ async function draw(status) {
         `).join('')}
       </tbody>
     </table>
+
+    <!-- Modal for Payment Proof Preview -->
+    <div id="proof-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+      <div style="background:#fff; padding:24px; border-radius:6px; max-width:500px; width:90%; max-height:85vh; overflow-y:auto; text-align:center; position:relative;">
+        <h3 id="modal-title" style="margin-bottom:14px; font-family:var(--font-display);">Payment Proof</h3>
+        <img id="modal-img" style="max-width:100%; max-height:60vh; border-radius:4px; border:1px solid var(--line); object-fit:contain;">
+        <div style="margin-top:16px;">
+          <button class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Close Preview</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  window.showProof = function(code, encodedUrl) {
+    const modal = document.getElementById('proof-modal');
+    document.getElementById('modal-title').textContent = `Payment Proof — ${code}`;
+    document.getElementById('modal-img').src = decodeURIComponent(encodedUrl);
+    modal.style.display = 'flex';
+  };
   `;
   document.getElementById('status-filter').addEventListener('change', (e) => draw(e.target.value));
   document.querySelectorAll('.status-select').forEach(sel => {
