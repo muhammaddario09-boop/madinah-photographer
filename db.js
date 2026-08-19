@@ -4,18 +4,17 @@ const Database = require('better-sqlite3');
 
 const DB_PATH = process.env.DB_PATH || (process.env.VERCEL ? path.join('/tmp', 'data.sqlite') : path.join(__dirname, 'data.sqlite'));
 
-if (process.env.VERCEL && !fs.existsSync(DB_PATH)) {
-  const localDb = path.join(__dirname, 'data.sqlite');
-  if (fs.existsSync(localDb)) {
-    try { fs.copyFileSync(localDb, DB_PATH); } catch(e) {}
-  }
-}
-
-const isNew = !fs.existsSync(DB_PATH);
-const db = new Database(DB_PATH);
+let db;
 try {
-  db.pragma(process.env.VERCEL ? 'journal_mode = DELETE' : 'journal_mode = WAL');
-} catch(e) {}
+  db = new Database(DB_PATH);
+  if (process.env.VERCEL) {
+    try { db.pragma('journal_mode = DELETE'); } catch(e) {}
+  }
+} catch(err) {
+  // If opening failed (e.g. corrupted or locked), fallback to clean /tmp or memory
+  const fallbackPath = process.env.VERCEL ? `/tmp/data_${Date.now()}.sqlite` : ':memory:';
+  db = new Database(fallbackPath);
+}
 
 const { hashPassword } = require('./lib/auth');
 
@@ -25,9 +24,7 @@ db.exec(schema);
 // Migration: add proof_url column to payments if not present
 try {
   db.exec(`ALTER TABLE payments ADD COLUMN proof_url TEXT;`);
-} catch (e) {
-  // column already exists
-}
+} catch (e) {}
 
 function ensureSettings() {
   const defaults = {
@@ -61,10 +58,14 @@ function ensureAdminUser() {
     const adminPass = process.env.ADMIN_PASSWORD || 'AdminMadinah2026!';
     const passwordHash = hashPassword(adminPass);
     db.prepare(`INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'ADMIN')`).run(adminEmail, passwordHash);
-    console.log(`Created default admin user: ${adminEmail}`);
   }
 }
 ensureAdminUser();
+
+const photogCount = db.prepare(`SELECT COUNT(*) as count FROM photographers`).get().count;
+if (photogCount === 0) {
+  seed();
+}
 
 function ensureSampleBooking() {
   const existing = db.prepare(`SELECT id FROM bookings WHERE booking_code='MDN-2026-0001'`).get();
@@ -88,16 +89,6 @@ function ensureSampleBooking() {
 }
 ensureSampleBooking();
 
-if (isNew) seed();
-
-// Ensure photographer name is updated to UMROH LENS
-try {
-  const currentPhotographer = db.prepare(`SELECT id, name FROM photographers LIMIT 1`).get();
-  if (currentPhotographer && (currentPhotographer.name === 'Yusuf Al-Madani' || !currentPhotographer.name)) {
-    db.prepare(`UPDATE photographers SET name='UMROH LENS' WHERE id=?`).run(currentPhotographer.id);
-  }
-} catch(e) {}
-
 function seed() {
   const insertPhotographer = db.prepare(
     `INSERT INTO photographers (name, bio, avatar_url) VALUES (?,?,?)`
@@ -109,7 +100,6 @@ function seed() {
   );
   const photographerId = p.lastInsertRowid;
 
-  // Weekly schedule per spec section 13.
   const weekly = [
     [0, 0, '08:00', '20:00'], // Sunday
     [1, 0, '08:00', '20:00'], // Monday
@@ -163,31 +153,6 @@ function seed() {
     ['Hotel', 'In-hotel or hotel-lobby session.', 10],
     ['Private Location', 'A location you specify.', 30],
   ].forEach((l) => insertLocation.run(...l));
-
-  const insertOrIgnore = db.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`);
-  insertOrIgnore.run('min_booking_notice_hours', '12');
-  insertOrIgnore.run('max_booking_window_days', '90');
-  insertOrIgnore.run('cancellation_deadline_hours', '48');
-  insertOrIgnore.run('buffer_minutes', '30');
-  insertOrIgnore.run('max_sessions_per_day', '8');
-
-  // Seed sample client & booking
-  const insertClient = db.prepare(`INSERT INTO clients (name, email, phone, country) VALUES (?,?,?,?)`);
-  const clientInfo = insertClient.run('Ahmad Dahlan', 'ahmad@example.com', '+628123456789', 'Indonesia');
-
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const insertBooking = db.prepare(
-    `INSERT INTO bookings (booking_code, photographer_id, client_id, service_id, package_id, location_id, date, start_time, end_time, total_price, deposit_amount, currency, status, payment_status, occasion, number_of_people)
-     VALUES (?, 1, ?, 1, 1, 1, ?, '16:00', '17:00', 650, 195, 'SAR', 'CONFIRMED', 'DEPOSIT_PAID', 'Umrah', 2)`
-  );
-  const bInfo = insertBooking.run('MDN-2026-0001', clientInfo.lastInsertRowid, todayStr);
-
-  db.prepare(
-    `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference)
-     VALUES (?, 195, 'SAR', 'BANK_TRANSFER', 'DEPOSIT', 'PAID', 'DP Transfer BSI')`
-  ).run(bInfo.lastInsertRowid);
-
-  console.log('Seeded database with 1 photographer, 6 services, 18 packages, 6 locations.');
 }
 
 module.exports = db;

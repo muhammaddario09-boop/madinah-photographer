@@ -5,7 +5,7 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["db/**", "lib/**", "routes/**", "public/**", "data.sqlite"]
+        "includeFiles": ["db/**", "lib/**", "routes/**", "public/**"]
       }
     }
   ],
