@@ -117,7 +117,15 @@ router.get('/dashboard', (req, res) => {
   res.json({ todayShoots, upcoming, pendingPayments, revenue });
 });
 
-router.get('/bookings', (req, res) => {
+const { syncCloudBookingsToDb, recordBookingToCloud } = require('../lib/cloudStore');
+
+router.get('/bookings', async (req, res) => {
+  try {
+    await syncCloudBookingsToDb(db);
+  } catch (e) {
+    console.error('Cloud sync error on /bookings:', e.message);
+  }
+
   const { status, from, to } = req.query;
   let sql = `SELECT b.*, c.name AS client_name, c.phone AS client_phone, s.name AS service_name, p.name AS photographer_name,
              (SELECT proof_url FROM payments WHERE booking_id=b.id AND proof_url IS NOT NULL ORDER BY id DESC LIMIT 1) AS proof_url
@@ -130,7 +138,7 @@ router.get('/bookings', (req, res) => {
   if (status) { sql += ` AND b.status=?`; params.push(status); }
   if (from) { sql += ` AND b.date>=?`; params.push(from); }
   if (to) { sql += ` AND b.date<=?`; params.push(to); }
-  sql += ` ORDER BY b.date, b.start_time`;
+  sql += ` ORDER BY b.date DESC, b.start_time DESC`;
   res.json(db.prepare(sql).all(...params));
 });
 
@@ -143,16 +151,26 @@ router.get('/bookings/:id', (req, res) => {
   res.json({ booking, client, history, payments });
 });
 
-router.post('/bookings/:id/status', (req, res) => {
+router.post('/bookings/:id/status', async (req, res) => {
   try {
     const updated = setStatus(db, Number(req.params.id), req.body.status, 'admin', req.body.note || '');
+    const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(req.params.id);
+    if (b) {
+      recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status }).catch(() => {});
+    }
     res.json({ ok: true, from: updated.status, to: req.body.status });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });
   }
 });
 
-router.get('/calendar', (req, res) => {
+router.get('/calendar', async (req, res) => {
+  try {
+    await syncCloudBookingsToDb(db);
+  } catch (e) {
+    console.error('Cloud sync error on /calendar:', e.message);
+  }
+
   const { from, to, photographerId } = req.query;
   let sql = `SELECT b.id, b.booking_code, b.date, b.start_time, b.end_time, b.status,
              c.name AS client_name, s.name AS service_name, p.name AS photographer_name

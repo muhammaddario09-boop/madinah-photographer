@@ -166,6 +166,35 @@ router.post('/bookings', (req, res) => {
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
+const { recordBookingToCloud, syncCloudBookingsToDb } = require('../lib/cloudStore');
+
+    // Record to central cloud datastore
+    recordBookingToCloud({
+      booking_code: result.bookingCode,
+      client_name: b.clientName,
+      client_email: b.clientEmail,
+      client_phone: b.clientPhone,
+      client_country: b.clientCountry || 'Indonesia',
+      service_id: b.serviceId,
+      service_name: service.name,
+      package_id: b.packageId,
+      package_name: pkg.name,
+      location_id: b.locationId,
+      location_name: location ? location.name : 'Madinah Area',
+      date: b.date,
+      start_time: b.startTime,
+      end_time: result.endTime,
+      total_price: pkg.price,
+      deposit_amount: depositAmount,
+      currency: pkg.currency,
+      status: 'PENDING',
+      payment_status: b.paymentProof ? 'DEPOSIT_PAID' : 'PENDING',
+      occasion: b.occasion || 'Umrah',
+      number_of_people: b.numberOfPeople || 1,
+      proof_url: b.paymentProof || null,
+      created_at: new Date().toISOString()
+    }).catch(err => console.error('Cloud sync error:', err.message));
+
     res.status(201).json({
       bookingCode: result.bookingCode,
       id: result.id,
@@ -184,9 +213,13 @@ router.post('/bookings', (req, res) => {
   }
 });
 
-router.get('/bookings/:code', (req, res) => {
+router.get('/bookings/:code', async (req, res) => {
   try {
-    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    let booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    if (!booking) {
+      await syncCloudBookingsToDb(db);
+      booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    }
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
     const service = booking.service_id ? db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id) : null;
     const pkg = booking.package_id ? db.prepare(`SELECT * FROM packages WHERE id=?`).get(booking.package_id) : null;
