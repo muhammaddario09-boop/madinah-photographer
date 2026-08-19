@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:26:41.199Z",
+  "lastUpdated": "2026-08-19T14:31:34.226Z",
   "count": 3,
   "bookings": [
     {
@@ -57,7 +57,7 @@
       "total_price": 650,
       "deposit_amount": 195,
       "currency": "SAR",
-      "status": "PENDING",
+      "status": "CONFIRMED",
       "payment_status": "DEPOSIT_PAID",
       "occasion": "Umrah Audit",
       "number_of_people": 2,
