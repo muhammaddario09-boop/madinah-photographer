@@ -150,7 +150,7 @@ router.post('/bookings', (req, res) => {
     const waNumber = (waSetting ? waSetting.value : '+966501234567').replace(/[^0-9]/g, '');
 
     const waText = [
-      `Assalamu'alaikum Al-Madani Photography,`,
+      `Assalamu'alaikum UMROH LENS,`,
       `Saya ingin konfirmasi reservasi sesi foto di Madinah:`,
       ``,
       `📋 *Booking Code*: ${result.bookingCode}`,

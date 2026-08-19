@@ -43,7 +43,7 @@ const I18N_DICTIONARY = {
     booking_code_label: 'Your Booking Code',
     deposit_label: 'Required Deposit (30%)',
     total_label: 'Total Investment',
-    footer_rights: '© 2026 Al-Madani Photography, Madinah. All rights reserved.',
+    footer_rights: '© 2026 UMROH LENS, Madinah. All rights reserved.',
     cat_all: 'All Categories',
     cat_portrait: 'Portrait',
     cat_couple: 'Couple',

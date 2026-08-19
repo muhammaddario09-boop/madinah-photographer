@@ -92,7 +92,7 @@ function renderAdminNav(active) {
   document.write(`
     <div class="admin-shell">
       <aside class="admin-sidebar">
-        <span class="brand">Al-Madani <span style="color:var(--gold-soft)">Admin</span></span>
+        <span class="brand">UMROH LENS <span style="color:var(--gold-soft)">Admin</span></span>
         
         <div style="margin-bottom: 24px; padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 0.78rem;">
           <div style="opacity: 0.6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.68rem;">Logged in as</div>

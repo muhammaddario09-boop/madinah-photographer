@@ -3,6 +3,14 @@ const fs = require('fs');
 const Database = require('better-sqlite3');
 
 const DB_PATH = process.env.DB_PATH || (process.env.VERCEL ? path.join('/tmp', 'data.sqlite') : path.join(__dirname, 'data.sqlite'));
+
+if (process.env.VERCEL && !fs.existsSync(DB_PATH)) {
+  const localDb = path.join(__dirname, 'data.sqlite');
+  if (fs.existsSync(localDb)) {
+    try { fs.copyFileSync(localDb, DB_PATH); } catch(e) {}
+  }
+}
+
 const isNew = !fs.existsSync(DB_PATH);
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
@@ -21,6 +29,7 @@ try {
 
 function ensureSettings() {
   const defaults = {
+    'studio_name': 'UMROH LENS',
     'min_booking_notice_hours': '12',
     'max_booking_window_days': '90',
     'cancellation_deadline_hours': '48',
@@ -29,10 +38,10 @@ function ensureSettings() {
     'admin_whatsapp': process.env.ADMIN_WHATSAPP || '+966501234567',
     'bank_sar_name': 'Al Rajhi Bank (Saudi Arabia)',
     'bank_sar_account': 'SA84 8000 0123 4567 8901 2345',
-    'bank_sar_holder': 'Al-Madani Photography Studio',
+    'bank_sar_holder': 'UMROH LENS Photography Studio',
     'bank_idr_name': 'Bank Syariah Indonesia (BSI) / BCA',
     'bank_idr_account': '7123456789 (BSI) / 5420123456 (BCA)',
-    'bank_idr_holder': 'Al-Madani Photography',
+    'bank_idr_holder': 'UMROH LENS Photography',
     'idr_sar_rate': '4200'
   };
 
@@ -57,13 +66,21 @@ ensureAdminUser();
 
 if (isNew) seed();
 
+// Ensure photographer name is updated to UMROH LENS
+try {
+  const currentPhotographer = db.prepare(`SELECT id, name FROM photographers LIMIT 1`).get();
+  if (currentPhotographer && (currentPhotographer.name === 'Yusuf Al-Madani' || !currentPhotographer.name)) {
+    db.prepare(`UPDATE photographers SET name='UMROH LENS' WHERE id=?`).run(currentPhotographer.id);
+  }
+} catch(e) {}
+
 function seed() {
   const insertPhotographer = db.prepare(
     `INSERT INTO photographers (name, bio, avatar_url) VALUES (?,?,?)`
   );
   const p = insertPhotographer.run(
-    'Yusuf Al-Madani',
-    'Editorial photographer based in Madinah, specializing in pilgrimage, portrait, and golden-hour storytelling around the Prophet\'s Mosque.',
+    'UMROH LENS',
+    'Professional editorial & pilgrimage photography studio based in Madinah Al-Munawwarah. Specializing in Umrah moments, couple portraits, family memories, and golden-hour sessions around Masjid Nabawi.',
     '/img/photographer-1.jpg'
   );
   const photographerId = p.lastInsertRowid;
