@@ -245,7 +245,11 @@ router.get('/bookings/:code', async (req, res) => {
 
 router.post('/bookings/:code/reschedule', async (req, res) => {
   try {
-    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    let booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    if (!booking) {
+      await syncCloudBookingsToDb(db);
+      booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    }
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
     const buffer = bufferMinutes(db);
     const updated = reschedule(db, booking.id, { date: req.body.date, startTime: req.body.startTime, bufferMinutes: buffer }, 'client');
