@@ -64,6 +64,28 @@ function ensureAdminUser() {
 }
 ensureAdminUser();
 
+function ensureSampleBooking() {
+  const existing = db.prepare(`SELECT id FROM bookings WHERE booking_code='MDN-2026-0001'`).get();
+  if (!existing) {
+    let client = db.prepare(`SELECT id FROM clients WHERE email='ahmad@example.com'`).get();
+    if (!client) {
+      const res = db.prepare(`INSERT INTO clients (name, email, phone, country) VALUES (?,?,?,?)`).run('Ahmad Dahlan', 'ahmad@example.com', '+628123456789', 'Indonesia');
+      client = { id: res.lastInsertRowid };
+    }
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const bRes = db.prepare(
+      `INSERT INTO bookings (booking_code, photographer_id, client_id, service_id, package_id, location_id, date, start_time, end_time, total_price, deposit_amount, currency, status, payment_status, occasion, number_of_people)
+       VALUES (?, 1, ?, 1, 1, 1, ?, '16:00', '17:00', 650, 195, 'SAR', 'CONFIRMED', 'DEPOSIT_PAID', 'Umrah', 2)`
+    ).run('MDN-2026-0001', client.id, todayStr);
+    
+    db.prepare(
+      `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference)
+       VALUES (?, 195, 'SAR', 'BANK_TRANSFER', 'DEPOSIT', 'PAID', 'DP Transfer BSI')`
+    ).run(bRes.lastInsertRowid);
+  }
+}
+ensureSampleBooking();
+
 if (isNew) seed();
 
 // Ensure photographer name is updated to UMROH LENS
