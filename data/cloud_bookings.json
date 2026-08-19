@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T15:01:18.559Z",
+  "lastUpdated": "2026-08-19T15:06:28.625Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -114,10 +114,10 @@
   "services": [],
   "portfolio": [
     {
-      "id": 1,
-      "image_url": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa",
-      "title": "Masjid Nabawi Courtyard",
-      "category": "Nabawi",
+      "id": 9,
+      "image_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "title": "Nabawi Sunset Reflection Test",
+      "category": "Golden Hour",
       "description": "",
       "location": "Madinah",
       "featured": 1,
@@ -125,7 +125,7 @@
       "active": 1
     },
     {
-      "id": 2,
+      "id": 1,
       "image_url": "/img/service-golden-hour.jpg",
       "title": "Golden Hour at Masjid Nabawi",
       "category": "Masjid Nabawi",
@@ -136,7 +136,7 @@
       "active": 1
     },
     {
-      "id": 3,
+      "id": 2,
       "image_url": "/img/service-couple.jpg",
       "title": "Serene Couple Portrait",
       "category": "Couple",
@@ -147,7 +147,7 @@
       "active": 1
     },
     {
-      "id": 4,
+      "id": 3,
       "image_url": "/img/service-portrait.jpg",
       "title": "Individual Editorial Portrait",
       "category": "Portrait",
@@ -158,7 +158,7 @@
       "active": 1
     },
     {
-      "id": 5,
+      "id": 4,
       "image_url": "/img/service-family.jpg",
       "title": "Joyful Family Pilgrimage",
       "category": "Family",
@@ -169,7 +169,7 @@
       "active": 1
     },
     {
-      "id": 6,
+      "id": 5,
       "image_url": "/img/service-umrah.jpg",
       "title": "Moments of Quiet Reflection",
       "category": "Umrah",
@@ -180,7 +180,7 @@
       "active": 1
     },
     {
-      "id": 7,
+      "id": 6,
       "image_url": "/img/service-tour.jpg",
       "title": "Historic Mount Uhud Expedition",
       "category": "Uhud",
@@ -191,7 +191,7 @@
       "active": 1
     },
     {
-      "id": 8,
+      "id": 7,
       "image_url": "/img/service-reels.jpg",
       "title": "Cinematic 4K Moments",
       "category": "Cinematic",
@@ -202,7 +202,7 @@
       "active": 1
     },
     {
-      "id": 9,
+      "id": 8,
       "image_url": "/img/service-drone.jpg",
       "title": "Grand Aerial Landmark Perspective",
       "category": "Drone",
