@@ -1,6 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:51:08.569Z",
-  "count": 4,
+  "lastUpdated": "2026-08-19T14:53:56.561Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -101,5 +100,12 @@
       "proof_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
       "created_at": "2026-08-19T14:42:39.896Z"
     }
-  ]
+  ],
+  "settings": {
+    "admin_whatsapp": "+6281234567890",
+    "bank_idr_account": "7123456789 (BSI)",
+    "bank_idr_holder": "UMROH LENS Official"
+  },
+  "services": [],
+  "portfolio": []
 }
