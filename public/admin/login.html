@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Al-Madani Photography</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body.admin-login-page {
+    background-color: var(--charcoal);
+    color: var(--sand);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    margin: 0;
+    font-family: var(--font-body);
+  }
+
+  .login-card {
+    background: #1c1c1a;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 6px;
+    width: 100%;
+    max-width: 420px;
+    padding: 44px 36px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-brand {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .login-sub {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 32px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 8px;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 14px;
+    background: #282825;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    background: #2e2e2a;
+  }
+
+  .alert-error {
+    background: rgba(235, 87, 87, 0.12);
+    border: 1px solid rgba(235, 87, 87, 0.35);
+    color: #ff9b9b;
+    padding: 12px 14px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    color: #121210;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+  }
+
+  .btn-login:hover {
+    background: #e5be49;
+    transform: translateY(-1px);
+  }
+
+  .btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: #fff;
+  }
+</style>
+</head>
+<body class="admin-login-page">
+
+<div class="login-card">
+  <div class="login-brand">Al-Madani <span style="color:var(--gold-soft)">Admin</span></div>
+  <div class="login-sub">Sign in to manage bookings and availability</div>
+
+  <div id="error-alert" class="alert-error"></div>
+
+  <form id="login-form">
+    <div class="form-group">
+      <label for="email">Admin Email</label>
+      <input type="email" id="email" class="form-control" placeholder="admin@madinahphoto.com" required autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" class="form-control" placeholder="••••••••••••" required autocomplete="current-password">
+    </div>
+
+    <button type="submit" id="submit-btn" class="btn-login">Sign In to Dashboard</button>
+  </form>
+
+  <a href="/" class="back-link">← Return to Madinah Photographer Homepage</a>
+</div>
+
+<script src="/js/admin-nav.js"></script>
+<script>
+  // If already authenticated, redirect to dashboard
+  if (getAdminToken()) {
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = params.get('redirect') || '/admin/index.html';
+  }
+
+  const form = document.getElementById('login-form');
+  const errAlert = document.getElementById('error-alert');
+  const submitBtn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errAlert.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Authenticating...';
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed.');
+      }
+
+      // Save token and user details
+      setAdminToken(data.token, data.user);
+
+      // Redirect to target destination
+      const params = new URLSearchParams(window.location.search);
+      window.location.href = params.get('redirect') || '/admin/index.html';
+    } catch (err) {
+      errAlert.textContent = err.message;
+      errAlert.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In to Dashboard';
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -21,7 +21,7 @@
     <h2 style="font-family:var(--font-display); font-size:1.2rem; margin-bottom:14px;">Today's shoots</h2>
     <table class="admin-table" id="today-table"><tbody></tbody></table>
   `;
-  const kpis = await fetch('/api/admin/dashboard').then(r => r.json());
+  const kpis = await adminFetch('/api/admin/dashboard').then(r => r.json());
   document.getElementById('kpis').innerHTML = `
     <div class="kpi-card"><div class="kpi-label">Today's Shoots</div><div class="kpi-value">${kpis.todayShoots}</div></div>
     <div class="kpi-card"><div class="kpi-label">Upcoming Bookings</div><div class="kpi-value">${kpis.upcoming}</div></div>
@@ -29,7 +29,7 @@
     <div class="kpi-card"><div class="kpi-label">Revenue</div><div class="kpi-value">SAR ${kpis.revenue}</div></div>
   `;
   const today = new Date().toISOString().slice(0,10);
-  const bookings = await fetch(`/api/admin/bookings?from=${today}&to=${today}`).then(r => r.json());
+  const bookings = await adminFetch(`/api/admin/bookings?from=${today}&to=${today}`).then(r => r.json());
   const tbody = document.querySelector('#today-table tbody');
   tbody.innerHTML = bookings.length ? bookings.map(b => `
     <tr>

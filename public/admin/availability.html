@@ -18,8 +18,8 @@ const PHOTOGRAPHER_ID = 1; // single-photographer seed; extend with a picker for
 async function draw() {
   const main = document.getElementById('admin-main');
   const [rules, overrides] = await Promise.all([
-    fetch(`/api/admin/availability/rules?photographerId=${PHOTOGRAPHER_ID}`).then(r => r.json()),
-    fetch(`/api/admin/availability/overrides?photographerId=${PHOTOGRAPHER_ID}`).then(r => r.json()),
+    adminFetch(`/api/admin/availability/rules?photographerId=${PHOTOGRAPHER_ID}`).then(r => r.json()),
+    adminFetch(`/api/admin/availability/overrides?photographerId=${PHOTOGRAPHER_ID}`).then(r => r.json()),
   ]);
   main.innerHTML = `
     <h1 class="admin-h1">Availability Manager</h1>
@@ -75,7 +75,7 @@ async function draw() {
     });
     row.querySelector('.save-rule').addEventListener('click', async () => {
       const id = row.dataset.rule;
-      await fetch(`/api/admin/availability/rules/${id}`, {
+      await adminFetch(`/api/admin/availability/rules/${id}`, {
         method: 'PUT', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
           isOff: offCheck.checked,
@@ -90,7 +90,7 @@ async function draw() {
   document.getElementById('ov-add').addEventListener('click', async () => {
     const date = document.getElementById('ov-date').value;
     if (!date) return alert('Pick a date first.');
-    await fetch('/api/admin/availability/overrides', {
+    await adminFetch('/api/admin/availability/overrides', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         photographerId: PHOTOGRAPHER_ID,
@@ -106,7 +106,7 @@ async function draw() {
 
   document.querySelectorAll('.del-override').forEach(btn => {
     btn.addEventListener('click', async () => {
-      await fetch(`/api/admin/availability/overrides/${btn.dataset.id}`, { method: 'DELETE' });
+      await adminFetch(`/api/admin/availability/overrides/${btn.dataset.id}`, { method: 'DELETE' });
       draw();
     });
   });

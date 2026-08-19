@@ -15,7 +15,7 @@
 const STATUSES = ['PENDING','AWAITING_PAYMENT','CONFIRMED','RESCHEDULE_REQUESTED','COMPLETED','CANCELLED','NO_SHOW'];
 async function loadBookings(status) {
   const url = status ? `/api/admin/bookings?status=${status}` : '/api/admin/bookings';
-  return fetch(url).then(r => r.json());
+  return adminFetch(url).then(r => r.json());
 }
 async function draw(status) {
   const main = document.getElementById('admin-main');
@@ -55,7 +55,7 @@ async function draw(status) {
   document.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async (e) => {
       if (!e.target.value) return;
-      const res = await fetch(`/api/admin/bookings/${e.target.dataset.id}/status`, {
+      const res = await adminFetch(`/api/admin/bookings/${e.target.dataset.id}/status`, {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ status: e.target.value }),
       });

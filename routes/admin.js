@@ -3,18 +3,101 @@ const router = express.Router();
 const db = require('../db');
 const { setStatus } = require('../lib/bookingEngine');
 const { todayRiyadhISODate } = require('../lib/timezone');
+const { verifyPassword, hashPassword, generateToken, verifyToken } = require('../lib/auth');
 
-// NOTE ON AUTH: spec section 34 requires role-based auth (ADMIN /
-// PHOTOGRAPHER / CLIENT) with server-side enforcement on every route.
-// This build wires the `users` table and role column for that model, but
-// does not implement session/JWT middleware — see README "Known
-// limitations". requireAdmin() below is the seam to plug real auth into;
-// every admin route already calls it so wiring a real check is a one-line
-// change with no route rewrites needed.
+// Public Login Route
+router.post('/login', (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+
+  const user = db.prepare(`SELECT * FROM users WHERE email = ? COLLATE NOCASE`).get(email.trim());
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Invalid email or password.' });
+  }
+
+  if (user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied: Admin privileges required.' });
+  }
+
+  const token = generateToken({
+    id: user.id,
+    email: user.email,
+    role: user.role
+  });
+
+  res.json({
+    ok: true,
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role
+    }
+  });
+});
+
+// Middleware for Admin Authentication
 function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization || req.headers['x-admin-token'] || req.query.token;
+  let token = null;
+
+  if (authHeader) {
+    if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7).trim();
+    } else {
+      token = String(authHeader).trim();
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required. Please login.' });
+  }
+
+  const payload = verifyToken(token);
+  if (!payload || payload.role !== 'ADMIN') {
+    return res.status(401).json({ error: 'Invalid or expired session. Please login again.' });
+  }
+
+  const user = db.prepare(`SELECT id, email, role FROM users WHERE id = ?`).get(payload.id);
+  if (!user || user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Admin account not found or disabled.' });
+  }
+
+  req.user = user;
   next();
 }
+
+// Apply authentication guard to all subsequent routes
 router.use(requireAdmin);
+
+// Current Admin Profile
+router.get('/me', (req, res) => {
+  res.json({ user: req.user });
+});
+
+// Change Password Route
+router.post('/change-password', (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current password and new password are required.' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+  }
+
+  const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(req.user.id);
+  if (!user || !verifyPassword(currentPassword, user.password_hash)) {
+    return res.status(400).json({ error: 'Current password is incorrect.' });
+  }
+
+  const newHash = hashPassword(newPassword);
+  db.prepare(`UPDATE users SET password_hash = ? WHERE id = ?`).run(newHash, req.user.id);
+
+  res.json({ ok: true, message: 'Password successfully updated.' });
+});
 
 router.get('/dashboard', (req, res) => {
   const today = todayRiyadhISODate();

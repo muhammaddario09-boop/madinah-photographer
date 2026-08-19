@@ -26,7 +26,7 @@
 
   async function draw() {
     const end = new Date(start); end.setDate(end.getDate() + 6);
-    const bookings = await fetch(`/api/admin/calendar?from=${fmt(start)}&to=${fmt(end)}`).then(r => r.json());
+    const bookings = await adminFetch(`/api/admin/calendar?from=${fmt(start)}&to=${fmt(end)}`).then(r => r.json());
     const days = Array.from({length:7}).map((_,i) => { const d = new Date(start); d.setDate(d.getDate()+i); return d; });
     main.innerHTML = `
       <h1 class="admin-h1">Calendar</h1>
