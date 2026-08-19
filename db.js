@@ -13,7 +13,9 @@ if (process.env.VERCEL && !fs.existsSync(DB_PATH)) {
 
 const isNew = !fs.existsSync(DB_PATH);
 const db = new Database(DB_PATH);
-db.pragma('journal_mode = WAL');
+try {
+  db.pragma(process.env.VERCEL ? 'journal_mode = DELETE' : 'journal_mode = WAL');
+} catch(e) {}
 
 const { hashPassword } = require('./lib/auth');
 
