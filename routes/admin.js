@@ -123,7 +123,8 @@ const {
   recordSettingsToCloud,
   recordPortfolioToCloud,
   recordServicesToCloud,
-  syncCloudSettingsToDb
+  syncCloudSettingsToDb,
+  syncCloudPortfolioToDb
 } = require('../lib/cloudStore');
 
 router.get('/bookings', async (req, res) => {
@@ -283,8 +284,9 @@ router.delete('/packages/:id', async (req, res) => {
 });
 
 // --- Portfolio & Gallery Manager ---
-router.get('/portfolio', (req, res) => {
-  res.json(db.prepare(`SELECT * FROM portfolio ORDER BY sort_order, id DESC`).all());
+router.get('/portfolio', async (req, res) => {
+  try { await syncCloudPortfolioToDb(db); } catch(e) {}
+  res.json(db.prepare(`SELECT * FROM portfolio WHERE active=1 ORDER BY sort_order, id DESC`).all());
 });
 
 router.post('/portfolio', async (req, res) => {
