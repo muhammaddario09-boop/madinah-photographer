@@ -185,13 +185,30 @@ router.post('/bookings', (req, res) => {
 });
 
 router.get('/bookings/:code', (req, res) => {
-  const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
-  if (!booking) return res.status(404).json({ error: 'Booking not found.' });
-  const service = db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id);
-  const pkg = db.prepare(`SELECT * FROM packages WHERE id=?`).get(booking.package_id);
-  const location = booking.location_id ? db.prepare(`SELECT * FROM locations WHERE id=?`).get(booking.location_id) : null;
-  const photographer = db.prepare(`SELECT * FROM photographers WHERE id=?`).get(booking.photographer_id);
-  res.json({ booking, service, package: pkg, location, photographer });
+  try {
+    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
+    if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+    const service = booking.service_id ? db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id) : null;
+    const pkg = booking.package_id ? db.prepare(`SELECT * FROM packages WHERE id=?`).get(booking.package_id) : null;
+    const location = booking.location_id ? db.prepare(`SELECT * FROM locations WHERE id=?`).get(booking.location_id) : null;
+    const photographer = booking.photographer_id ? db.prepare(`SELECT * FROM photographers WHERE id=?`).get(booking.photographer_id) : null;
+    const client = booking.client_id ? db.prepare(`SELECT * FROM clients WHERE id=?`).get(booking.client_id) : null;
+
+    res.json({
+      booking: {
+        ...booking,
+        client_name: client?.name || 'Client',
+        client_email: client?.email || '',
+        client_phone: client?.phone || ''
+      },
+      service: service || { name: 'Madinah Photoshoot' },
+      package: pkg || { name: 'Standard' },
+      location: location || { name: 'Madinah Area' },
+      photographer: photographer || { name: 'UMROH LENS' }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.post('/bookings/:code/reschedule', (req, res) => {
