@@ -75,17 +75,19 @@ router.get('/payment-info', (req, res) => {
   const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
   const s = {};
   settingsRows.forEach(r => { s[r.key] = r.value; });
+  const wa = s.admin_whatsapp || '+966501234567';
   res.json({
-    whatsappNumber: s.admin_whatsapp || '+966501234567',
+    adminWhatsApp: wa,
+    whatsappNumber: wa,
     bankSAR: {
       name: s.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)',
       account: s.bank_sar_account || 'SA84 8000 0123 4567 8901 2345',
-      holder: s.bank_sar_holder || 'Al-Madani Photography Studio'
+      holder: s.bank_sar_holder || 'UMROH LENS Photography Studio'
     },
     bankIDR: {
       name: s.bank_idr_name || 'Bank Syariah Indonesia (BSI) / BCA',
       account: s.bank_idr_account || '7123456789 (BSI) / 5420123456 (BCA)',
-      holder: s.bank_idr_holder || 'Al-Madani Photography',
+      holder: s.bank_idr_holder || 'UMROH LENS Photography',
       rate: Number(s.idr_sar_rate) || 4200
     }
   });
@@ -168,17 +170,17 @@ router.post('/bookings', (req, res) => {
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
     // Record to central cloud datastore
-    recordBookingToCloud({
+    await recordBookingToCloud({
       booking_code: result.bookingCode,
       client_name: b.clientName,
       client_email: b.clientEmail,
       client_phone: b.clientPhone,
       client_country: b.clientCountry || 'Indonesia',
-      service_id: b.serviceId,
+      service_id: service.id,
       service_name: service.name,
-      package_id: b.packageId,
+      package_id: pkg.id,
       package_name: pkg.name,
-      location_id: b.locationId,
+      location_id: b.locationId || null,
       location_name: location ? location.name : 'Madinah Area',
       date: b.date,
       start_time: b.startTime,
