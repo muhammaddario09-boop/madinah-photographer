@@ -1,19 +1,19 @@
 {
-  "lastUpdated": "2026-08-19T14:53:56.561Z",
+  "lastUpdated": "2026-08-19T14:54:12.380Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
-      "client_name": "Audit Terminal Tester",
+      "client_name": "Permanent Persistence Tester",
       "client_phone": "+6281122334455",
       "service_name": "Cinematic Video & Reels",
-      "date": "2026-09-15",
-      "start_time": "09:00",
-      "end_time": "09:45",
+      "date": "2026-09-25",
+      "start_time": "16:00",
+      "end_time": "16:45",
       "deposit_amount": 195,
       "currency": "SAR",
-      "status": "CONFIRMED",
+      "status": "PENDING",
       "payment_status": "DEPOSIT_PAID",
-      "client_email": "tester@madinahphoto.com",
+      "client_email": "persist.tester@example.com",
       "client_country": "Indonesia",
       "service_id": 7,
       "package_id": 19,
@@ -21,10 +21,10 @@
       "location_id": 1,
       "location_name": "Masjid Nabawi Area",
       "total_price": 650,
-      "occasion": "Umrah Terminal Audit",
-      "number_of_people": 3,
+      "occasion": "Umrah Audit",
+      "number_of_people": 2,
       "proof_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-      "created_at": "2026-08-19T14:38:22.430Z"
+      "created_at": "2026-08-19T14:54:12.267Z"
     },
     {
       "booking_code": "MDN-2026-0002",
@@ -107,5 +107,6 @@
     "bank_idr_holder": "UMROH LENS Official"
   },
   "services": [],
-  "portfolio": []
+  "portfolio": [],
+  "count": 4
 }
