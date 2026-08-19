@@ -94,7 +94,7 @@ router.get('/payment-info', (req, res) => {
 });
 
 // POST /api/bookings — creates a booking with full server-side re-validation.
-router.post('/bookings', (req, res) => {
+router.post('/bookings', async (req, res) => {
   try {
     const b = req.body;
     const buffer = bufferMinutes(db);
