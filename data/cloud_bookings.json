@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:42:40.028Z",
+  "lastUpdated": "2026-08-19T14:42:41.704Z",
   "count": 4,
   "bookings": [
     {
@@ -88,13 +88,13 @@
       "package_name": "Essential Reels",
       "location_id": 1,
       "location_name": "Masjid Nabawi Area",
-      "date": "2026-09-25",
-      "start_time": "16:00",
-      "end_time": "16:45",
+      "date": "2026-09-26",
+      "start_time": "17:00",
+      "end_time": "17:45",
       "total_price": 650,
       "deposit_amount": 195,
       "currency": "SAR",
-      "status": "PENDING",
+      "status": "RESCHEDULE_REQUESTED",
       "payment_status": "DEPOSIT_PAID",
       "occasion": "Umrah Terminal Audit",
       "number_of_people": 3,
