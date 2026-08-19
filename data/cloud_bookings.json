@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-19T14:31:34.226Z",
+  "lastUpdated": "2026-08-19T14:37:37.272Z",
   "count": 3,
   "bookings": [
     {
@@ -27,13 +27,13 @@
       "package_name": "Premium",
       "location_id": 1,
       "location_name": "Masjid Nabawi Area",
-      "date": "2026-08-25",
-      "start_time": "18:00",
-      "end_time": "19:30",
+      "date": "2026-08-28",
+      "start_time": "17:00",
+      "end_time": "18:30",
       "total_price": 950,
       "deposit_amount": 285,
       "currency": "SAR",
-      "status": "CONFIRMED",
+      "status": "RESCHEDULE_REQUESTED",
       "payment_status": "DEPOSIT_PAID",
       "occasion": "Umrah",
       "number_of_people": 2,
