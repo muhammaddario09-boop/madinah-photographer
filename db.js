@@ -164,9 +164,12 @@ function seed() {
     ['Private Location', 'A location you specify.', 30],
   ].forEach((l) => insertLocation.run(...l));
 
-  db.prepare(`INSERT INTO settings (key, value) VALUES ('min_booking_notice_hours', '12')`).run();
-  db.prepare(`INSERT INTO settings (key, value) VALUES ('max_booking_window_days', '90')`).run();
-  db.prepare(`INSERT INTO settings (key, value) VALUES ('cancellation_deadline_hours', '48')`).run();
+  const insertOrIgnore = db.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`);
+  insertOrIgnore.run('min_booking_notice_hours', '12');
+  insertOrIgnore.run('max_booking_window_days', '90');
+  insertOrIgnore.run('cancellation_deadline_hours', '48');
+  insertOrIgnore.run('buffer_minutes', '30');
+  insertOrIgnore.run('max_sessions_per_day', '8');
 
   // Seed sample client & booking
   const insertClient = db.prepare(`INSERT INTO clients (name, email, phone, country) VALUES (?,?,?,?)`);
@@ -183,9 +186,6 @@ function seed() {
     `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference)
      VALUES (?, 195, 'SAR', 'BANK_TRANSFER', 'DEPOSIT', 'PAID', 'DP Transfer BSI')`
   ).run(bInfo.lastInsertRowid);
-
-  db.prepare(`INSERT INTO settings (key, value) VALUES ('buffer_minutes', '30')`).run();
-  db.prepare(`INSERT INTO settings (key, value) VALUES ('max_sessions_per_day', '8')`).run();
 
   console.log('Seeded database with 1 photographer, 6 services, 18 packages, 6 locations.');
 }
