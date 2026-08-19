@@ -162,3 +162,38 @@ h3 { font-size: 1.25rem; }
   .nav-links { display: none; }
   .footer .container { flex-direction: column; }
 }
+
+/* --- Floating WhatsApp Widget --- */
+.wa-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #25D366;
+  color: #fff;
+  border-radius: 50px;
+  padding: 12px 20px 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+  z-index: 9998;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-body);
+}
+.wa-float:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(37, 211, 102, 0.45);
+  color: #fff;
+}
+.wa-float-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+[dir="rtl"] .wa-float {
+  right: auto;
+  left: 24px;
+  padding: 12px 16px 12px 20px;
+}
