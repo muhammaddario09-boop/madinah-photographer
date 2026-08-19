@@ -72,6 +72,8 @@ function renderAdminNav(active) {
     ['Calendar', '/admin/calendar.html', 'calendar'],
     ['Bookings', '/admin/bookings.html', 'bookings'],
     ['Availability', '/admin/availability.html', 'availability'],
+    ['Services & Pricing', '/admin/services.html', 'services'],
+    ['Portfolio & Photos', '/admin/portfolio.html', 'portfolio'],
   ];
 
   document.write(`

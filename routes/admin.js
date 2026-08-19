@@ -190,12 +190,93 @@ router.delete('/availability/overrides/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-router.get('/services', (req, res) => {
-  res.json(db.prepare(`SELECT * FROM services ORDER BY sort_order`).all());
+// --- Services & Price List Manager ---
+router.get('/services-full', (req, res) => {
+  const services = db.prepare(`SELECT * FROM services ORDER BY sort_order`).all();
+  const full = services.map(s => {
+    const packages = db.prepare(`SELECT * FROM packages WHERE service_id = ? ORDER BY price`).all(s.id);
+    return { ...s, packages };
+  });
+  res.json(full);
 });
 
-router.get('/packages', (req, res) => {
-  res.json(db.prepare(`SELECT p.*, s.name as service_name FROM packages p JOIN services s ON s.id=p.service_id`).all());
+router.put('/services/:id', (req, res) => {
+  const { name, description, cover_image, starting_price, currency, edited_photos } = req.body;
+  db.prepare(
+    `UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=? WHERE id=?`
+  ).run(name, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, req.params.id);
+  res.json({ ok: true });
+});
+
+router.put('/packages/:id', (req, res) => {
+  const { name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
+  db.prepare(
+    `UPDATE packages SET name=?, description=?, price=?, currency=?, duration_minutes=?, edited_photos=?, deposit_percentage=?, cancellation_policy=? WHERE id=?`
+  ).run(
+    name, description, Number(price) || 0, currency || 'SAR',
+    Number(duration_minutes) || 30, Number(edited_photos) || 10,
+    Number(deposit_percentage) || 30, cancellation_policy || '',
+    req.params.id
+  );
+  res.json({ ok: true });
+});
+
+router.post('/packages', (req, res) => {
+  const { service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
+  const info = db.prepare(
+    `INSERT INTO packages (service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy)
+     VALUES (?,?,?,?,?,?,?,?,?)`
+  ).run(
+    service_id, name, description, Number(price) || 0, currency || 'SAR',
+    Number(duration_minutes) || 30, Number(edited_photos) || 10,
+    Number(deposit_percentage) || 30, cancellation_policy || ''
+  );
+  res.json({ ok: true, id: info.lastInsertRowid });
+});
+
+router.delete('/packages/:id', (req, res) => {
+  db.prepare(`DELETE FROM packages WHERE id=?`).run(req.params.id);
+  res.json({ ok: true });
+});
+
+// --- Portfolio & Gallery Manager ---
+router.get('/portfolio', (req, res) => {
+  res.json(db.prepare(`SELECT * FROM portfolio ORDER BY sort_order, id DESC`).all());
+});
+
+router.post('/portfolio', (req, res) => {
+  const { image_url, title, category, description, location, featured, sort_order } = req.body;
+  if (!image_url) return res.status(400).json({ error: 'Image URL is required.' });
+  const info = db.prepare(
+    `INSERT INTO portfolio (image_url, title, category, description, location, featured, sort_order)
+     VALUES (?,?,?,?,?,?,?)`
+  ).run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
+  res.json({ ok: true, id: info.lastInsertRowid });
+});
+
+router.put('/portfolio/:id', (req, res) => {
+  const { image_url, title, category, description, location, featured, sort_order } = req.body;
+  db.prepare(
+    `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
+  ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
+  res.json({ ok: true });
+});
+
+router.delete('/portfolio/:id', (req, res) => {
+  db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
+  res.json({ ok: true });
+});
+
+// --- Photographer Profile Manager ---
+router.get('/photographer', (req, res) => {
+  const p = db.prepare(`SELECT * FROM photographers LIMIT 1`).get();
+  res.json(p || {});
+});
+
+router.put('/photographer', (req, res) => {
+  const { name, bio, avatar_url } = req.body;
+  db.prepare(`UPDATE photographers SET name=?, bio=?, avatar_url=? WHERE id=1`).run(name, bio, avatar_url);
+  res.json({ ok: true });
 });
 
 module.exports = router;

@@ -46,7 +46,7 @@ fetch('/api/services').then(r => r.json()).then(async services => {
     const detail = await fetch(`/api/services/${s.slug}`).then(r => r.json());
     return `
       <div style="display:grid; grid-template-columns: 320px 1fr; gap:44px; padding:44px 0; border-bottom:1px solid var(--line);">
-        <div class="service-thumb" style="height:220px; margin-bottom:0;"></div>
+        <div class="service-thumb" style="height:220px; margin-bottom:0; ${s.cover_image ? `background-image:url('${s.cover_image}'); background-size:cover; background-position:center;` : ''}"></div>
         <div>
           <h2 style="font-size:1.7rem;">${s.name}</h2>
           <p style="color:var(--charcoal-soft); margin-top:10px; max-width:560px;">${s.description}</p>

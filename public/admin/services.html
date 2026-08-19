@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services & Pricing — Al-Madani Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+<style>
+  .service-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 24px;
+    margin-bottom: 32px;
+    border-radius: 4px;
+  }
+  .service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .pkg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .pkg-card {
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    padding: 18px;
+    border-radius: 4px;
+  }
+  .pkg-card h4 {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    color: var(--charcoal);
+  }
+  .form-row {
+    margin-bottom: 12px;
+  }
+  .form-row label {
+    display: block;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--charcoal-soft);
+    margin-bottom: 4px;
+  }
+  .form-row input, .form-row textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    font-family: inherit;
+    font-size: 0.88rem;
+    box-sizing: border-box;
+    background: #fff;
+  }
+  .pkg-card input {
+    font-size: 0.84rem;
+    padding: 6px 8px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #2A4A5B;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 9999;
+  }
+</style>
+</head>
+<body class="admin">
+<script src="/js/admin-nav.js"></script>
+<script>renderAdminNav('services');</script>
+<div id="toast" class="toast">Saved successfully!</div>
+
+<script>
+function showToast(msg = 'Saved successfully!') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+async function loadData() {
+  const main = document.getElementById('admin-main');
+  main.innerHTML = `<h1 class="admin-h1">Services & Price List Manager</h1><p class="admin-sub">Loading catalog...</p>`;
+
+  try {
+    const [services, photographer] = await Promise.all([
+      adminFetch('/api/admin/services-full').then(r => r.json()),
+      adminFetch('/api/admin/photographer').then(r => r.json())
+    ]);
+
+    main.innerHTML = `
+      <h1 class="admin-h1">Services & Price List Manager</h1>
+      <p class="admin-sub">Update service descriptions, cover photos, and package pricing in real-time.</p>
+
+      <!-- Photographer Profile Section -->
+      <div class="service-card" style="border-left: 4px solid var(--gold);">
+        <h2 style="font-family:var(--font-display); font-size:1.3rem; margin-bottom:14px;">Photographer Profile</h2>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+          <div class="form-row">
+            <label>Name</label>
+            <input type="text" id="p-name" value="${photographer.name || ''}">
+          </div>
+          <div class="form-row">
+            <label>Avatar / Profile Photo URL</label>
+            <input type="text" id="p-avatar" value="${photographer.avatar_url || ''}">
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Bio / Description</label>
+          <textarea id="p-bio" rows="2">${photographer.bio || ''}</textarea>
+        </div>
+        <button class="btn btn-primary" onclick="savePhotographer()" style="padding:8px 18px; font-size:0.8rem;">Save Photographer Profile</button>
+      </div>
+
+      <h2 style="font-family:var(--font-display); font-size:1.3rem; margin: 36px 0 16px 0;">Services & Packages Catalog</h2>
+      
+      <div id="services-container">
+        ${services.map(s => `
+          <div class="service-card" data-service-id="${s.id}">
+            <div class="service-header">
+              <div style="flex:1; min-width:280px;">
+                <div style="display:flex; gap:12px; align-items:center; margin-bottom:10px;">
+                  <span class="eyebrow" style="color:var(--gold);">Service ID: ${s.id}</span>
+                  <span style="font-size:0.75rem; color:var(--charcoal-soft);">/${s.slug}</span>
+                </div>
+                <div class="form-row">
+                  <label>Service Title</label>
+                  <input type="text" class="svc-name" value="${s.name}">
+                </div>
+                <div class="form-row">
+                  <label>Description</label>
+                  <textarea class="svc-desc" rows="2">${s.description || ''}</textarea>
+                </div>
+              </div>
+
+              <div style="width:260px;">
+                <div class="form-row">
+                  <label>Cover Image URL</label>
+                  <input type="text" class="svc-cover" value="${s.cover_image || ''}">
+                </div>
+                <div class="form-row">
+                  <label>Starting Price (${s.currency})</label>
+                  <input type="number" class="svc-start-price" value="${s.starting_price}">
+                </div>
+                <button class="btn btn-ghost" onclick="saveService(${s.id})" style="width:100%; padding:8px; font-size:0.75rem; margin-top:8px;">Save Service Info</button>
+              </div>
+            </div>
+
+            <h3 style="font-family:var(--font-display); font-size:1.1rem; margin-top:16px;">Pricing Tiers (${s.packages.length})</h3>
+            <div class="pkg-grid">
+              ${s.packages.map(p => `
+                <div class="pkg-card" data-pkg-id="${p.id}">
+                  <h4>${p.name}</h4>
+                  <div class="form-row">
+                    <label>Tier Name</label>
+                    <input type="text" class="pkg-name" value="${p.name}">
+                  </div>
+                  <div class="form-row">
+                    <label>Price (SAR)</label>
+                    <input type="number" class="pkg-price" value="${p.price}" style="font-weight:600; color:#2A4A5B;">
+                  </div>
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                    <div class="form-row">
+                      <label>Duration (Mins)</label>
+                      <input type="number" class="pkg-duration" value="${p.duration_minutes}">
+                    </div>
+                    <div class="form-row">
+                      <label>Edited Photos</label>
+                      <input type="number" class="pkg-photos" value="${p.edited_photos}">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label>Deposit Required (%)</label>
+                    <input type="number" class="pkg-deposit" value="${p.deposit_percentage}">
+                  </div>
+                  <div class="form-row">
+                    <label>Description</label>
+                    <input type="text" class="pkg-desc" value="${p.description || ''}">
+                  </div>
+                  <button class="btn btn-primary" onclick="savePackage(${p.id})" style="width:100%; padding:7px; font-size:0.75rem; margin-top:6px;">Update Package Price</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch (err) {
+    main.innerHTML = `<div class="alert-error" style="display:block;">Failed to load catalog: ${err.message}</div>`;
+  }
+}
+
+async function savePhotographer() {
+  const name = document.getElementById('p-name').value;
+  const avatar_url = document.getElementById('p-avatar').value;
+  const bio = document.getElementById('p-bio').value;
+  await adminFetch('/api/admin/photographer', {
+    method: 'PUT',
+    body: JSON.stringify({ name, avatar_url, bio })
+  });
+  showToast('Photographer profile updated!');
+}
+
+async function saveService(id) {
+  const card = document.querySelector(`.service-card[data-service-id="${id}"]`);
+  const name = card.querySelector('.svc-name').value;
+  const description = card.querySelector('.svc-desc').value;
+  const cover_image = card.querySelector('.svc-cover').value;
+  const starting_price = card.querySelector('.svc-start-price').value;
+
+  await adminFetch(`/api/admin/services/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ name, description, cover_image, starting_price })
+  });
+  showToast('Service details updated!');
+}
+
+async function savePackage(id) {
+  const card = document.querySelector(`.pkg-card[data-pkg-id="${id}"]`);
+  const name = card.querySelector('.pkg-name').value;
+  const price = card.querySelector('.pkg-price').value;
+  const duration_minutes = card.querySelector('.pkg-duration').value;
+  const edited_photos = card.querySelector('.pkg-photos').value;
+  const deposit_percentage = card.querySelector('.pkg-deposit').value;
+  const description = card.querySelector('.pkg-desc').value;
+
+  await adminFetch(`/api/admin/packages/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ name, price, duration_minutes, edited_photos, deposit_percentage, description })
+  });
+  showToast(`Package "${name}" price updated to SAR ${price}!`);
+}
+
+loadData();
+</script>
+</body>
+</html>

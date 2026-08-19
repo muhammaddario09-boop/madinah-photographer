@@ -44,7 +44,11 @@ const categories = ['Portrait','Couple','Family','Umrah','Golden Hour','Heritage
 fetch('/api/portfolio').then(r => r.json()).then(items => {
   const grid = document.getElementById('portfolio-grid');
   const list = items.length ? items : Array.from({length: 12}).map((_,i) => ({ title: categories[i % categories.length] }));
-  grid.innerHTML = list.map(p => `<div class="portfolio-item"><span>${p.title || p.category || ''}</span></div>`).join('');
+  grid.innerHTML = list.map(p => `
+    <div class="portfolio-item" style="${p.image_url ? `background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, transparent 100%), url('${p.image_url}'); background-size: cover; background-position: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);` : ''}">
+      <span>${p.title || p.category || ''}</span>
+    </div>
+  `).join('');
 });
 </script>
 </body>
