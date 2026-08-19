@@ -153,10 +153,13 @@ router.get('/bookings/:id', (req, res) => {
 
 router.post('/bookings/:id/status', async (req, res) => {
   try {
-    const updated = setStatus(db, Number(req.params.id), req.body.status, 'admin', req.body.note || '');
-    const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(req.params.id);
+    await syncCloudBookingsToDb(db);
+    let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    const updated = setStatus(db, booking.id, req.body.status, 'admin', req.body.note || '');
+    const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(booking.id);
     if (b) {
-      recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status }).catch(() => {});
+      await recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status });
     }
     res.json({ ok: true, from: updated.status, to: req.body.status });
   } catch (e) {
