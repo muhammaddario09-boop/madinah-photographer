@@ -4,6 +4,7 @@ const db = require('../db');
 const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
+const { recordBookingToCloud } = require('../lib/cloudStore');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
@@ -237,6 +238,33 @@ router.post('/bookings', async (req, res) => {
     ].join('\n');
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
+
+    // Record to persistent store non-blockingly
+    recordBookingToCloud({
+      booking_code: result.bookingCode,
+      client_name: b.clientName,
+      client_email: b.clientEmail,
+      client_phone: b.clientPhone,
+      client_country: b.clientCountry || 'Indonesia',
+      service_id: service.id,
+      service_name: service.name,
+      package_id: pkg.id,
+      package_name: pkg.name,
+      location_id: b.locationId || null,
+      location_name: location ? location.name : 'Madinah Area',
+      date: b.date,
+      start_time: b.startTime,
+      end_time: result.endTime,
+      total_price: pkg.price,
+      deposit_amount: depositAmount,
+      currency: pkg.currency,
+      status: 'PENDING',
+      payment_status: b.paymentProof ? 'DEPOSIT_PAID' : 'UNPAID',
+      occasion: b.occasion || 'Umrah',
+      number_of_people: b.numberOfPeople || 1,
+      proof_url: b.paymentProof || null,
+      created_at: new Date().toISOString()
+    }).catch(() => {});
 
     return res.status(201).json({
       bookingCode: result.bookingCode,

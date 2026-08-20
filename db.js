@@ -11,7 +11,7 @@ try {
   db = new Database(':memory:', { timeout: 10000 });
 }
 
-// Execute pure SQL Schema & Seed Data directly from db/schema.sql
+// Execute pure SQL Schema & Initial Seed Data directly from db/schema.sql
 const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
 db.exec(schema);
 
@@ -35,5 +35,30 @@ function ensureAdminUser() {
   }
 }
 ensureAdminUser();
+
+// Auto-restore persistent state on Serverless Cold Starts
+const {
+  syncCloudBookingsToDb,
+  syncCloudSettingsToDb,
+  syncCloudPortfolioToDb,
+  syncCloudServicesToDb,
+  syncCloudLocationsToDb
+} = require('./lib/cloudStore');
+
+async function autoRestorePersistentData() {
+  try {
+    await Promise.all([
+      syncCloudSettingsToDb(db),
+      syncCloudServicesToDb(db),
+      syncCloudLocationsToDb(db),
+      syncCloudPortfolioToDb(db),
+      syncCloudBookingsToDb(db)
+    ]);
+  } catch (e) {}
+}
+
+if (process.env.VERCEL) {
+  autoRestorePersistentData();
+}
 
 module.exports = db;

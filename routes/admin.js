@@ -130,6 +130,16 @@ router.get('/dashboard', (req, res) => {
   res.json({ todayShoots, upcoming, pendingPayments, revenue });
 });
 
+const {
+  recordBookingToCloud,
+  removeBookingFromCloud,
+  resetAllBookingsInCloud,
+  recordSettingsToCloud,
+  recordPortfolioToCloud,
+  recordServicesToCloud,
+  recordLocationsToCloud
+} = require('../lib/cloudStore');
+
 router.get('/bookings', (req, res) => {
   const { status, from, to } = req.query;
   let sql = `SELECT b.*, 
@@ -170,6 +180,10 @@ router.post('/bookings/:id/status', (req, res) => {
     let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
     const updated = setStatus(db, booking.id, req.body.status, 'admin', req.body.note || '');
+    const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(booking.id);
+    if (b) {
+      recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status }).catch(() => {});
+    }
     res.json({ ok: true, from: updated.status, to: req.body.status });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });
@@ -184,6 +198,7 @@ router.delete('/bookings/:id', (req, res) => {
       db.prepare(`DELETE FROM booking_history WHERE booking_id=?`).run(booking.id);
       db.prepare(`DELETE FROM notifications WHERE booking_id=?`).run(booking.id);
       db.prepare(`DELETE FROM bookings WHERE id=?`).run(booking.id);
+      removeBookingFromCloud(booking.booking_code).catch(() => {});
     }
     res.json({ ok: true });
   } catch (e) {
@@ -197,6 +212,7 @@ router.post('/bookings/reset-all', (req, res) => {
     db.prepare(`DELETE FROM booking_history`).run();
     db.prepare(`DELETE FROM notifications`).run();
     db.prepare(`DELETE FROM bookings`).run();
+    resetAllBookingsInCloud().catch(() => {});
     res.json({ ok: true, message: 'All bookings cleared successfully.' });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -281,6 +297,11 @@ router.put('/photographer', (req, res) => {
       db.prepare(`INSERT INTO photographers (name, bio, avatar_url) VALUES (?,?,?)`)
         .run(name || 'UMROH LENS', bio || '', avatar_url || '/img/photographer-1.jpg');
     }
+    recordSettingsToCloud({
+      photographer_name: name,
+      photographer_bio: bio,
+      photographer_avatar: avatar_url
+    }).catch(() => {});
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -306,6 +327,7 @@ router.put('/services/:id', (req, res) => {
   db.prepare(
     `UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=? WHERE id=?`
   ).run(name, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, req.params.id);
+  recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -319,6 +341,7 @@ router.put('/packages/:id', (req, res) => {
     Number(deposit_percentage) || 30, cancellation_policy || '',
     req.params.id
   );
+  recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -333,11 +356,13 @@ router.post('/packages', (req, res) => {
     Number(duration_minutes) || 30, Number(edited_photos) || 10,
     Number(deposit_percentage) || 30, cancellation_policy || ''
   );
+  recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true, id: result.lastInsertRowid });
 });
 
 router.delete('/packages/:id', (req, res) => {
   db.prepare(`DELETE FROM packages WHERE id=?`).run(req.params.id);
+  recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -358,6 +383,7 @@ router.post('/locations', (req, res) => {
     const info = db.prepare(
       `INSERT INTO locations (name, description, travel_buffer_minutes) VALUES (?,?,?)`
     ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15);
+    recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true, id: info.lastInsertRowid });
   } catch(e) {
     res.status(500).json({ error: e.message });
@@ -370,6 +396,7 @@ router.put('/locations/:id', (req, res) => {
     db.prepare(
       `UPDATE locations SET name=?, description=?, travel_buffer_minutes=? WHERE id=?`
     ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15, req.params.id);
+    recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true });
   } catch(e) {
     res.status(500).json({ error: e.message });
@@ -379,6 +406,7 @@ router.put('/locations/:id', (req, res) => {
 router.delete('/locations/:id', (req, res) => {
   try {
     db.prepare(`DELETE FROM locations WHERE id=?`).run(req.params.id);
+    recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true });
   } catch(e) {
     res.status(500).json({ error: e.message });
@@ -403,6 +431,7 @@ router.post('/portfolio', (req, res) => {
      VALUES (?,?,?,?,?,?,?)`
   );
   info.run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
+  recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -411,11 +440,13 @@ router.put('/portfolio/:id', (req, res) => {
   db.prepare(
     `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
   ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
+  recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 router.delete('/portfolio/:id', (req, res) => {
   db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
+  recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -440,6 +471,7 @@ router.put('/settings', (req, res) => {
   for (const [key, val] of Object.entries(settings)) {
     upsert.run(key, String(val));
   }
+  recordSettingsToCloud(settings).catch(() => {});
   res.json({ ok: true });
 });
 
