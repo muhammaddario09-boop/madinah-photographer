@@ -212,4 +212,88 @@ function seed() {
   ].forEach((l) => insertLocation.run(...l));
 }
 
+function loadInitialJsonData() {
+  try {
+    const cloudFile = path.join(__dirname, 'data', 'cloud_bookings.json');
+    if (!fs.existsSync(cloudFile)) return;
+    const content = fs.readFileSync(cloudFile, 'utf8');
+    const parsed = JSON.parse(content);
+
+    // Sync settings & photographer
+    if (parsed.settings && typeof parsed.settings === 'object') {
+      const upsertSetting = db.prepare(
+        `INSERT INTO settings (key, value) VALUES (?, ?)
+         ON CONFLICT(key) DO UPDATE SET value=excluded.value`
+      );
+      for (const [k, v] of Object.entries(parsed.settings)) {
+        if (v !== undefined && v !== null) {
+          upsertSetting.run(k, String(v));
+        }
+      }
+      if (parsed.settings.photographer_name) {
+        db.prepare(`UPDATE photographers SET name=?, bio=COALESCE(?, bio), avatar_url=COALESCE(?, avatar_url) WHERE id=1`).run(
+          parsed.settings.photographer_name,
+          parsed.settings.photographer_bio || null,
+          parsed.settings.photographer_avatar || null
+        );
+      }
+    }
+
+    // Sync locations
+    if (Array.isArray(parsed.locations) && parsed.locations.length > 0) {
+      const checkLoc = db.prepare(`SELECT id FROM locations WHERE id=? LIMIT 1`);
+      const updateLoc = db.prepare(`UPDATE locations SET name=?, description=?, travel_buffer_minutes=? WHERE id=?`);
+      const insertLoc = db.prepare(`INSERT INTO locations (name, description, travel_buffer_minutes) VALUES (?,?,?)`);
+      
+      parsed.locations.forEach(l => {
+        if (!l || !l.name) return;
+        if (l.id && checkLoc.get(l.id)) {
+          updateLoc.run(l.name, l.description || '', Number(l.travel_buffer_minutes) || 15, l.id);
+        } else {
+          insertLoc.run(l.name, l.description || '', Number(l.travel_buffer_minutes) || 15);
+        }
+      });
+    }
+
+    // Sync services & packages
+    if (Array.isArray(parsed.services) && parsed.services.length > 0) {
+      const checkSvc = db.prepare(`SELECT id FROM services WHERE slug=? LIMIT 1`);
+      const updateSvc = db.prepare(`UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=?, sort_order=? WHERE id=?`);
+      const insertSvc = db.prepare(`INSERT INTO services (name, slug, description, cover_image, starting_price, currency, edited_photos, sort_order) VALUES (?,?,?,?,?,?,?,?)`);
+      
+      const checkPkg = db.prepare(`SELECT id FROM packages WHERE id=? OR (service_id=? AND name=?) LIMIT 1`);
+      const updatePkg = db.prepare(`UPDATE packages SET name=?, description=?, price=?, currency=?, duration_minutes=?, edited_photos=?, deposit_percentage=?, cancellation_policy=? WHERE id=?`);
+      const insertPkg = db.prepare(`INSERT INTO packages (service_id, name, description, price, currency, duration_minutes, edited_photos, raw_photos_included, deposit_percentage, cancellation_policy) VALUES (?,?,?,?,?,?,?,?,?,?)`);
+
+      parsed.services.forEach(s => {
+        if (!s || !s.slug) return;
+        let svcId = null;
+        const exists = checkSvc.get(s.slug);
+        if (exists) {
+          svcId = exists.id;
+          updateSvc.run(s.name, s.description || '', s.cover_image || '', Number(s.starting_price) || 0, s.currency || 'SAR', Number(s.edited_photos) || 0, Number(s.sort_order) || 0, svcId);
+        } else {
+          const info = insertSvc.run(s.name, s.slug, s.description || '', s.cover_image || '', Number(s.starting_price) || 0, s.currency || 'SAR', Number(s.edited_photos) || 0, Number(s.sort_order) || 0);
+          svcId = info.lastInsertRowid;
+        }
+
+        if (Array.isArray(s.packages)) {
+          s.packages.forEach(p => {
+            if (!p || !p.name) return;
+            const pExists = p.id ? checkPkg.get(p.id, svcId, p.name) : null;
+            if (pExists) {
+              updatePkg.run(p.name, p.description || '', Number(p.price) || 0, p.currency || 'SAR', Number(p.duration_minutes) || 30, Number(p.edited_photos) || 10, Number(p.deposit_percentage) || 30, p.cancellation_policy || '', pExists.id);
+            } else {
+              insertPkg.run(svcId, p.name, p.description || '', Number(p.price) || 0, p.currency || 'SAR', Number(p.duration_minutes) || 30, Number(p.edited_photos) || 10, p.raw_photos_included ? 1 : 0, Number(p.deposit_percentage) || 30, p.cancellation_policy || '');
+            }
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.error('loadInitialJsonData error:', err.message);
+  }
+}
+loadInitialJsonData();
+
 module.exports = db;
