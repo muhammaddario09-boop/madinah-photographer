@@ -133,6 +133,8 @@ router.get('/dashboard', (req, res) => {
 const {
   syncCloudBookingsToDb,
   recordBookingToCloud,
+  removeBookingFromCloud,
+  resetAllBookingsInCloud,
   recordSettingsToCloud,
   recordPortfolioToCloud,
   recordServicesToCloud,
@@ -185,6 +187,35 @@ router.post('/bookings/:id/status', async (req, res) => {
     res.json({ ok: true, from: updated.status, to: req.body.status });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });
+  }
+});
+
+router.delete('/bookings/:id', async (req, res) => {
+  try {
+    const booking = db.prepare(`SELECT id, booking_code FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
+    if (booking) {
+      db.prepare(`DELETE FROM payments WHERE booking_id=?`).run(booking.id);
+      db.prepare(`DELETE FROM booking_history WHERE booking_id=?`).run(booking.id);
+      db.prepare(`DELETE FROM notifications WHERE booking_id=?`).run(booking.id);
+      db.prepare(`DELETE FROM bookings WHERE id=?`).run(booking.id);
+      await removeBookingFromCloud(booking.booking_code);
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/bookings/reset-all', async (req, res) => {
+  try {
+    db.prepare(`DELETE FROM payments`).run();
+    db.prepare(`DELETE FROM booking_history`).run();
+    db.prepare(`DELETE FROM notifications`).run();
+    db.prepare(`DELETE FROM bookings`).run();
+    await resetAllBookingsInCloud();
+    res.json({ ok: true, message: 'All bookings cleared successfully.' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
