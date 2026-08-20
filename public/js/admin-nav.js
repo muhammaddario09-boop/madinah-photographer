@@ -1,14 +1,18 @@
 // Admin Authentication & Navigation Helper — Safari & WebKit Compatible
 
 function getAdminToken() {
-  const raw = localStorage.getItem('admin_token');
-  if (!raw) return null;
-  return String(raw).replace(/^["']|["']$/g, '').trim();
+  try {
+    const raw = localStorage.getItem('admin_token');
+    if (!raw) return null;
+    return String(raw).replace(/["'\s]/g, '').trim();
+  } catch (e) {
+    return null;
+  }
 }
 
 function setAdminToken(token, user) {
   if (token) {
-    const clean = String(token).replace(/^["']|["']$/g, '').trim();
+    const clean = String(token).replace(/["'\s]/g, '').trim();
     localStorage.setItem('admin_token', clean);
   }
   if (user) {
@@ -43,8 +47,11 @@ async function adminFetch(url, options = {}) {
     Object.assign(headers, options.headers);
   }
 
-  if (token && /^[A-Za-z0-9_\-\.]+$/.test(token)) {
-    headers['Authorization'] = `Bearer ${token}`;
+  if (token) {
+    const cleanToken = token.replace(/[^A-Za-z0-9_\-\.]/g, '');
+    if (cleanToken.length > 5) {
+      headers['Authorization'] = 'Bearer ' + cleanToken;
+    }
   }
 
   try {

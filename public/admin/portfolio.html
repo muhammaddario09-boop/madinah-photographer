@@ -108,7 +108,7 @@ function showToast(msg = 'Saved successfully!') {
 let selectedFileDataUrl = '';
 
 // Helper to compress image in browser for fast upload
-function compressImage(file, maxWidth = 1600, quality = 0.85) {
+function compressImage(file, maxWidth = 1200, quality = 0.8) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -129,9 +129,9 @@ function compressImage(file, maxWidth = 1600, quality = 0.85) {
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', quality));
       };
-      img.onerror = reject;
+      img.onerror = () => reject(new Error('Invalid image file format.'));
     };
-    reader.onerror = reject;
+    reader.onerror = () => reject(new Error('Failed to read file.'));
   });
 }
 
@@ -140,7 +140,11 @@ async function loadPortfolio() {
   main.innerHTML = `<h1 class="admin-h1">Portfolio & Photo Gallery Manager</h1><p class="admin-sub">Loading gallery...</p>`;
 
   try {
-    const items = await adminFetch('/api/admin/portfolio').then(r => r.json());
+    const res = await adminFetch('/api/admin/portfolio');
+    if (!res.ok) {
+      throw new Error('Server returned HTTP ' + res.status);
+    }
+    const items = await res.json();
 
     main.innerHTML = `
       <h1 class="admin-h1">Portfolio & Photo Gallery Manager</h1>
