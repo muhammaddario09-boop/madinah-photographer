@@ -232,7 +232,7 @@ router.get('/bookings/:code', async (req, res) => {
   try {
     let booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
     if (!booking) {
-      await syncCloudBookingsToDb(db);
+      await syncCloudBookingsToDb(db).catch(() => {});
       booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
     }
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
