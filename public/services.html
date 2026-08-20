@@ -78,14 +78,14 @@
 <script>
 fetch('/api/services')
   .then(r => r.json())
-  .then(async services => {
+  .then(services => {
     const container = document.getElementById('services-list');
     if (!services || services.length === 0) {
-      container.innerHTML = '<p style="color:var(--charcoal-soft); padding:40px 0;">Memuat layanan...</p>';
+      container.innerHTML = '<p style="color:var(--charcoal-soft); padding:40px 0;">Belum ada layanan yang aktif.</p>';
       return;
     }
-    const blocks = await Promise.all(services.map(async s => {
-      const detail = await fetch(`/api/services/${s.slug}`).then(r => r.json());
+    const blocks = services.map(s => {
+      const pkgs = s.packages || [];
       return `
         <div class="service-row">
           <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
@@ -93,20 +93,20 @@ fetch('/api/services')
             <div class="eyebrow" style="color:var(--gold); margin-bottom:6px;">UMROH LENS MADINAH</div>
             <h2 style="font-size:1.75rem; font-family:var(--font-display);">${s.name}</h2>
             <p style="color:var(--charcoal-soft); margin-top:10px; max-width:600px; line-height:1.6;">${s.description}</p>
-            <div style="display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;">
-              ${(detail.packages || []).map(p => `
-                <div style="border:1px solid var(--line); border-radius:4px; padding:18px 22px; min-width:180px; background:#fff;">
-                  <div class="eyebrow" style="color:var(--charcoal-soft);">${p.name}</div>
-                  <div style="font-family:var(--font-display); font-size:1.35rem; margin-top:8px; color:var(--charcoal);">${p.currency} ${p.price}</div>
-                  <div style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:6px;">${p.duration_minutes} min · ${p.edited_photos} edited photos</div>
-                  <a class="btn btn-primary" style="margin-top:14px; padding:8px 16px; font-size:0.72rem; width:100%; text-align:center;" href="/booking.html?service=${s.slug}&package=${p.id}">Pesan Sekarang</a>
+            <div style="display:flex; gap:14px; margin-top:24px; flex-wrap:wrap;">
+              ${pkgs.map(p => `
+                <div style="border:1px solid var(--line); border-radius:4px; padding:18px 22px; min-width:200px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+                  <div class="eyebrow" style="color:var(--charcoal-soft); font-weight:600;">${p.name}</div>
+                  <div style="font-family:var(--font-display); font-size:1.35rem; margin-top:8px; color:var(--charcoal); font-weight:600;">${p.currency} ${p.price}</div>
+                  <div style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:6px;">⏱ ${p.duration_minutes} min · 📸 ${p.edited_photos} edited photos</div>
+                  <a class="btn btn-primary" style="margin-top:14px; padding:8px 16px; font-size:0.75rem; width:100%; text-align:center; display:block; text-decoration:none;" href="/booking.html?service=${s.slug}&package=${p.id}">Pesan Sekarang →</a>
                 </div>
               `).join('')}
             </div>
           </div>
         </div>
       `;
-    }));
+    });
     container.innerHTML = blocks.join('');
   })
   .catch(err => {

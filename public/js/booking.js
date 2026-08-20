@@ -27,20 +27,30 @@ const params = new URLSearchParams(location.search);
 
 async function init() {
   const [services, photographers, locations, paymentInfo] = await Promise.all([
-    fetch('/api/services').then(r => r.json()),
-    fetch('/api/photographers').then(r => r.json()),
-    fetch('/api/locations').then(r => r.json()),
+    fetch('/api/services').then(r => r.json()).catch(() => []),
+    fetch('/api/photographers').then(r => r.json()).catch(() => []),
+    fetch('/api/locations').then(r => r.json()).catch(() => []),
     fetch('/api/payment-info').then(r => r.json()).catch(() => ({})),
   ]);
-  state.services = services;
-  state.locations = locations;
+  state.services = Array.isArray(services) ? services : [];
+  state.locations = Array.isArray(locations) ? locations : [];
   state.photographerId = photographers[0]?.id || 1;
   state.paymentInfo = paymentInfo;
 
   const presetSlug = params.get('service');
+  const presetPkg = params.get('package');
   if (presetSlug) {
-    state.service = services.find(s => s.slug === presetSlug) || null;
-    if (state.service) state.step = 1;
+    state.service = state.services.find(s => s.slug === presetSlug || String(s.id) === presetSlug) || null;
+    if (state.service) {
+      state.step = 1;
+      if (presetPkg && state.service.packages) {
+        state.package = state.service.packages.find(p => String(p.id) === String(presetPkg) || p.name.toLowerCase() === presetPkg.toLowerCase()) || null;
+        if (state.package) {
+          state.step = 2; // Jump to DATE step
+          loadMonth();
+        }
+      }
+    }
   }
   render();
 }
@@ -76,15 +86,16 @@ function render() {
 
 function renderService() {
   return `
-    <div class="step-label">Step 1 — Select Service</div>
-    <h2 style="margin-bottom:24px;">What kind of session?</h2>
+    <div class="step-label">Step 1 — Pilih Layanan</div>
+    <h2 style="margin-bottom:24px;">Pilihan Jenis Sesi Fotografi</h2>
     ${state.services.map(s => `
-      <div class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}">
-        <div>
+      <div class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;">
+        <div style="width:70px; height:70px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
+        <div style="flex:1;">
           <h3 style="font-size:1.05rem;">${s.name}</h3>
-          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">${s.duration_minutes} min · from ${s.currency} ${s.starting_price}</p>
+          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">${s.duration_minutes} min · Mulai ${s.currency} ${s.starting_price}</p>
         </div>
-        <span style="font-size:1.2rem;">→</span>
+        <span style="font-size:1.2rem; color:var(--gold);">→</span>
       </div>
     `).join('')}
   `;

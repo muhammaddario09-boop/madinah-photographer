@@ -30,9 +30,10 @@ router.get('/services', async (req, res) => {
 
 router.get('/services/:slug', async (req, res) => {
   try { await syncCloudServicesToDb(db); } catch(e) {}
-  const service = db.prepare(`SELECT * FROM services WHERE slug=? AND active=1`).get(req.params.slug);
+  const param = req.params.slug;
+  const service = db.prepare(`SELECT * FROM services WHERE (slug=? OR id=? OR LOWER(slug)=LOWER(?)) AND active=1`).get(param, isNaN(param) ? -1 : Number(param), param);
   if (!service) return res.status(404).json({ error: 'Service not found' });
-  const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1`).all(service.id);
+  const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(service.id);
   res.json({ ...service, packages });
 });
 
