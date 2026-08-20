@@ -6,14 +6,14 @@ const DB_PATH = process.env.DB_PATH || (process.env.VERCEL ? path.join('/tmp', '
 
 let db;
 try {
-  db = new Database(DB_PATH);
-  if (process.env.VERCEL) {
-    try { db.pragma('journal_mode = DELETE'); } catch(e) {}
-  }
+  db = new Database(DB_PATH, { timeout: 10000 });
+  try { db.pragma('journal_mode = WAL'); } catch(e) {}
+  try { db.pragma('synchronous = NORMAL'); } catch(e) {}
 } catch(err) {
   // If opening failed (e.g. corrupted or locked), fallback to clean /tmp or memory
   const fallbackPath = process.env.VERCEL ? `/tmp/data_${Date.now()}.sqlite` : ':memory:';
-  db = new Database(fallbackPath);
+  db = new Database(fallbackPath, { timeout: 10000 });
+  try { db.pragma('journal_mode = WAL'); } catch(e) {}
 }
 
 const { hashPassword } = require('./lib/auth');
