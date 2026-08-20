@@ -54,6 +54,16 @@ function ensureSettings() {
 }
 ensureSettings();
 
+function ensureAvailabilityRules() {
+  try {
+    const rules = db.prepare(`SELECT COUNT(*) n FROM availability_rules`).get();
+    if (rules && rules.n > 0) {
+      db.prepare(`UPDATE availability_rules SET is_off=0, start_time='05:30', end_time='22:30' WHERE is_off=1 OR start_time > '06:00'`).run();
+    }
+  } catch (e) {}
+}
+ensureAvailabilityRules();
+
 function ensureAdminUser() {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@madinahphoto.com';
   const adminPass = process.env.ADMIN_PASSWORD || 'AdminMadinah2026!';
@@ -153,13 +163,13 @@ function seed() {
   const photographerId = p.lastInsertRowid;
 
   const weekly = [
-    [0, 0, '08:00', '20:00'], // Sunday
-    [1, 0, '08:00', '20:00'], // Monday
-    [2, 0, '08:00', '20:00'], // Tuesday
-    [3, 1, null, null],       // Wednesday OFF
-    [4, 0, '14:00', '21:00'], // Thursday
-    [5, 0, '14:00', '21:00'], // Friday
-    [6, 0, '08:00', '21:00'], // Saturday
+    [0, 0, '05:30', '22:30'], // Sunday
+    [1, 0, '05:30', '22:30'], // Monday
+    [2, 0, '05:30', '22:30'], // Tuesday
+    [3, 0, '05:30', '22:30'], // Wednesday
+    [4, 0, '05:30', '22:30'], // Thursday
+    [5, 0, '05:30', '22:30'], // Friday
+    [6, 0, '05:30', '22:30'], // Saturday
   ];
   const insertRule = db.prepare(
     `INSERT INTO availability_rules (photographer_id, day_of_week, is_off, start_time, end_time) VALUES (?,?,?,?,?)`
