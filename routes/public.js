@@ -195,14 +195,18 @@ router.post('/bookings', async (req, res) => {
     }
 
     const location = b.locationId ? db.prepare(`SELECT * FROM locations WHERE id=?`).get(b.locationId) : null;
-    const photographer = db.prepare(`SELECT * FROM photographers WHERE id=?`).get(photographerId);
+    const photographer = (photographerId ? db.prepare(`SELECT * FROM photographers WHERE id=?`).get(photographerId) : null) || { name: 'UMROH LENS' };
     const message = renderConfirmation(
       { ...result, clientName: b.clientName, date: b.date, start_time: b.startTime, end_time: result.endTime },
       service, photographer, location
     );
-    queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'CONFIRMATION', payload: message });
-    queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'REMINDER_24H', payload: null, scheduledFor: null });
-    queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'REMINDER_3H', payload: null, scheduledFor: null });
+    try {
+      queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'CONFIRMATION', payload: message });
+      queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'REMINDER_24H', payload: null, scheduledFor: null });
+      queueNotification(db, { bookingId: result.id, channel: 'WHATSAPP', type: 'REMINDER_3H', payload: null, scheduledFor: null });
+    } catch(notifErr) {
+      console.error('Queue notification notice:', notifErr.message);
+    }
 
     // WhatsApp Direct URL Generation
     const waSetting = db.prepare(`SELECT value FROM settings WHERE key='admin_whatsapp'`).get();
