@@ -3,13 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Services &amp; Packages — Madinah Photographer</title>
+<title>Services &amp; Packages — UMROH LENS Madinah</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  .service-row { display:grid; grid-template-columns: 320px 1fr; gap:44px; padding:44px 0; border-bottom:1px solid var(--line); }
-  @media (max-width: 768px) {
-    .service-row { grid-template-columns: 1fr; gap: 20px; padding: 28px 0; }
+  .service-row {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 44px;
+    padding: 44px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .service-thumb {
+    height: 250px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background-color: #f4f0e6;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  }
+  @media (max-width: 860px) {
+    .service-row { grid-template-columns: 1fr; gap: 20px; padding: 32px 0; }
+    .service-thumb { height: 220px; }
   }
 </style>
 </head>
@@ -34,14 +51,14 @@
 
 <section class="section-tight">
   <div class="container">
-    <p class="eyebrow" data-i18n="nav_services">Services &amp; Packages</p>
-    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="sec_services_title">Choose your session</h1>
+    <p class="eyebrow" data-i18n="nav_services">Layanan &amp; Paket</p>
+    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="sec_services_title">Pilihan Sesi Foto &amp; Video</h1>
   </div>
 </section>
 
-<section class="section">
+<section class="section" style="padding-top:10px;">
   <div class="container">
-    <div class="grid-2" id="services-list"></div>
+    <div id="services-list"></div>
   </div>
 </section>
 
@@ -53,32 +70,42 @@
 </footer>
 
 <script>
-fetch('/api/services').then(r => r.json()).then(async services => {
-  const container = document.getElementById('services-list');
-  const blocks = await Promise.all(services.map(async s => {
-    const detail = await fetch(`/api/services/${s.slug}`).then(r => r.json());
-    return `
-      <div class="service-row">
-        <div class="service-thumb" style="height:220px; margin-bottom:0; ${s.cover_image ? `background-image:url('${s.cover_image}'); background-size:cover; background-position:center;` : ''}"></div>
-        <div>
-          <h2 style="font-size:1.7rem;">${s.name}</h2>
-          <p style="color:var(--charcoal-soft); margin-top:10px; max-width:560px;">${s.description}</p>
-          <div style="display:flex; gap:10px; margin-top:24px; flex-wrap:wrap;">
-            ${detail.packages.map(p => `
-              <div style="border:1px solid var(--line); padding:18px 20px; min-width:180px;">
-                <div class="eyebrow" style="color:var(--charcoal-soft);">${p.name}</div>
-                <div style="font-family:var(--font-display); font-size:1.3rem; margin-top:8px;">${p.currency} ${p.price}</div>
-                <div style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:6px;">${p.duration_minutes} min · ${p.edited_photos} edited photos</div>
-                <a class="btn btn-ghost" style="margin-top:14px; padding:9px 16px; font-size:0.72rem;" href="/booking.html?service=${s.slug}&package=${p.id}">Book Now</a>
-              </div>
-            `).join('')}
+fetch('/api/services')
+  .then(r => r.json())
+  .then(async services => {
+    const container = document.getElementById('services-list');
+    if (!services || services.length === 0) {
+      container.innerHTML = '<p style="color:var(--charcoal-soft); padding:40px 0;">Memuat layanan...</p>';
+      return;
+    }
+    const blocks = await Promise.all(services.map(async s => {
+      const detail = await fetch(`/api/services/${s.slug}`).then(r => r.json());
+      return `
+        <div class="service-row">
+          <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
+          <div>
+            <div class="eyebrow" style="color:var(--gold); margin-bottom:6px;">UMROH LENS MADINAH</div>
+            <h2 style="font-size:1.75rem; font-family:var(--font-display);">${s.name}</h2>
+            <p style="color:var(--charcoal-soft); margin-top:10px; max-width:600px; line-height:1.6;">${s.description}</p>
+            <div style="display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;">
+              ${(detail.packages || []).map(p => `
+                <div style="border:1px solid var(--line); border-radius:4px; padding:18px 22px; min-width:180px; background:#fff;">
+                  <div class="eyebrow" style="color:var(--charcoal-soft);">${p.name}</div>
+                  <div style="font-family:var(--font-display); font-size:1.35rem; margin-top:8px; color:var(--charcoal);">${p.currency} ${p.price}</div>
+                  <div style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:6px;">${p.duration_minutes} min · ${p.edited_photos} edited photos</div>
+                  <a class="btn btn-primary" style="margin-top:14px; padding:8px 16px; font-size:0.72rem; width:100%; text-align:center;" href="/booking.html?service=${s.slug}&package=${p.id}">Pesan Sekarang</a>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  }));
-  container.innerHTML = blocks.join('');
-});
+      `;
+    }));
+    container.innerHTML = blocks.join('');
+  })
+  .catch(err => {
+    document.getElementById('services-list').innerHTML = `<p style="color:var(--status-booked);">Gagal memuat katalog: ${err.message}</p>`;
+  });
 </script>
 </body>
 </html>
