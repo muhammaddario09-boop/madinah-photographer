@@ -4,14 +4,6 @@ const db = require('../db');
 const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
-const {
-  recordBookingToCloud,
-  syncCloudBookingsToDb,
-  syncCloudSettingsToDb,
-  syncCloudPortfolioToDb,
-  syncCloudServicesToDb,
-  syncCloudLocationsToDb
-} = require('../lib/cloudStore');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
@@ -246,33 +238,6 @@ router.post('/bookings', async (req, res) => {
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
-    // Record to central cloud datastore non-blocking
-    recordBookingToCloud({
-      booking_code: result.bookingCode,
-      client_name: b.clientName,
-      client_email: b.clientEmail,
-      client_phone: b.clientPhone,
-      client_country: b.clientCountry || 'Indonesia',
-      service_id: service.id,
-      service_name: service.name,
-      package_id: pkg.id,
-      package_name: pkg.name,
-      location_id: b.locationId || null,
-      location_name: location ? location.name : 'Madinah Area',
-      date: b.date,
-      start_time: b.startTime,
-      end_time: result.endTime,
-      total_price: pkg.price,
-      deposit_amount: depositAmount,
-      currency: pkg.currency,
-      status: 'PENDING',
-      payment_status: b.paymentProof ? 'DEPOSIT_PAID' : 'UNPAID',
-      occasion: b.occasion || 'Umrah',
-      number_of_people: b.numberOfPeople || 1,
-      proof_url: b.paymentProof || null,
-      created_at: new Date().toISOString()
-    }).catch(err => console.error('Cloud sync error:', err.message));
-
     return res.status(201).json({
       bookingCode: result.bookingCode,
       id: result.id,
@@ -293,13 +258,9 @@ router.post('/bookings', async (req, res) => {
   }
 });
 
-router.get('/bookings/:code', async (req, res) => {
+router.get('/bookings/:code', (req, res) => {
   try {
-    let booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
-    if (!booking) {
-      await syncCloudBookingsToDb(db).catch(() => {});
-      booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
-    }
+    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
     const service = booking.service_id ? db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id) : null;
     const pkg = booking.package_id ? db.prepare(`SELECT * FROM packages WHERE id=?`).get(booking.package_id) : null;
@@ -324,28 +285,15 @@ router.get('/bookings/:code', async (req, res) => {
   }
 });
 
-router.post('/bookings/:code/reschedule', async (req, res) => {
+router.post('/bookings/:code/reschedule', (req, res) => {
   try {
-    let booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
-    if (!booking) {
-      await syncCloudBookingsToDb(db);
-      booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
-    }
+    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
     const buffer = bufferMinutes(db);
     const updated = reschedule(db, booking.id, { date: req.body.date, startTime: req.body.startTime, bufferMinutes: buffer }, 'client');
 
     const client = db.prepare(`SELECT * FROM clients WHERE id=?`).get(booking.client_id);
     const service = db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id);
-
-    // Sync to cloud datastore
-    recordBookingToCloud({
-      booking_code: booking.booking_code,
-      date: req.body.date,
-      start_time: req.body.startTime,
-      end_time: updated.end_time,
-      status: 'RESCHEDULE_REQUESTED'
-    }).catch(() => {});
 
     // Generate WhatsApp Notification Template for Reschedule
     const waSetting = db.prepare(`SELECT value FROM settings WHERE key='admin_whatsapp'`).get();

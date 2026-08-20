@@ -130,26 +130,7 @@ router.get('/dashboard', (req, res) => {
   res.json({ todayShoots, upcoming, pendingPayments, revenue });
 });
 
-const {
-  syncCloudBookingsToDb,
-  recordBookingToCloud,
-  removeBookingFromCloud,
-  resetAllBookingsInCloud,
-  recordSettingsToCloud,
-  recordPortfolioToCloud,
-  recordServicesToCloud,
-  recordLocationsToCloud,
-  syncCloudSettingsToDb,
-  syncCloudPortfolioToDb,
-  syncCloudServicesToDb,
-  syncCloudLocationsToDb
-} = require('../lib/cloudStore');
-
 router.get('/bookings', (req, res) => {
-  try {
-    syncCloudBookingsToDb(db).catch(() => {});
-  } catch (e) {}
-
   const { status, from, to } = req.query;
   let sql = `SELECT b.*, 
              COALESCE(c.name, 'Guest') AS client_name, 
@@ -184,23 +165,18 @@ router.get('/bookings/:id', (req, res) => {
   res.json({ booking, client, history, payments });
 });
 
-router.post('/bookings/:id/status', async (req, res) => {
+router.post('/bookings/:id/status', (req, res) => {
   try {
-    await syncCloudBookingsToDb(db);
     let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
     const updated = setStatus(db, booking.id, req.body.status, 'admin', req.body.note || '');
-    const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(booking.id);
-    if (b) {
-      await recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status });
-    }
     res.json({ ok: true, from: updated.status, to: req.body.status });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });
   }
 });
 
-router.delete('/bookings/:id', async (req, res) => {
+router.delete('/bookings/:id', (req, res) => {
   try {
     const booking = db.prepare(`SELECT id, booking_code FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
     if (booking) {
@@ -208,7 +184,6 @@ router.delete('/bookings/:id', async (req, res) => {
       db.prepare(`DELETE FROM booking_history WHERE booking_id=?`).run(booking.id);
       db.prepare(`DELETE FROM notifications WHERE booking_id=?`).run(booking.id);
       db.prepare(`DELETE FROM bookings WHERE id=?`).run(booking.id);
-      await removeBookingFromCloud(booking.booking_code);
     }
     res.json({ ok: true });
   } catch (e) {
@@ -216,23 +191,20 @@ router.delete('/bookings/:id', async (req, res) => {
   }
 });
 
-router.post('/bookings/reset-all', async (req, res) => {
+router.post('/bookings/reset-all', (req, res) => {
   try {
     db.prepare(`DELETE FROM payments`).run();
     db.prepare(`DELETE FROM booking_history`).run();
     db.prepare(`DELETE FROM notifications`).run();
     db.prepare(`DELETE FROM bookings`).run();
-    await resetAllBookingsInCloud();
     res.json({ ok: true, message: 'All bookings cleared successfully.' });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-router.get('/calendar', async (req, res) => {
+router.get('/calendar', (req, res) => {
   try {
-    try { await syncCloudBookingsToDb(db); } catch (e) {}
-
     const from = req.query.from || '2000-01-01';
     const to = req.query.to || '2099-12-31';
     const photographerId = req.query.photographerId;
@@ -298,7 +270,7 @@ router.get('/photographer', (req, res) => {
   }
 });
 
-router.put('/photographer', async (req, res) => {
+router.put('/photographer', (req, res) => {
   try {
     const { name, bio, avatar_url } = req.body || {};
     const p = db.prepare(`SELECT id FROM photographers ORDER BY id LIMIT 1`).get();
@@ -309,11 +281,6 @@ router.put('/photographer', async (req, res) => {
       db.prepare(`INSERT INTO photographers (name, bio, avatar_url) VALUES (?,?,?)`)
         .run(name || 'UMROH LENS', bio || '', avatar_url || '/img/photographer-1.jpg');
     }
-    await recordSettingsToCloud({
-      photographer_name: name,
-      photographer_bio: bio,
-      photographer_avatar: avatar_url
-    }).catch(() => {});
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -334,16 +301,15 @@ router.get('/services-full', (req, res) => {
   }
 });
 
-router.put('/services/:id', async (req, res) => {
+router.put('/services/:id', (req, res) => {
   const { name, description, cover_image, starting_price, currency, edited_photos } = req.body;
   db.prepare(
     `UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=? WHERE id=?`
   ).run(name, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, req.params.id);
-  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.put('/packages/:id', async (req, res) => {
+router.put('/packages/:id', (req, res) => {
   const { name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
   db.prepare(
     `UPDATE packages SET name=?, description=?, price=?, currency=?, duration_minutes=?, edited_photos=?, deposit_percentage=?, cancellation_policy=? WHERE id=?`
@@ -353,11 +319,10 @@ router.put('/packages/:id', async (req, res) => {
     Number(deposit_percentage) || 30, cancellation_policy || '',
     req.params.id
   );
-  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.post('/packages', async (req, res) => {
+router.post('/packages', (req, res) => {
   const { service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
   const info = db.prepare(
     `INSERT INTO packages (service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy)
@@ -368,13 +333,11 @@ router.post('/packages', async (req, res) => {
     Number(duration_minutes) || 30, Number(edited_photos) || 10,
     Number(deposit_percentage) || 30, cancellation_policy || ''
   );
-  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true, id: result.lastInsertRowid });
 });
 
-router.delete('/packages/:id', async (req, res) => {
+router.delete('/packages/:id', (req, res) => {
   db.prepare(`DELETE FROM packages WHERE id=?`).run(req.params.id);
-  await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -388,37 +351,34 @@ router.get('/locations', (req, res) => {
   }
 });
 
-router.post('/locations', async (req, res) => {
+router.post('/locations', (req, res) => {
   try {
     const { name, description, travel_buffer_minutes } = req.body;
     if (!name) return res.status(400).json({ error: 'Location name is required.' });
     const info = db.prepare(
       `INSERT INTO locations (name, description, travel_buffer_minutes) VALUES (?,?,?)`
     ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15);
-    await recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true, id: info.lastInsertRowid });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-router.put('/locations/:id', async (req, res) => {
+router.put('/locations/:id', (req, res) => {
   try {
     const { name, description, travel_buffer_minutes } = req.body;
     db.prepare(
       `UPDATE locations SET name=?, description=?, travel_buffer_minutes=? WHERE id=?`
     ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15, req.params.id);
-    await recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-router.delete('/locations/:id', async (req, res) => {
+router.delete('/locations/:id', (req, res) => {
   try {
     db.prepare(`DELETE FROM locations WHERE id=?`).run(req.params.id);
-    await recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true });
   } catch(e) {
     res.status(500).json({ error: e.message });
@@ -435,7 +395,7 @@ router.get('/portfolio', (req, res) => {
   }
 });
 
-router.post('/portfolio', async (req, res) => {
+router.post('/portfolio', (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   if (!image_url) return res.status(400).json({ error: 'Image URL is required.' });
   const info = db.prepare(
@@ -443,22 +403,19 @@ router.post('/portfolio', async (req, res) => {
      VALUES (?,?,?,?,?,?,?)`
   );
   info.run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
-  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.put('/portfolio/:id', async (req, res) => {
+router.put('/portfolio/:id', (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   db.prepare(
     `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
   ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
-  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.delete('/portfolio/:id', async (req, res) => {
+router.delete('/portfolio/:id', (req, res) => {
   db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
-  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
@@ -474,7 +431,7 @@ router.get('/settings', (req, res) => {
   }
 });
 
-router.put('/settings', async (req, res) => {
+router.put('/settings', (req, res) => {
   const settings = req.body || {};
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (?, ?)
@@ -483,7 +440,6 @@ router.put('/settings', async (req, res) => {
   for (const [key, val] of Object.entries(settings)) {
     upsert.run(key, String(val));
   }
-  await recordSettingsToCloud(settings);
   res.json({ ok: true });
 });
 

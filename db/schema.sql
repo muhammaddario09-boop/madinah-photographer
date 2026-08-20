@@ -1,4 +1,4 @@
--- MADINAH PHOTOGRAPHER — DATABASE SCHEMA
+-- MADINAH PHOTOGRAPHER — DATABASE SCHEMA & SEED DATA
 -- All timestamps stored as UTC ISO-8601 strings; converted to Asia/Riyadh
 -- at the presentation layer (see lib/timezone.js). Never trust client TZ.
 
@@ -68,8 +68,6 @@ CREATE TABLE IF NOT EXISTS locations (
   active INTEGER NOT NULL DEFAULT 1
 );
 
--- Weekly recurring working hours per photographer.
--- day_of_week: 0=Sunday .. 6=Saturday (matches section 13 listing Sun-Sat)
 CREATE TABLE IF NOT EXISTS availability_rules (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   photographer_id INTEGER NOT NULL REFERENCES photographers(id),
@@ -79,7 +77,6 @@ CREATE TABLE IF NOT EXISTS availability_rules (
   end_time TEXT
 );
 
--- Date-specific overrides. Always takes priority over availability_rules.
 CREATE TABLE IF NOT EXISTS availability_overrides (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   photographer_id INTEGER NOT NULL REFERENCES photographers(id),
@@ -93,14 +90,14 @@ CREATE TABLE IF NOT EXISTS availability_overrides (
 
 CREATE TABLE IF NOT EXISTS bookings (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  booking_code TEXT UNIQUE NOT NULL, -- e.g. MDN-2026-0001
+  booking_code TEXT UNIQUE NOT NULL,
   client_id INTEGER NOT NULL REFERENCES clients(id),
   photographer_id INTEGER NOT NULL REFERENCES photographers(id),
   service_id INTEGER NOT NULL REFERENCES services(id),
   package_id INTEGER NOT NULL REFERENCES packages(id),
   location_id INTEGER REFERENCES locations(id),
-  date TEXT NOT NULL,        -- 'YYYY-MM-DD' Asia/Riyadh
-  start_time TEXT NOT NULL,  -- 'HH:MM' Asia/Riyadh
+  date TEXT NOT NULL,
+  start_time TEXT NOT NULL,
   end_time TEXT NOT NULL,
   occasion TEXT,
   number_of_people INTEGER DEFAULT 1,
@@ -115,16 +112,13 @@ CREATE TABLE IF NOT EXISTS bookings (
     CHECK (status IN ('PENDING','AWAITING_PAYMENT','CONFIRMED','RESCHEDULE_REQUESTED','COMPLETED','CANCELLED','NO_SHOW')),
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  -- Hard DB-level guard: the same photographer cannot hold two live bookings
-  -- in the same slot. Combined with the transaction in bookingEngine.js this
-  -- is the second line of defense against double booking / race conditions.
   UNIQUE(photographer_id, date, start_time)
 );
 
 CREATE TABLE IF NOT EXISTS booking_history (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   booking_id INTEGER NOT NULL REFERENCES bookings(id),
-  event TEXT NOT NULL, -- CREATED, CONFIRMED, RESCHEDULED, CANCELLED, ...
+  event TEXT NOT NULL,
   from_date TEXT,
   from_time TEXT,
   to_date TEXT,
@@ -138,10 +132,11 @@ CREATE TABLE IF NOT EXISTS payments (
   booking_id INTEGER NOT NULL REFERENCES bookings(id),
   amount REAL NOT NULL,
   currency TEXT NOT NULL DEFAULT 'SAR',
-  method TEXT NOT NULL, -- BANK_TRANSFER, GATEWAY, CASH
+  method TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('DEPOSIT','FULL','BALANCE')),
   status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING','PAID','FAILED','REFUNDED')),
   reference TEXT,
+  proof_url TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -161,17 +156,17 @@ CREATE TABLE IF NOT EXISTS notifications (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   booking_id INTEGER REFERENCES bookings(id),
   channel TEXT NOT NULL CHECK (channel IN ('WHATSAPP','EMAIL','SMS')),
-  type TEXT NOT NULL, -- CONFIRMATION, REMINDER_24H, REMINDER_3H, RESCHEDULE, CANCELLATION
-  payload TEXT,        -- rendered message body
+  type TEXT NOT NULL,
+  payload TEXT,
   status TEXT NOT NULL DEFAULT 'QUEUED' CHECK (status IN ('QUEUED','SENT','FAILED')),
-  scheduled_for TEXT,   -- when it should fire
+  scheduled_for TEXT,
   sent_at TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS activity_logs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  actor TEXT,      -- e.g. 'admin', 'client', 'system'
+  actor TEXT,
   action TEXT NOT NULL,
   entity TEXT,
   entity_id INTEGER,
@@ -186,3 +181,102 @@ CREATE TABLE IF NOT EXISTS settings (
 
 CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(date);
 CREATE INDEX IF NOT EXISTS idx_bookings_photographer_date ON bookings(photographer_id, date);
+
+-- =========================================================================
+-- INITIAL SEED DATA (PURE SQL)
+-- =========================================================================
+
+-- Default Settings
+INSERT OR IGNORE INTO settings (key, value) VALUES
+  ('studio_name', 'UMROH LENS'),
+  ('min_booking_notice_hours', '12'),
+  ('max_booking_window_days', '90'),
+  ('cancellation_deadline_hours', '48'),
+  ('buffer_minutes', '30'),
+  ('max_sessions_per_day', '8'),
+  ('admin_whatsapp', '+6282175272547'),
+  ('admin_whatsapp_2', '+6281234567890'),
+  ('instagram_url', 'https://instagram.com/umrohlens'),
+  ('instagram_handle', '@umrohlens'),
+  ('bank_sar_name', 'Al Rajhi Bank (Saudi Arabia)'),
+  ('bank_sar_account', 'SA84 8000 0123 4567 8901 2345'),
+  ('bank_sar_holder', 'UMROH LENS Photography Studio'),
+  ('bank_idr_name', 'Bank Central Asia (BCA)'),
+  ('bank_idr_account', '5420123456 (BCA)'),
+  ('bank_idr_holder', 'WAHYU AFRIANSYAH'),
+  ('idr_sar_rate', '4200');
+
+-- Default Photographer
+INSERT OR IGNORE INTO photographers (id, name, bio, avatar_url) VALUES
+  (1, 'UMROH LENS', 'Professional editorial & pilgrimage photography studio based in Madinah Al-Munawwarah. Specializing in Umrah moments, couple portraits, family memories, and golden-hour sessions around Masjid Nabawi.', '/img/photographer-1.jpg');
+
+-- Default Weekly Availability Rules (05:30 - 22:30 everyday)
+INSERT OR IGNORE INTO availability_rules (id, photographer_id, day_of_week, is_off, start_time, end_time) VALUES
+  (1, 1, 0, 0, '05:30', '22:30'),
+  (2, 1, 1, 0, '05:30', '22:30'),
+  (3, 1, 2, 0, '05:30', '22:30'),
+  (4, 1, 3, 0, '05:30', '22:30'),
+  (5, 1, 4, 0, '05:30', '22:30'),
+  (6, 1, 5, 0, '05:30', '22:30'),
+  (7, 1, 6, 0, '05:30', '22:30');
+
+-- Default Locations
+INSERT OR IGNORE INTO locations (id, name, description, travel_buffer_minutes) VALUES
+  (1, 'jabal uhud', 'The Prophet''s Mosque and surrounding plazas.', 15),
+  (2, 'Quba Area', 'The first mosque built in Islam.', 30),
+  (3, 'Uhud Area', 'The historic mountain and battlefield site.', 30),
+  (4, 'Al Madinah Heritage Area', 'Old-city streets and heritage architecture.', 20),
+  (5, 'Hotel', 'In-hotel or hotel-lobby session.', 10),
+  (6, 'Private Location', 'A location you specify.', 30),
+  (7, 'Bir Ali & Qiblatain Area', 'Historic miqat and two-qibla heritage mosque.', 25),
+  (8, 'AlUla Heritage Expedition', 'Exclusive desert rock heritage expedition in Hegra & Elephant Rock.', 60),
+  (9, 'Makkah Al-Mukarramah (Special Request)', 'Private pilgrimage documentation in Holy Makkah.', 60);
+
+-- Default Services
+INSERT OR IGNORE INTO services (id, name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order) VALUES
+  (1, 'Madinah Portrait', 'madinah-portrait', 'Individual editorial portraits around the city''s most timeless corners.', '/img/service-portrait.jpg', 60, 350, 'SAR', 10, 1),
+  (2, 'Couple Session', 'couple-session', 'Intimate couple photography set against Madinah''s golden stone and quiet streets.', '/img/service-couple.jpg', 60, 650, 'SAR', 20, 2),
+  (3, 'Family Session', 'family-session', 'Warm, unposed family and group photography.', '/img/service-family.jpg', 90, 850, 'SAR', 30, 3),
+  (4, 'Umrah Memory Session', 'umrah-memory-session', 'Documenting the quiet, meaningful moments of your pilgrimage.', '/img/service-umrah.jpg', 45, 400, 'SAR', 12, 4),
+  (5, 'Golden Hour Session', 'golden-hour-session', 'Photography timed to sunrise or sunset light.', '/img/service-golden-hour.jpg', 60, 700, 'SAR', 20, 5),
+  (6, 'Private Tour + Photography', 'private-tour-photography', 'A guided location experience paired with a full photography session.', '/img/service-tour.jpg', 120, 1400, 'SAR', 40, 6),
+  (7, 'Cinematic Video & Reels', 'cinematic-video-reels', '4K Video Reels (60s) for Instagram & TikTok with cinematic sound grading and color tone.', '/img/service-reels.jpg', 60, 750, 'SAR', 25, 7),
+  (8, 'Drone & Landmark Perspective', 'drone-landmark-perspective', 'Aerial 4K drone cinematography and wide landmark photography across Madinah & historic sites.', '/img/service-drone.jpg', 90, 1200, 'SAR', 35, 8);
+
+-- Default Packages for Services 1-8
+INSERT OR IGNORE INTO packages (id, service_id, name, description, price, currency, duration_minutes, edited_photos, raw_photos_included, deposit_percentage, cancellation_policy) VALUES
+  (1, 1, 'Essential', '30 minutes, 10 edited photos', 350, 'SAR', 30, 10, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (2, 1, 'Signature', '60 minutes, 25 edited photos', 650, 'SAR', 60, 25, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (3, 1, 'Premium', '90 minutes, 50 edited photos', 950, 'SAR', 90, 50, 1, 30, '50% refund up to 48 hours before the session.'),
+  (4, 2, 'Essential', '30 minutes, 10 edited photos', 650, 'SAR', 30, 10, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (5, 2, 'Signature', '60 minutes, 25 edited photos', 950, 'SAR', 60, 25, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (6, 2, 'Premium', '90 minutes, 50 edited photos', 1250, 'SAR', 90, 50, 1, 30, '50% refund up to 48 hours before the session.'),
+  (7, 3, 'Essential', '30 minutes, 15 edited photos', 850, 'SAR', 30, 15, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (8, 3, 'Signature', '60 minutes, 30 edited photos', 1200, 'SAR', 60, 30, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (9, 3, 'Premium', '90 minutes, 60 edited photos', 1600, 'SAR', 90, 60, 1, 30, '50% refund up to 48 hours before the session.'),
+  (10, 4, 'Essential', '30 minutes, 12 edited photos', 400, 'SAR', 30, 12, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (11, 4, 'Signature', '60 minutes, 25 edited photos', 700, 'SAR', 60, 25, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (12, 4, 'Premium', '90 minutes, 50 edited photos', 1000, 'SAR', 90, 50, 1, 30, '50% refund up to 48 hours before the session.'),
+  (13, 5, 'Essential', '45 minutes, 20 edited photos', 700, 'SAR', 45, 20, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (14, 5, 'Signature', '75 minutes, 35 edited photos', 1050, 'SAR', 75, 35, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (15, 5, 'Premium', '105 minutes, 60 edited photos', 1400, 'SAR', 105, 60, 1, 30, '50% refund up to 48 hours before the session.'),
+  (16, 6, 'Essential', '60 minutes, 30 edited photos', 1400, 'SAR', 60, 30, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (17, 6, 'Signature', '120 minutes, 50 edited photos', 2000, 'SAR', 120, 50, 0, 30, 'Full refund up to 48 hours before the session.'),
+  (18, 6, 'Premium', '180 minutes, 80 edited photos', 2700, 'SAR', 180, 80, 1, 30, '50% refund up to 48 hours before the session.'),
+  (19, 7, 'Essential Reels', '45 minutes, 1 Cinematic Reel (60s) + 15 edited photos', 650, 'SAR', 45, 15, 1, 30, 'Full refund up to 48 hours before the session.'),
+  (20, 7, 'Signature Creator', '75 minutes, 2 Cinematic Reels (60s) + 30 edited photos + Drone', 1100, 'SAR', 75, 30, 1, 30, 'Full refund up to 48 hours before the session.'),
+  (21, 7, 'VVIP Complete Story', '120 minutes, 3 Cinematic Reels + Full Drone + All RAW + 50 photos', 1600, 'SAR', 120, 50, 1, 30, '50% refund up to 48 hours before the session.'),
+  (22, 8, 'Essential Drone', '45 minutes, 15 Drone Aerial Shots + 15 Ground Photos', 800, 'SAR', 45, 30, 1, 30, 'Full refund up to 48 hours before the session.'),
+  (23, 8, 'Signature Landmark', '90 minutes, 30 Drone Aerial Shots + 30 Ground Photos', 1200, 'SAR', 90, 60, 1, 30, 'Full refund up to 48 hours before the session.'),
+  (24, 8, 'VVIP Heritage Aerial', '150 minutes, Full 4K Drone Video + All Photos', 1800, 'SAR', 150, 100, 1, 30, '50% refund up to 48 hours before the session.');
+
+-- Default Portfolio
+INSERT OR IGNORE INTO portfolio (id, image_url, title, category, description, location, featured, sort_order, active) VALUES
+  (1, '/img/service-golden-hour.jpg', 'Golden Hour at Masjid Nabawi', 'Masjid Nabawi', 'Sublime golden sunset lighting reflecting across the white marble courtyard.', 'Masjid Nabawi Area', 1, 1, 1),
+  (2, '/img/service-couple.jpg', 'Serene Couple Portrait', 'Couple', 'Harmonious couple session with architectural backdrops of the Holy City.', 'Masjid Nabawi Area', 1, 2, 1),
+  (3, '/img/service-portrait.jpg', 'Individual Editorial Portrait', 'Portrait', 'Timeless individual portrait capturing personal devotion and serenity.', 'Heritage Area', 1, 3, 1),
+  (4, '/img/service-family.jpg', 'Joyful Family Pilgrimage', 'Family', 'Multi-generational family moments documented during sacred journey.', 'Masjid Nabawi Area', 1, 4, 1),
+  (5, '/img/service-umrah.jpg', 'Moments of Quiet Reflection', 'Umrah', 'Candid documentation of pilgrims engaged in peaceful contemplation.', 'Masjid Nabawi Area', 1, 5, 1),
+  (6, '/img/service-tour.jpg', 'Historic Mount Uhud Expedition', 'Uhud', 'Dramatic mountain terrain and historical battlefield storytelling.', 'Uhud Area', 1, 6, 1),
+  (7, '/img/service-reels.jpg', 'Cinematic 4K Moments', 'Cinematic', 'Dynamic 4K vertical footage crafted for social media reels and stories.', 'Madinah Heritage', 1, 7, 1),
+  (8, '/img/service-drone.jpg', 'Grand Aerial Landmark Perspective', 'Drone', 'Stunning bird-eye view of landmark landscapes and historic minarets.', 'Quba & Uhud Area', 1, 8, 1);
