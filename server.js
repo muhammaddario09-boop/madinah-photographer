@@ -7,6 +7,21 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Clean URL routes for Admin and Public
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
+app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
+app.get('/admin/bookings', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'bookings.html')));
+app.get('/admin/calendar', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'calendar.html')));
+app.get('/admin/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'portfolio.html')));
+app.get('/admin/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
+app.get('/admin/availability', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
+
+app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));
+app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'portfolio.html')));
+app.get('/booking', (req, res) => res.sendFile(path.join(__dirname, 'public', 'booking.html')));
+app.get('/my-booking', (req, res) => res.sendFile(path.join(__dirname, 'public', 'my-booking.html')));
+
 app.use('/api', require('./routes/public'));
 app.use('/api/admin', require('./routes/admin'));
 
