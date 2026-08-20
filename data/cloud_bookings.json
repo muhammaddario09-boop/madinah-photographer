@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-20T02:58:21.688Z",
+  "lastUpdated": "2026-08-20T03:04:14.574Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -110,7 +110,9 @@
     "bank_sar_account": "SA84 8000 0123 4567 8901 2345",
     "bank_sar_holder": "Al-Madani Photography Studio",
     "bank_idr_name": "Bank Syariah Indonesia (BSI) / BCA",
-    "photographer_name": "Test"
+    "photographer_name": "UMROH LENS Official",
+    "photographer_bio": "Studio foto & video sinematik profesional di Madinah Al-Munawwarah.",
+    "photographer_avatar": "/img/photographer-1.jpg"
   },
   "services": [
     {
