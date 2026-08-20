@@ -300,40 +300,7 @@ function selectLanguage(code) {
   if (dd) dd.style.display = 'none';
 }
 
-async function injectFloatingWhatsApp() {
-  if (document.getElementById('floating-wa-btn') || window.location.pathname.startsWith('/admin')) return;
-  
-  let waNumber = '966501234567';
-  try {
-    const res = await fetch('/api/payment-info');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.whatsappNumber) waNumber = data.whatsappNumber.replace(/[^0-9]/g, '');
-    }
-  } catch(e) {}
-
-  const currentLang = getCurrentLanguage();
-  const labels = {
-    en: 'Chat on WhatsApp',
-    id: 'Tanya via WhatsApp',
-    ar: 'تحدث عبر واتساب',
-    ms: 'Hubungi via WhatsApp'
-  };
-  const label = labels[currentLang] || labels.en;
-  const greeting = encodeURIComponent("Assalamu'alaikum UMROH LENS, saya ingin bertanya tentang paket sesi foto di Madinah.");
-
-  const floatA = document.createElement('a');
-  floatA.id = 'floating-wa-btn';
-  floatA.className = 'wa-float';
-  floatA.href = `https://wa.me/${waNumber}?text=${greeting}`;
-  floatA.target = '_blank';
-  floatA.rel = 'noopener noreferrer';
-  floatA.innerHTML = `<span class="wa-float-icon">💬</span> <span>${label}</span>`;
-  document.body.appendChild(floatA);
-}
-
-// Auto-run translation & WhatsApp widget on DOMContentLoaded
+// Auto-run translation on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   applyTranslations(getCurrentLanguage());
-  injectFloatingWhatsApp();
 });

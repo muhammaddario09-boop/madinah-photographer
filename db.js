@@ -34,16 +34,16 @@ function ensureSettings() {
     'cancellation_deadline_hours': '48',
     'buffer_minutes': '30',
     'max_sessions_per_day': '8',
-    'admin_whatsapp': process.env.ADMIN_WHATSAPP || '+966501234567',
+    'admin_whatsapp': process.env.ADMIN_WHATSAPP || '+6282175272547',
     'admin_whatsapp_2': process.env.ADMIN_WHATSAPP_2 || '+6281234567890',
     'instagram_url': 'https://instagram.com/umrohlens',
     'instagram_handle': '@umrohlens',
     'bank_sar_name': 'Al Rajhi Bank (Saudi Arabia)',
     'bank_sar_account': 'SA84 8000 0123 4567 8901 2345',
     'bank_sar_holder': 'UMROH LENS Photography Studio',
-    'bank_idr_name': 'Bank Syariah Indonesia (BSI) / BCA',
-    'bank_idr_account': '7123456789 (BSI) / 5420123456 (BCA)',
-    'bank_idr_holder': 'UMROH LENS Photography',
+    'bank_idr_name': 'Bank Central Asia (BCA)',
+    'bank_idr_account': '5420123456 (BCA)',
+    'bank_idr_holder': 'WAHYU AFRIANSYAH',
     'idr_sar_rate': '4200'
   };
 
@@ -71,27 +71,6 @@ ensureAdminUser();
 const photogCount = db.prepare(`SELECT COUNT(*) as count FROM photographers`).get().count;
 if (photogCount === 0) {
   seed();
-}
-
-function ensureSampleBooking() {
-  const existing = db.prepare(`SELECT id FROM bookings WHERE booking_code='MDN-2026-0001'`).get();
-  if (!existing) {
-    let client = db.prepare(`SELECT id FROM clients WHERE email='ahmad@example.com'`).get();
-    if (!client) {
-      const res = db.prepare(`INSERT INTO clients (name, email, phone, country) VALUES (?,?,?,?)`).run('Ahmad Dahlan', 'ahmad@example.com', '+628123456789', 'Indonesia');
-      client = { id: res.lastInsertRowid };
-    }
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const bRes = db.prepare(
-      `INSERT INTO bookings (booking_code, photographer_id, client_id, service_id, package_id, location_id, date, start_time, end_time, total_price, deposit_amount, currency, status, payment_status, occasion, number_of_people)
-       VALUES (?, 1, ?, 1, 1, 1, ?, '16:00', '17:00', 650, 195, 'SAR', 'CONFIRMED', 'DEPOSIT_PAID', 'Umrah', 2)`
-    ).run('MDN-2026-0001', client.id, todayStr);
-    
-    db.prepare(
-      `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference)
-       VALUES (?, 195, 'SAR', 'BANK_TRANSFER', 'DEPOSIT', 'PAID', 'DP Transfer BSI')`
-    ).run(bRes.lastInsertRowid);
-  }
 }
 function ensureExtendedServicesAndLocations() {
   const extraServices = [

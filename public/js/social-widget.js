@@ -221,6 +221,14 @@
     }
   };
 
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('social-floating-widget');
+    const pop = document.getElementById('social-popup');
+    if (wrap && pop && !wrap.contains(e.target) && pop.style.display === 'block') {
+      pop.style.display = 'none';
+    }
+  });
+
   // Auto-init on page load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadSocialConfig);
