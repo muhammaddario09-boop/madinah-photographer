@@ -83,16 +83,22 @@ router.get('/availability/month', (req, res) => {
   res.json({ year, month, days });
 });
 
-// GET /api/payment-info — returns bank account details and WhatsApp numbers
+// GET /api/payment-info — returns bank account details, dual WhatsApp numbers, and Instagram info
 router.get('/payment-info', async (req, res) => {
   try { await syncCloudSettingsToDb(db); } catch(e) {}
   const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
   const s = {};
   settingsRows.forEach(r => { s[r.key] = r.value; });
   const wa = s.admin_whatsapp || '+966501234567';
+  const wa2 = s.admin_whatsapp_2 || '+6281234567890';
+  const igUrl = s.instagram_url || 'https://instagram.com/umrohlens';
+  const igHandle = s.instagram_handle || '@umrohlens';
   res.json({
     adminWhatsApp: wa,
     whatsappNumber: wa,
+    adminWhatsApp2: wa2,
+    instagramUrl: igUrl,
+    instagramHandle: igHandle,
     bankSAR: {
       name: s.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)',
       account: s.bank_sar_account || 'SA84 8000 0123 4567 8901 2345',

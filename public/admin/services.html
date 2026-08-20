@@ -163,8 +163,20 @@ async function loadData() {
         
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
           <div class="form-row">
-            <label>Admin WhatsApp Number (for customer confirmations)</label>
-            <input type="text" id="set-wa" value="${settings.admin_whatsapp || '+966501234567'}" placeholder="+966501234567 or +628123456789">
+            <label>Admin WhatsApp 1 (Utama / CS 1)</label>
+            <input type="text" id="set-wa" value="${settings.admin_whatsapp || '+966501234567'}" placeholder="+966501234567">
+          </div>
+          <div class="form-row">
+            <label>Admin WhatsApp 2 (CS 2 / Tim Madinah)</label>
+            <input type="text" id="set-wa-2" value="${settings.admin_whatsapp_2 || '+6281234567890'}" placeholder="+6281234567890">
+          </div>
+          <div class="form-row">
+            <label>Instagram Official URL</label>
+            <input type="text" id="set-ig-url" value="${settings.instagram_url || 'https://instagram.com/umrohlens'}" placeholder="https://instagram.com/umrohlens">
+          </div>
+          <div class="form-row">
+            <label>Instagram Handle / Username</label>
+            <input type="text" id="set-ig-handle" value="${settings.instagram_handle || '@umrohlens'}" placeholder="@umrohlens">
           </div>
           <div class="form-row">
             <label>SAR to IDR Exchange Rate (1 SAR = Rp)</label>
@@ -185,7 +197,7 @@ async function loadData() {
             </div>
             <div class="form-row">
               <label>Account Holder Name</label>
-              <input type="text" id="set-sar-holder" value="${settings.bank_sar_holder || 'Al-Madani Photography Studio'}">
+              <input type="text" id="set-sar-holder" value="${settings.bank_sar_holder || 'UMROH LENS Photography Studio'}">
             </div>
           </div>
 
@@ -201,12 +213,12 @@ async function loadData() {
             </div>
             <div class="form-row">
               <label>Account Holder Name</label>
-              <input type="text" id="set-idr-holder" value="${settings.bank_idr_holder || 'Al-Madani Photography'}">
+              <input type="text" id="set-idr-holder" value="${settings.bank_idr_holder || 'UMROH LENS Photography'}">
             </div>
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="savePaymentSettings()" style="margin-top:14px; padding:9px 22px; font-size:0.82rem; background:#128C7E;">Save Bank &amp; WhatsApp Settings</button>
+        <button class="btn btn-primary" onclick="savePaymentSettings()" style="margin-top:14px; padding:9px 22px; font-size:0.82rem; background:#128C7E;">Save Bank, WhatsApp &amp; Instagram Settings</button>
       </div>
 
       <!-- Photographer Profile Section -->
@@ -330,6 +342,9 @@ async function handleServiceCover(input, svcId) {
 
 async function savePaymentSettings() {
   const admin_whatsapp = document.getElementById('set-wa').value.trim();
+  const admin_whatsapp_2 = document.getElementById('set-wa-2').value.trim();
+  const instagram_url = document.getElementById('set-ig-url').value.trim();
+  const instagram_handle = document.getElementById('set-ig-handle').value.trim();
   const idr_sar_rate = document.getElementById('set-rate').value.trim();
   const bank_sar_name = document.getElementById('set-sar-name').value.trim();
   const bank_sar_account = document.getElementById('set-sar-acc').value.trim();
@@ -342,6 +357,9 @@ async function savePaymentSettings() {
     method: 'PUT',
     body: JSON.stringify({
       admin_whatsapp,
+      admin_whatsapp_2,
+      instagram_url,
+      instagram_handle,
       idr_sar_rate,
       bank_sar_name,
       bank_sar_account,
@@ -351,7 +369,7 @@ async function savePaymentSettings() {
       bank_idr_holder
     })
   });
-  showToast('Bank accounts and WhatsApp settings updated!');
+  showToast('Bank accounts, WhatsApp, & Instagram settings updated!');
 }
 
 async function savePhotographer() {
