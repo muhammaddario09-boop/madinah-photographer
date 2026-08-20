@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-20T08:24:42.414Z",
+  "lastUpdated": "2026-08-20T08:50:34.078Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -567,6 +567,17 @@
     }
   ],
   "portfolio": [
+    {
+      "id": 11,
+      "image_url": "/img/service-golden-hour.jpg",
+      "title": "Sunset over Mount Uhud",
+      "category": "Golden Hour",
+      "description": "",
+      "location": "Madinah",
+      "featured": 1,
+      "sort_order": 0,
+      "active": 1
+    },
     {
       "id": 1,
       "image_url": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa",
