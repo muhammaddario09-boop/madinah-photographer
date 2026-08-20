@@ -1,32 +1,6 @@
 {
-  "lastUpdated": "2026-08-20T06:04:04.758Z",
-  "bookings": [
-    {
-      "booking_code": "MDN-2026-0001",
-      "client_name": "Ahmad Dahlan",
-      "client_email": "ahmad@example.com",
-      "client_phone": "+6281234567890",
-      "client_country": "Indonesia",
-      "service_id": 1,
-      "service_name": "Madinah Portrait",
-      "package_id": 3,
-      "package_name": "Premium",
-      "location_id": 1,
-      "location_name": "Masjid Nabawi Area",
-      "date": "2026-09-12",
-      "start_time": "16:00",
-      "end_time": "17:30",
-      "total_price": 950,
-      "deposit_amount": 285,
-      "currency": "SAR",
-      "status": "PENDING",
-      "payment_status": "PENDING",
-      "occasion": "Umrah",
-      "number_of_people": 2,
-      "proof_url": null,
-      "created_at": "2026-08-20T06:04:04.513Z"
-    }
-  ],
+  "lastUpdated": "2026-08-20T06:04:14.538Z",
+  "bookings": [],
   "settings": {
     "admin_whatsapp": "+6282175272547",
     "admin_whatsapp_2": "+6281234567890",
@@ -602,5 +576,5 @@
       "active": 1
     }
   ],
-  "count": 1
+  "count": 0
 }
