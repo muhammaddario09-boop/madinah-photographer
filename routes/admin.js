@@ -229,6 +229,29 @@ router.delete('/availability/overrides/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+router.get('/photographer', (req, res) => {
+  const p = db.prepare(`SELECT * FROM photographers ORDER BY id LIMIT 1`).get();
+  res.json(p || {});
+});
+
+router.put('/photographer', async (req, res) => {
+  const { name, bio, avatar_url } = req.body;
+  const p = db.prepare(`SELECT id FROM photographers ORDER BY id LIMIT 1`).get();
+  if (p) {
+    db.prepare(`UPDATE photographers SET name=?, bio=?, avatar_url=? WHERE id=?`)
+      .run(name || 'UMROH LENS', bio || '', avatar_url || '/img/photographer-1.jpg', p.id);
+  } else {
+    db.prepare(`INSERT INTO photographers (name, bio, avatar_url) VALUES (?,?,?)`)
+      .run(name || 'UMROH LENS', bio || '', avatar_url || '/img/photographer-1.jpg');
+  }
+  await recordSettingsToCloud({
+    photographer_name: name,
+    photographer_bio: bio,
+    photographer_avatar: avatar_url
+  }).catch(() => {});
+  res.json({ ok: true });
+});
+
 // --- Services & Price List Manager ---
 router.get('/services-full', (req, res) => {
   const services = db.prepare(`SELECT * FROM services ORDER BY sort_order`).all();

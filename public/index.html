@@ -3,26 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UMROH LENS — Professional Photography in Madinah</title>
-<meta name="description" content="Jasa fotografer profesional di Madinah Al-Munawwarah untuk jemaah Umrah, pasangan, dan keluarga. Abadikan momen suci Anda di Masjid Nabawi & sudut terbaik kota Madinah.">
-<meta property="og:title" content="UMROH LENS — Madinah Photography">
-<meta property="og:description" content="Dokumentasi foto profesional di Madinah Al-Munawwarah untuk jemaah Umrah & keluarga. Pesan jadwal online mudah dan cepat.">
-<meta property="og:image" content="/img/portfolio-1.jpg">
-<meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>UMROH LENS — Professional Photographer in Madinah Al-Munawwarah</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
+<style>
+  .photographer-profile-box {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 36px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+  }
+  .photographer-avatar-frame {
+    width: 100%;
+    height: 320px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+  .cred-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+  @media (max-width: 768px) {
+    .photographer-profile-box {
+      grid-template-columns: 1fr;
+      padding: 24px;
+      gap: 24px;
+    }
+    .photographer-avatar-frame {
+      height: 260px;
+    }
+  }
+</style>
 </head>
 <body>
-
 <nav class="nav">
   <div class="nav-inner">
     <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
     <div class="nav-links">
       <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
       <a href="/services.html" data-i18n="nav_services">Services</a>
-      <a href="/index.html#about" data-i18n="nav_about">About</a>
-      <a href="/index.html#faq" data-i18n="nav_faq">FAQ</a>
+      <a href="#about" data-i18n="nav_about">About</a>
+      <a href="#faq" data-i18n="nav_faq">FAQ</a>
       <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
@@ -34,42 +70,53 @@
 </nav>
 
 <header class="hero">
-  <div class="hero-content">
-    <div class="hero-loc" data-i18n="hero_eyebrow">📍 Madinah, Saudi Arabia</div>
-    <h1 data-i18n="hero_title">Capture your<br>Madinah moments</h1>
-    <p data-i18n="hero_sub">Professional photography experiences in Madinah, created to preserve your most meaningful moments — from pilgrimage to portrait.</p>
+  <div class="hero-inner">
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Madinah Al-Munawwarah</p>
+    <h1 data-i18n="hero_title">Dokumentasi Foto Bersejarah di Kota Nabi</h1>
+    <p data-i18n="hero_sub">Jasa foto profesional untuk jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour di sudut-sudut terbaik kota Madinah.</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="/booking.html" data-i18n="hero_cta_book">Book a Session</a>
-      <a class="btn btn-ghost" href="/portfolio.html" data-i18n="hero_cta_view">View Portfolio</a>
+      <a class="btn btn-primary" href="/booking.html" data-i18n="hero_cta_book">Pesan Jadwal Sesi</a>
+      <a class="btn btn-ghost" href="/portfolio.html" data-i18n="hero_cta_view">Lihat Galeri Foto</a>
     </div>
   </div>
 </header>
 
+<!-- About Photographer Section -->
 <section class="section" id="about">
-  <div class="container" style="max-width:720px;">
-    <p class="eyebrow">About the studio</p>
-    <h2 style="margin-top:14px;">A quiet, editorial approach to a city full of meaning.</h2>
-    <p style="margin-top:22px; color:var(--charcoal-soft); font-size:1.05rem;">
-      Based in Madinah, UMROH LENS captures pilgrims, families, and couples with a
-      documentary sensibility — unobtrusive, patient, and attentive to the light the city
-      offers at dawn and dusk. Every session is booked and scheduled online, with a real-time
-      calendar kept accurate to the minute.
-    </p>
+  <div class="container">
+    <div class="photographer-profile-box" id="photographer-container">
+      <div class="photographer-avatar-frame" id="p-avatar-img" style="background-image: url('/img/photographer-1.jpg');"></div>
+      <div>
+        <p class="eyebrow" style="color:var(--gold);" data-i18n="nav_about">TENTANG FOTOGRAFER</p>
+        <h2 id="p-display-name" style="margin-top:8px; font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.2rem);">UMROH LENS Photography Studio</h2>
+        <p id="p-display-bio" style="margin-top:16px; color:var(--charcoal-soft); font-size:0.98rem; line-height:1.7;">
+          Fotografer profesional berbasis di Madinah Al-Munawwarah, berpengalaman mengabadikan momen sakral jemaah Umrah, pasangan, dan keluarga Indonesia di sekitar Masjid Nabawi dan situs bersejarah Kota Madinah. Mengutamakan pendekatan natural, ramah, dan memandu setiap sudut pose terbaik.
+        </p>
+        
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;">
+          <span class="cred-badge">🌟 5+ Tahun di Madinah</span>
+          <span class="cred-badge">📸 1.000+ Sesi Terlaksana</span>
+          <span class="cred-badge">🇮🇩 Bahasa Indonesia Ramah</span>
+          <span class="cred-badge">⚡ 24-48 Jam Pengiriman File</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 <hr class="hairline">
 
+<!-- Services Section -->
 <section class="section">
   <div class="container">
-    <p class="eyebrow">Services</p>
-    <h2 style="margin-top:14px; margin-bottom:44px;">Six ways to be photographed in Madinah.</h2>
+    <p class="eyebrow" data-i18n="nav_services">Pilihan Layanan</p>
+    <h2 style="margin-top:14px; margin-bottom:44px;" data-i18n="sec_services_title">Koleksi Layanan Foto &amp; Sinematik</h2>
   </div>
   <div class="container">
     <div class="grid-3" id="services-grid"></div>
   </div>
-  <div class="container" style="margin-top:36px;">
-    <a class="btn btn-ghost" href="/services.html">View all services &amp; packages</a>
+  <div class="container" style="margin-top:36px; text-align:center;">
+    <a class="btn btn-ghost" href="/services.html">Lihat Semua Layanan &amp; Paket Detail →</a>
   </div>
 </section>
 
@@ -104,18 +151,18 @@
 <section class="section" id="faq">
   <div class="container" style="max-width:760px;">
     <p class="eyebrow">FAQ</p>
-    <h2 style="margin-top:14px; margin-bottom:36px;">Good to know before you book.</h2>
+    <h2 style="margin-top:14px; margin-bottom:36px;">Pertanyaan Umum Jemaah</h2>
     <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
-      <h3>Do I need to create an account?</h3>
-      <p style="color:var(--charcoal-soft); margin-top:8px;">No — booking is guest-friendly. You can create an account after your session to manage future bookings.</p>
+      <h3 style="font-size:1.05rem;">Apakah fotografer bisa memandu pose dan lokasi terbaik?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Tentu! Fotografer kami sangat mengenal sudut-sudut terbaik dan waktu pencahayaan golden hour terindah di sekitar Masjid Nabawi, Quba, dan Uhud.</p>
     </div>
     <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
-      <h3>How much is the deposit?</h3>
-      <p style="color:var(--charcoal-soft); margin-top:8px;">Most packages require a 30% deposit to confirm your slot. The remainder is due at the session.</p>
+      <h3 style="font-size:1.05rem;">Berapa deposit yang diperlukan untuk konfirmasi jadwal?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Deposit sebesar 30% via transfer Bank BSI / BCA (Rupiah) atau Al Rajhi (SAR). Sisa pembayaran diselesaikan saat sesi di Madinah.</p>
     </div>
     <div class="faq-item" style="padding:20px 0;">
-      <h3>Can I reschedule?</h3>
-      <p style="color:var(--charcoal-soft); margin-top:8px;">Yes, from your booking confirmation page, subject to the cancellation policy on your package.</p>
+      <h3 style="font-size:1.05rem;">Apakah jadwal sesi foto bisa diubah (reschedule)?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Bisa. Anda dapat mengajukan permohonan reschedule langsung dari halaman Cek Reservasi Saya secara mudah dan cepat.</p>
     </div>
   </div>
 </section>
@@ -123,19 +170,19 @@
 <footer class="footer">
   <div class="container">
     <div>
-      <h3>UMROH LENS Photography</h3>
-      <p style="opacity:0.7; margin-top:10px; max-width:280px; font-size:0.9rem;">Editorial photography sessions across Madinah, Saudi Arabia.</p>
+      <h3 style="font-family:var(--font-display); font-size:1.2rem;">UMROH LENS Madinah</h3>
+      <p style="opacity:0.7; margin-top:10px; max-width:280px; font-size:0.9rem;">Jasa dokumentasi foto &amp; video sinematik profesional di Madinah Al-Munawwarah.</p>
     </div>
     <div class="footer-cols">
       <div class="footer-col">
-        <a href="/portfolio.html">Portfolio</a>
-        <a href="/services.html">Services</a>
-        <a href="/booking.html">Book a Session</a>
+        <a href="/portfolio.html">Portofolio</a>
+        <a href="/services.html">Layanan &amp; Paket</a>
+        <a href="/booking.html">Pesan Sesi Foto</a>
       </div>
       <div class="footer-col">
-        <a href="#">WhatsApp</a>
-        <a href="#">Email</a>
-        <a href="#">Instagram</a>
+        <a href="/my-booking.html">Cek Reservasi Saya</a>
+        <a href="#about">Tentang Kami</a>
+        <a href="#faq">FAQ</a>
       </div>
     </div>
   </div>
@@ -146,20 +193,36 @@
 </footer>
 
 <script>
-fetch('/api/services').then(r => r.json()).then(services => {
-  const grid = document.getElementById('services-grid');
-  grid.innerHTML = services.slice(0,6).map(s => `
-    <a class="service-card" href="/booking.html?service=${s.slug}" style="display:block;">
-      <div class="service-thumb"></div>
-      <h3>${s.name}</h3>
-      <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px;">${s.description}</p>
-      <div class="service-meta">
-        <span>${s.duration_minutes} min</span>
-        <span class="service-price">from ${s.currency} ${s.starting_price}</span>
-      </div>
-    </a>
-  `).join('');
-});
+// Load photographer details
+fetch('/api/photographers')
+  .then(r => r.json())
+  .then(list => {
+    if (list && list.length > 0) {
+      const p = list[0];
+      if (p.name) document.getElementById('p-display-name').textContent = p.name;
+      if (p.bio) document.getElementById('p-display-bio').textContent = p.bio;
+      if (p.avatar_url) document.getElementById('p-avatar-img').style.backgroundImage = `url('${p.avatar_url}')`;
+    }
+  })
+  .catch(() => {});
+
+// Load services cards with photos
+fetch('/api/services')
+  .then(r => r.json())
+  .then(services => {
+    const grid = document.getElementById('services-grid');
+    grid.innerHTML = services.slice(0,6).map(s => `
+      <a class="service-card" href="/booking.html?service=${s.slug}" style="display:block; text-decoration:none; color:inherit;">
+        <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; height:200px; border-radius:4px; margin-bottom:14px;"></div>
+        <h3 style="font-family:var(--font-display); font-size:1.25rem;">${s.name}</h3>
+        <p style="color:var(--charcoal-soft); font-size:0.9rem; margin-top:8px; line-height:1.5;">${s.description}</p>
+        <div class="service-meta" style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:10px;">
+          <span style="font-size:0.8rem; color:var(--charcoal-soft);">${s.duration_minutes} min</span>
+          <span class="service-price" style="font-weight:600; color:var(--gold);">Mulai ${s.currency} ${s.starting_price}</span>
+        </div>
+      </a>
+    `).join('');
+  });
 </script>
 </body>
 </html>
