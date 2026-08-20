@@ -46,9 +46,9 @@
   "services": [
     {
       "id": 1,
-      "name": "Madinah Portrait Editorial",
+      "name": "Madinah Portrait",
       "slug": "madinah-portrait",
-      "description": "Individual editorial portraits around the city holy places.",
+      "description": "Individual editorial portraits around the city's most timeless corners.",
       "cover_image": "/img/service-portrait.jpg",
       "duration_minutes": 60,
       "starting_price": 350,
