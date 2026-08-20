@@ -145,12 +145,10 @@ const {
   syncCloudLocationsToDb
 } = require('../lib/cloudStore');
 
-router.get('/bookings', async (req, res) => {
+router.get('/bookings', (req, res) => {
   try {
-    await syncCloudBookingsToDb(db);
-  } catch (e) {
-    console.error('Cloud sync error on /bookings:', e.message);
-  }
+    syncCloudBookingsToDb(db).catch(() => {});
+  } catch (e) {}
 
   const { status, from, to } = req.query;
   let sql = `SELECT b.*, 
@@ -323,14 +321,17 @@ router.put('/photographer', async (req, res) => {
 });
 
 // --- Services & Price List Manager ---
-router.get('/services-full', async (req, res) => {
-  try { await syncCloudServicesToDb(db); } catch(e) {}
-  const services = db.prepare(`SELECT * FROM services ORDER BY sort_order`).all();
-  const full = services.map(s => {
-    const packages = db.prepare(`SELECT * FROM packages WHERE service_id = ? ORDER BY price`).all(s.id);
-    return { ...s, packages };
-  });
-  res.json(full);
+router.get('/services-full', (req, res) => {
+  try {
+    const services = db.prepare(`SELECT * FROM services ORDER BY sort_order`).all();
+    const full = services.map(s => {
+      const packages = db.prepare(`SELECT * FROM packages WHERE service_id = ? ORDER BY price`).all(s.id);
+      return { ...s, packages };
+    });
+    res.json(full);
+  } catch (err) {
+    res.json([]);
+  }
 });
 
 router.put('/services/:id', async (req, res) => {
@@ -378,9 +379,8 @@ router.delete('/packages/:id', async (req, res) => {
 });
 
 // --- Locations & Shooting Spots Manager ---
-router.get('/locations', async (req, res) => {
+router.get('/locations', (req, res) => {
   try {
-    try { await syncCloudLocationsToDb(db); } catch(e) {}
     const locations = db.prepare(`SELECT * FROM locations ORDER BY id`).all();
     res.json(locations);
   } catch(e) {
@@ -426,9 +426,8 @@ router.delete('/locations/:id', async (req, res) => {
 });
 
 // --- Portfolio & Gallery Manager ---
-router.get('/portfolio', async (req, res) => {
+router.get('/portfolio', (req, res) => {
   try {
-    try { await syncCloudPortfolioToDb(db); } catch(e) {}
     const items = db.prepare(`SELECT * FROM portfolio ORDER BY sort_order, id DESC`).all();
     res.json(items || []);
   } catch (err) {
@@ -442,9 +441,10 @@ router.post('/portfolio', async (req, res) => {
   const info = db.prepare(
     `INSERT INTO portfolio (image_url, title, category, description, location, featured, sort_order)
      VALUES (?,?,?,?,?,?,?)`
-  ).run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
+  );
+  info.run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
   await recordPortfolioToCloud(db).catch(() => {});
-  res.json({ ok: true, id: info.lastInsertRowid });
+  res.json({ ok: true });
 });
 
 router.put('/portfolio/:id', async (req, res) => {
@@ -463,12 +463,15 @@ router.delete('/portfolio/:id', async (req, res) => {
 });
 
 // --- Settings Manager (WhatsApp & Bank Accounts) ---
-router.get('/settings', async (req, res) => {
-  try { await syncCloudSettingsToDb(db); } catch (e) {}
-  const rows = db.prepare(`SELECT key, value FROM settings`).all();
-  const map = {};
-  rows.forEach(r => { map[r.key] = r.value; });
-  res.json(map);
+router.get('/settings', (req, res) => {
+  try {
+    const rows = db.prepare(`SELECT key, value FROM settings`).all();
+    const map = {};
+    rows.forEach(r => { map[r.key] = r.value; });
+    res.json(map);
+  } catch (e) {
+    res.json({});
+  }
 });
 
 router.put('/settings', async (req, res) => {

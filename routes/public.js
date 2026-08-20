@@ -112,9 +112,8 @@ router.get('/availability/month', (req, res) => {
 });
 
 // GET /api/payment-info — returns bank account details, dual WhatsApp numbers, and Instagram info
-router.get('/payment-info', async (req, res) => {
+router.get('/payment-info', (req, res) => {
   try {
-    try { await syncCloudSettingsToDb(db); } catch(e) {}
     const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
     const s = {};
     settingsRows.forEach(r => { s[r.key] = r.value; });
