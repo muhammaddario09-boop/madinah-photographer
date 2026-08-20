@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-20T08:04:25.707Z",
+  "lastUpdated": "2026-08-20T08:05:42.953Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -602,5 +602,69 @@
       "active": 1
     }
   ],
-  "count": 1
+  "locations": [
+    {
+      "id": 1,
+      "name": "JABAL UHUD",
+      "description": "The Prophet's Mosque and surrounding plazas.",
+      "travel_buffer_minutes": 15,
+      "active": 1
+    },
+    {
+      "id": 2,
+      "name": "Quba Area",
+      "description": "The first mosque built in Islam.",
+      "travel_buffer_minutes": 30,
+      "active": 1
+    },
+    {
+      "id": 3,
+      "name": "Uhud Area",
+      "description": "The historic mountain and battlefield site.",
+      "travel_buffer_minutes": 30,
+      "active": 1
+    },
+    {
+      "id": 4,
+      "name": "Al Madinah Heritage Area",
+      "description": "Old-city streets and heritage architecture.",
+      "travel_buffer_minutes": 20,
+      "active": 1
+    },
+    {
+      "id": 5,
+      "name": "Hotel",
+      "description": "In-hotel or hotel-lobby session.",
+      "travel_buffer_minutes": 10,
+      "active": 1
+    },
+    {
+      "id": 6,
+      "name": "Private Location",
+      "description": "A location you specify.",
+      "travel_buffer_minutes": 30,
+      "active": 1
+    },
+    {
+      "id": 7,
+      "name": "Bir Ali & Qiblatain Area",
+      "description": "Historic miqat and two-qibla heritage mosque.",
+      "travel_buffer_minutes": 25,
+      "active": 1
+    },
+    {
+      "id": 8,
+      "name": "AlUla Heritage Expedition",
+      "description": "Exclusive desert rock heritage expedition in Hegra & Elephant Rock.",
+      "travel_buffer_minutes": 60,
+      "active": 1
+    },
+    {
+      "id": 9,
+      "name": "Makkah Al-Mukarramah (Special Request)",
+      "description": "Private pilgrimage documentation in Holy Makkah.",
+      "travel_buffer_minutes": 60,
+      "active": 1
+    }
+  ]
 }
