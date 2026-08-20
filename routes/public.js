@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
+const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
 const { recordBookingToCloud, syncCloudBookingsToDb, syncCloudSettingsToDb, syncCloudPortfolioToDb } = require('../lib/cloudStore');
 
 function bufferMinutes(db) {
@@ -251,7 +252,7 @@ router.post('/bookings', async (req, res) => {
       whatsappUrl,
     });
   } catch (e) {
-    res.status(e.status || 500).json({ error: e.status ? e.message : 'Your booking could not be completed. Please try again.' });
+    res.status(e.status || 500).json({ error: e.message || 'Your booking could not be completed. Please try again.' });
   }
 });
 
