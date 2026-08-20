@@ -153,19 +153,28 @@ router.get('/bookings', async (req, res) => {
   }
 
   const { status, from, to } = req.query;
-  let sql = `SELECT b.*, c.name AS client_name, c.phone AS client_phone, s.name AS service_name, p.name AS photographer_name,
+  let sql = `SELECT b.*, 
+             COALESCE(c.name, 'Guest') AS client_name, 
+             COALESCE(c.phone, '') AS client_phone, 
+             COALESCE(s.name, 'Madinah Session') AS service_name, 
+             COALESCE(p.name, 'UMROH LENS') AS photographer_name,
              (SELECT proof_url FROM payments WHERE booking_id=b.id AND proof_url IS NOT NULL ORDER BY id DESC LIMIT 1) AS proof_url
              FROM bookings b
-             JOIN clients c ON c.id=b.client_id
-             JOIN services s ON s.id=b.service_id
-             JOIN photographers p ON p.id=b.photographer_id
+             LEFT JOIN clients c ON c.id=b.client_id
+             LEFT JOIN services s ON s.id=b.service_id
+             LEFT JOIN photographers p ON p.id=b.photographer_id
              WHERE 1=1`;
   const params = [];
   if (status) { sql += ` AND b.status=?`; params.push(status); }
   if (from) { sql += ` AND b.date>=?`; params.push(from); }
   if (to) { sql += ` AND b.date<=?`; params.push(to); }
   sql += ` ORDER BY b.date DESC, b.start_time DESC`;
-  res.json(db.prepare(sql).all(...params));
+  try {
+    res.json(db.prepare(sql).all(...params));
+  } catch(err) {
+    console.error('Admin /bookings SQL error:', err.message);
+    res.json([]);
+  }
 });
 
 router.get('/bookings/:id', (req, res) => {
@@ -247,7 +256,8 @@ router.get('/calendar', async (req, res) => {
 
 // --- Availability manager ---
 router.get('/availability/rules', (req, res) => {
-  const photographerId = req.query.photographerId;
+  const photoRow = db.prepare(`SELECT id FROM photographers LIMIT 1`).get();
+  const photographerId = req.query.photographerId || (photoRow ? photoRow.id : 1);
   res.json(db.prepare(`SELECT * FROM availability_rules WHERE photographer_id=? ORDER BY day_of_week`).all(photographerId));
 });
 
@@ -259,7 +269,8 @@ router.put('/availability/rules/:id', (req, res) => {
 });
 
 router.get('/availability/overrides', (req, res) => {
-  const photographerId = req.query.photographerId;
+  const photoRow = db.prepare(`SELECT id FROM photographers LIMIT 1`).get();
+  const photographerId = req.query.photographerId || (photoRow ? photoRow.id : 1);
   res.json(db.prepare(`SELECT * FROM availability_overrides WHERE photographer_id=? ORDER BY date`).all(photographerId));
 });
 

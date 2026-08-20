@@ -255,7 +255,7 @@ router.post('/bookings', async (req, res) => {
       deposit_amount: depositAmount,
       currency: pkg.currency,
       status: 'PENDING',
-      payment_status: b.paymentProof ? 'DEPOSIT_PAID' : 'PENDING',
+      payment_status: b.paymentProof ? 'DEPOSIT_PAID' : 'UNPAID',
       occasion: b.occasion || 'Umrah',
       number_of_people: b.numberOfPeople || 1,
       proof_url: b.paymentProof || null,
