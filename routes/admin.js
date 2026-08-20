@@ -190,23 +190,25 @@ router.post('/bookings/:id/status', async (req, res) => {
 
 router.get('/calendar', async (req, res) => {
   try {
-    await syncCloudBookingsToDb(db);
-  } catch (e) {
-    console.error('Cloud sync error on /calendar:', e.message);
-  }
+    try { await syncCloudBookingsToDb(db); } catch (e) {}
 
-  const { from, to, photographerId } = req.query;
-  let sql = `SELECT b.id, b.booking_code, b.date, b.start_time, b.end_time, b.status,
-             c.name AS client_name, s.name AS service_name, p.name AS photographer_name
-             FROM bookings b
-             JOIN clients c ON c.id=b.client_id
-             JOIN services s ON s.id=b.service_id
-             JOIN photographers p ON p.id=b.photographer_id
-             WHERE b.date BETWEEN ? AND ? AND b.status NOT IN ('CANCELLED')`;
-  const params = [from, to];
-  if (photographerId) { sql += ` AND b.photographer_id=?`; params.push(photographerId); }
-  sql += ` ORDER BY b.date, b.start_time`;
-  res.json(db.prepare(sql).all(...params));
+    const from = req.query.from || '2000-01-01';
+    const to = req.query.to || '2099-12-31';
+    const photographerId = req.query.photographerId;
+    let sql = `SELECT b.id, b.booking_code, b.date, b.start_time, b.end_time, b.status,
+               c.name AS client_name, s.name AS service_name, p.name AS photographer_name
+               FROM bookings b
+               JOIN clients c ON c.id=b.client_id
+               JOIN services s ON s.id=b.service_id
+               JOIN photographers p ON p.id=b.photographer_id
+               WHERE b.date BETWEEN ? AND ? AND b.status NOT IN ('CANCELLED')`;
+    const params = [from, to];
+    if (photographerId) { sql += ` AND b.photographer_id=?`; params.push(photographerId); }
+    sql += ` ORDER BY b.date, b.start_time`;
+    res.json(db.prepare(sql).all(...params));
+  } catch (err) {
+    res.json([]);
+  }
 });
 
 // --- Availability manager ---
@@ -329,8 +331,13 @@ router.delete('/packages/:id', async (req, res) => {
 
 // --- Portfolio & Gallery Manager ---
 router.get('/portfolio', async (req, res) => {
-  try { await syncCloudPortfolioToDb(db); } catch(e) {}
-  res.json(db.prepare(`SELECT * FROM portfolio WHERE active=1 ORDER BY sort_order, id DESC`).all());
+  try {
+    try { await syncCloudPortfolioToDb(db); } catch(e) {}
+    const items = db.prepare(`SELECT * FROM portfolio ORDER BY sort_order, id DESC`).all();
+    res.json(items || []);
+  } catch (err) {
+    res.json([]);
+  }
 });
 
 router.post('/portfolio', async (req, res) => {
