@@ -21,7 +21,11 @@ function bufferMinutes(db) {
 router.get('/services', async (req, res) => {
   try { await syncCloudServicesToDb(db); } catch(e) {}
   const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order`).all();
-  res.json(services);
+  const full = services.map(s => {
+    const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(s.id);
+    return { ...s, packages };
+  });
+  res.json(full);
 });
 
 router.get('/services/:slug', async (req, res) => {
