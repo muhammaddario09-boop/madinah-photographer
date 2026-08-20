@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-20T02:45:03.597Z",
+  "lastUpdated": "2026-08-20T02:58:21.688Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -109,7 +109,8 @@
     "bank_sar_name": "Al Rajhi Bank (Saudi Arabia)",
     "bank_sar_account": "SA84 8000 0123 4567 8901 2345",
     "bank_sar_holder": "Al-Madani Photography Studio",
-    "bank_idr_name": "Bank Syariah Indonesia (BSI) / BCA"
+    "bank_idr_name": "Bank Syariah Indonesia (BSI) / BCA",
+    "photographer_name": "Test"
   },
   "services": [
     {
