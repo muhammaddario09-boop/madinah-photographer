@@ -1,1382 +1,326 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UMROH LENS — Professional Photographer in Madinah & Makkah</title>
-  <meta name="description" content="Jasa dokumentasi foto & video sinematik profesional jemaah Umrah di Madinah Al-Munawwarah dan Makkah Al-Mukarramah.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            amber: {
-              DEFAULT: '#F59E0B',
-              50: '#FFFBEB',
-              100: '#FEF3C7',
-              200: '#FDE68A',
-              300: '#FCD34D',
-              400: '#FBBF24',
-              500: '#F59E0B',
-              600: '#D97706',
-              700: '#B45309',
-              800: '#92400E',
-              900: '#78350F',
-            },
-            card: 'var(--card)',
-            background: 'var(--bg)',
-            foreground: 'var(--fg)',
-            secondary: 'var(--sec)',
-            border: 'var(--brd)',
-            muted: 'var(--muted)',
-          },
-          fontFamily: {
-            sans: ['Space Grotesk', 'Inter', 'sans-serif'],
-            serif: ['Fraunces', 'Cormorant Garamond', 'serif'],
-          },
-          boxShadow: {
-            'glow-amber': '0 0 35px -5px rgba(245, 158, 11, 0.35)',
-            'glow-subtle': '0 4px 20px -2px rgba(217, 119, 6, 0.18)',
-          },
-          animation: {
-            'marquee': 'marquee 36s linear infinite',
-          },
-          keyframes: {
-            marquee: {
-              '0%': { transform: 'translateX(0%)' },
-              '100%': { transform: 'translateX(-50%)' },
-            }
-          }
-        }
-      }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UMROH LENS — Professional Photographer in Madinah Al-Munawwarah</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .photographer-profile-box {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 36px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+  }
+  .photographer-avatar-frame {
+    width: 100%;
+    height: 320px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+  .cred-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+  @media (max-width: 768px) {
+    .photographer-profile-box {
+      grid-template-columns: 1fr;
+      padding: 24px;
+      gap: 24px;
     }
-  </script>
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- React & Babel for Standalone Live Execution -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <style>
-    :root {
-      --bg: #FAFAF8;
-      --fg: #111827;
-      --card: #FFFFFF;
-      --sec: #F3F4F6;
-      --brd: #E5E7EB;
-      --muted: #6B7280;
+    .photographer-avatar-frame {
+      height: 260px;
     }
-    .dark {
-      --bg: #08090C;
-      --fg: #F9FAFB;
-      --card: #10121A;
-      --sec: #181C26;
-      --brd: #222634;
-      --muted: #9CA3AF;
-    }
-    body {
-      background-color: var(--bg);
-      color: var(--fg);
-      font-family: 'Space Grotesk', sans-serif;
-      overflow-x: hidden;
-    }
-    .glass-nav {
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
-  </style>
+  }
+</style>
 </head>
-<body class="min-h-full transition-colors duration-300">
-  <div id="root"></div>
-
-  <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
-
-    // Fallback data if API is starting up
-    const DEFAULT_SERVICES = [
-      {
-        id: 1,
-        slug: 'madinah-portrait',
-        name: 'Madinah Portrait & Couple Session',
-        description: 'Sesi foto personal & pasangan di pelataran Masjid Nabawi dengan pencahayaan golden hour dan panduan pose santun.',
-        cover_image: '/img/service-portrait.jpg',
-        starting_price: 350,
-        currency: 'SAR',
-        duration_minutes: 60,
-        packages: [
-          { id: 1, name: 'Essential (30 min)', price: 350, duration_minutes: 30, edited_photos: 10, deposit_percentage: 30, description: '30 menit sesi, 10 foto edit, 50+ file mentah.' },
-          { id: 2, name: 'Signature (60 min)', price: 650, duration_minutes: 60, edited_photos: 25, deposit_percentage: 30, description: '60 menit golden hour, 25 foto edit, 100+ file mentah.' },
-          { id: 3, name: 'Premium (90 min)', price: 950, duration_minutes: 90, edited_photos: 50, deposit_percentage: 30, description: '90 menit santai, 50 foto edit, video pendek 15s.' }
-        ]
-      },
-      {
-        id: 2,
-        slug: 'family-group',
-        name: 'Family & Group Full Session',
-        description: 'Dokumentasi lengkap dan ramah lansia/anak untuk keluarga besar jemaah Umrah.',
-        cover_image: '/img/service-family.jpg',
-        starting_price: 450,
-        currency: 'SAR',
-        duration_minutes: 90,
-        packages: [
-          { id: 4, name: 'Standard Family (60 min)', price: 650, duration_minutes: 60, edited_photos: 30, deposit_percentage: 30, description: 'Foto keluarga besar & perorangan.' },
-          { id: 5, name: 'Complete Family (120 min)', price: 1100, duration_minutes: 120, edited_photos: 60, deposit_percentage: 30, description: '2 jam sesi foto santai di beberapa titik Nabawi.' }
-        ]
-      },
-      {
-        id: 3,
-        slug: 'cinematic-reels',
-        name: 'Cinematic Reels & 4K Video',
-        description: 'Video sinematik 60-90 detik format vertikal siap upload Instagram Reels & TikTok dengan musik syahdu.',
-        cover_image: '/img/service-reels.jpg',
-        starting_price: 500,
-        currency: 'SAR',
-        duration_minutes: 90,
-        packages: [
-          { id: 6, name: 'Single Reel (45 min)', price: 500, duration_minutes: 45, edited_photos: 15, deposit_percentage: 30, description: '1 video sinematik 4K + 15 foto edit.' },
-          { id: 7, name: 'Dual Reels Pack (90 min)', price: 850, duration_minutes: 90, edited_photos: 30, deposit_percentage: 30, description: '2 video sinematik 4K + 30 foto edit.' }
-        ]
-      }
-    ];
-
-    const FAQS = [
-      {
-        q: 'Bagaimana cara memesan jadwal sesi foto di UMROH LENS?',
-        a: 'Pilih paket layanan yang diinginkan di menu "Pesan Sesi", tentukan tanggal & waktu yang diinginkan, isi data jemaah, lalu lakukan konfirmasi ke admin via WhatsApp untuk penguncian jadwal resmi.'
-      },
-      {
-        q: 'Apakah fotografer bisa memandu pose bagi jemaah yang kaku?',
-        a: 'Tentu saja! Fotografer kami adalah muslim Indonesia yang ramah dan sangat berpengalaman memandu pose alami (candid), sudut terbaik, dan momen sakral tanpa membuat Anda canggung.'
-      },
-      {
-        q: 'Berapa lama proses edit dan penyerahan file foto/video?',
-        a: 'Semua foto mentah (original high-res) dan hasil editan warna terpilih akan dikirimkan melalui link Google Drive privat dalam 24 hingga 48 jam setelah sesi selesai.'
-      },
-      {
-        q: 'Bagaimana sistem pembayaran dan deposit (DP)?',
-        a: 'Untuk mengunci jadwal, diperlukan DP sebesar 30% via transfer Bank BCA / Bank Syariah Indonesia (BSI) dalam Rupiah atau Bank Al Rajhi / Tunai SAR. Sisa pelunasan diselesaikan saat sesi di Madinah/Makkah.'
-      },
-      {
-        q: 'Apakah jadwal sesi foto bisa diubah (Reschedule)?',
-        a: 'Bisa. Anda dapat menghubungi admin WhatsApp kami paling lambat 24 jam sebelum jadwal sesi tanpa biaya tambahan.'
-      },
-      {
-        q: 'Apakah sesi foto diperbolehkan di area Masjid Nabawi dan Makkah?',
-        a: 'Ya, kami mengambil foto di pelataran luar Masjid Nabawi, sekitar payung elektrik, gerbang utama, dan area bersejarah sesuai aturan resmi otoritas Haramain dengan menjaga adab ibadah.'
-      }
-    ];
-
-    function App() {
-      const [theme, setTheme] = useState('dark');
-      const [activeTab, setActiveTab] = useState('home');
-      
-      // Dynamic Data from Backend
-      const [services, setServices] = useState([]);
-      const [portfolio, setPortfolio] = useState([]);
-      const [locations, setLocations] = useState([]);
-      const [photographer, setPhotographer] = useState(null);
-      const [paymentInfo, setPaymentInfo] = useState({
-        adminWhatsApp: '+6282175272547',
-        adminWhatsApp2: '+6281234567890',
-        instagramUrl: 'https://instagram.com/umrohlens',
-        bankIDR: { rate: 4200, name: 'Bank Central Asia (BCA)', account: '5420123456', holder: 'WAHYU AFRIANSYAH' },
-        bankSAR: { name: 'Al Rajhi Bank', account: 'SA84 8000 0123 4567 8901 2345', holder: 'UMROH LENS' }
-      });
-      const [isLoading, setIsLoading] = useState(true);
-
-      // Booking Wizard State
-      const [bookingStep, setBookingStep] = useState(1);
-      const [selectedServiceId, setSelectedServiceId] = useState(null);
-      const [selectedPackageId, setSelectedPackageId] = useState(null);
-      const [selectedDate, setSelectedDate] = useState('');
-      const [selectedLocationId, setSelectedLocationId] = useState(1);
-      const [selectedSlot, setSelectedSlot] = useState('16:00');
-      const [clientName, setClientName] = useState('');
-      const [clientWa, setClientWa] = useState('');
-      const [clientEmail, setClientEmail] = useState('');
-      const [clientHotel, setClientHotel] = useState('');
-      const [clientPax, setClientPax] = useState('2');
-      const [clientNotes, setClientNotes] = useState('');
-      const [paymentProofBase64, setPaymentProofBase64] = useState('');
-      const [isSubmitting, setIsSubmitting] = useState(false);
-      const [confirmedBooking, setConfirmedBooking] = useState(null);
-      const [bookingError, setBookingError] = useState('');
-
-      // My Booking Search
-      const [searchQuery, setSearchQuery] = useState('');
-      const [searchResult, setSearchResult] = useState(null);
-      const [isSearching, setIsSearching] = useState(false);
-      const [hasSearched, setHasSearched] = useState(false);
-
-      // Lightbox
-      const [lightboxImg, setLightboxImg] = useState(null);
-
-      // Portfolio Filter
-      const [portFilter, setPortFilter] = useState('all');
-
-      // Theme toggle
-      useEffect(() => {
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }, [theme]);
-
-      // Re-init lucide icons on render
-      useEffect(() => {
-        if (window.lucide) window.lucide.createIcons();
-      });
-
-      // Fetch dynamic backend data on mount
-      useEffect(() => {
-        async function fetchBackendData() {
-          try {
-            const [sRes, pRes, lRes, setRes, phRes] = await Promise.all([
-              fetch('/api/services').catch(() => null),
-              fetch('/api/portfolio').catch(() => null),
-              fetch('/api/locations').catch(() => null),
-              fetch('/api/payment-info').catch(() => null),
-              fetch('/api/photographers').catch(() => null),
-            ]);
-
-            if (sRes && sRes.ok) {
-              const sData = await sRes.json();
-              setServices(sData.length ? sData : DEFAULT_SERVICES);
-              if (sData.length) {
-                setSelectedServiceId(sData[0].id);
-                if (sData[0].packages && sData[0].packages.length) {
-                  setSelectedPackageId(sData[0].packages[0].id);
-                }
-              }
-            } else {
-              setServices(DEFAULT_SERVICES);
-              setSelectedServiceId(DEFAULT_SERVICES[0].id);
-              setSelectedPackageId(DEFAULT_SERVICES[0].packages[0].id);
-            }
-
-            if (pRes && pRes.ok) {
-              const pData = await pRes.json();
-              setPortfolio(pData);
-            }
-
-            if (lRes && lRes.ok) {
-              const lData = await lRes.json();
-              setLocations(lData);
-              if (lData.length) setSelectedLocationId(lData[0].id);
-            }
-
-            if (setRes && setRes.ok) {
-              const setData = await setRes.json();
-              setPaymentInfo(setData);
-            }
-
-            if (phRes && phRes.ok) {
-              const phData = await phRes.json();
-              if (phData && phData.length) setPhotographer(phData[0]);
-            }
-          } catch (e) {
-            console.error('Error loading backend data:', e);
-            setServices(DEFAULT_SERVICES);
-          } finally {
-            setIsLoading(false);
-          }
-        }
-
-        fetchBackendData();
-      }, []);
-
-      // Check URL parameters (e.g. ?service=madinah-portrait or ?tab=booking)
-      useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const tabParam = urlParams.get('tab');
-        const srvParam = urlParams.get('service');
-        if (tabParam) setActiveTab(tabParam);
-        if (srvParam && services.length) {
-          const match = services.find(s => s.slug === srvParam);
-          if (match) {
-            setSelectedServiceId(match.id);
-            if (match.packages && match.packages.length) setSelectedPackageId(match.packages[0].id);
-            setActiveTab('booking');
-            setBookingStep(2);
-          }
-        }
-      }, [services]);
-
-      const rate = paymentInfo?.bankIDR?.rate || 4200;
-      const formatSAR = (amt) => `SAR ${Number(amt || 0).toLocaleString('id-ID')}`;
-      const formatIDR = (amtSAR) => `Rp ${(Number(amtSAR || 0) * rate).toLocaleString('id-ID')}`;
-
-      // Selected entities
-      const currentService = services.find(s => s.id === Number(selectedServiceId)) || services[0] || DEFAULT_SERVICES[0];
-      const availablePackages = currentService?.packages || [];
-      const currentPackage = availablePackages.find(p => p.id === Number(selectedPackageId)) || availablePackages[0];
-
-      // Calendar days generator
-      const upcomingDays = useMemo(() => {
-        const list = [];
-        const today = new Date();
-        for (let i = 1; i <= 21; i++) {
-          const d = new Date();
-          d.setDate(today.getDate() + i);
-          list.push({
-            dateStr: d.toISOString().split('T')[0],
-            dayName: d.toLocaleDateString('id-ID', { weekday: 'short' }),
-            dayNum: d.getDate(),
-            monthName: d.toLocaleDateString('id-ID', { month: 'short' })
-          });
-        }
-        return list;
-      }, []);
-
-      // Initial date
-      useEffect(() => {
-        if (!selectedDate && upcomingDays.length) {
-          setSelectedDate(upcomingDays[0].dateStr);
-        }
-      }, [upcomingDays, selectedDate]);
-
-      // Handle Image compression for proof
-      const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const img = new Image();
-          img.src = evt.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const maxWidth = 1000;
-            let width = img.width;
-            let height = img.height;
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            setPaymentProofBase64(canvas.toDataURL('image/jpeg', 0.8));
-          };
-        };
-        reader.readAsDataURL(file);
-      };
-
-      // Submit Real Booking to Backend
-      const handleSubmitBooking = async () => {
-        setBookingError('');
-        if (!clientName.trim()) {
-          setBookingError('Silakan masukkan nama lengkap jemaah.');
-          return;
-        }
-        if (!clientWa.trim()) {
-          setBookingError('Silakan masukkan nomor WhatsApp aktif.');
-          return;
-        }
-
-        setIsSubmitting(true);
-        try {
-          const payload = {
-            serviceId: currentService.id,
-            packageId: currentPackage?.id || 1,
-            locationId: Number(selectedLocationId) || 1,
-            date: selectedDate || upcomingDays[0].dateStr,
-            startTime: selectedSlot,
-            clientName: clientName.trim(),
-            clientEmail: clientEmail.trim() || `${clientWa.replace(/[^0-9]/g, '')}@umrohlens.client`,
-            clientPhone: clientWa.trim(),
-            clientCountry: 'Indonesia',
-            occasion: 'Umrah & Ziarah',
-            numberOfPeople: Number(clientPax) || 2,
-            specialRequest: clientHotel ? `Hotel: ${clientHotel}. Catatan: ${clientNotes}` : clientNotes,
-            paymentProof: paymentProofBase64 || null
-          };
-
-          const res = await fetch('/api/bookings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
-          const data = await res.json();
-          if (!res.ok) {
-            throw new Error(data.error || 'Gagal memproses pemesanan.');
-          }
-
-          setConfirmedBooking(data);
-          setBookingStep(4);
-        } catch (err) {
-          setBookingError(err.message);
-        } finally {
-          setIsSubmitting(false);
-        }
-      };
-
-      // Search Booking from API
-      const handleSearchBooking = async (e) => {
-        e.preventDefault();
-        if (!searchQuery.trim()) return;
-        setHasSearched(true);
-        setIsSearching(true);
-        setSearchResult(null);
-
-        try {
-          const code = searchQuery.trim();
-          const res = await fetch(`/api/bookings/${encodeURIComponent(code)}`);
-          if (res.ok) {
-            const data = await res.json();
-            setSearchResult(data);
-          } else {
-            setSearchResult(null);
-          }
-        } catch (err) {
-          setSearchResult(null);
-        } finally {
-          setIsSearching(false);
-        }
-      };
-
-      const filteredPortfolio = useMemo(() => {
-        if (!portfolio || portfolio.length === 0) return [];
-        if (portFilter === 'all') return portfolio;
-        return portfolio.filter(item => 
-          (item.category || '').toLowerCase().includes(portFilter.toLowerCase())
-        );
-      }, [portfolio, portFilter]);
-
-      const waAdminNumber = (paymentInfo?.adminWhatsApp || '6282175272547').replace(/[^0-9]/g, '');
-
-      return (
-        <div className="min-h-screen flex flex-col">
-          {/* ========== NAVBAR ========== */}
-          <header className="fixed top-0 left-0 right-0 z-50 py-3.5 glass-nav bg-background/85 border-b border-border transition-all">
-            <div className="mx-auto max-w-[1400px] px-6 flex items-center justify-between">
-              
-              {/* Logo */}
-              <div 
-                onClick={() => setActiveTab('home')} 
-                className="flex items-center gap-3 cursor-pointer group"
-              >
-                <div className="h-10 w-10 rounded-xl bg-amber flex items-center justify-center text-black font-bold shadow-glow-amber group-hover:scale-105 transition-transform">
-                  <i data-lucide="camera" className="w-5 h-5"></i>
-                </div>
-                <div>
-                  <span className="text-xl font-bold font-serif tracking-tight block leading-none">
-                    UMROH <span className="text-amber">LENS</span>
-                  </span>
-                  <span className="text-[10px] tracking-[0.25em] text-muted uppercase font-semibold block mt-1">
-                    Madinah • Makkah
-                  </span>
-                </div>
-              </div>
-
-              {/* Nav Items */}
-              <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-                {[
-                  { id: 'home', label: 'Beranda' },
-                  { id: 'services', label: 'Layanan & Paket' },
-                  { id: 'portfolio', label: 'Portofolio' },
-                  { id: 'about', label: 'Tentang' },
-                  { id: 'faq', label: 'FAQ' },
-                  { id: 'my-booking', label: 'Cek Reservasi' }
-                ].map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => { setActiveTab(item.id); setBookingError(''); }}
-                    className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                      activeTab === item.id 
-                        ? 'bg-amber/15 text-amber font-bold' 
-                        : 'text-muted hover:text-foreground hover:bg-secondary'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
-
-              {/* Right Tools */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-foreground hover:bg-amber hover:text-black border border-border transition-all"
-                  title="Ganti Tema Gelap / Terang"
-                >
-                  <i data-lucide={theme === 'dark' ? 'sun' : 'moon'} className="w-4 h-4"></i>
-                </button>
-
-                <button
-                  onClick={() => { setActiveTab('booking'); setBookingStep(1); }}
-                  className="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-amber hover:bg-amber-400 text-black text-xs font-bold uppercase tracking-wider shadow-glow-amber transition-all hover:scale-105"
-                >
-                  <i data-lucide="calendar" className="w-3.5 h-3.5"></i>
-                  Pesan Sesi
-                </button>
-              </div>
-
-            </div>
-          </header>
-
-          {/* ========== MAIN CONTENT ========== */}
-          <main className="flex-1 pt-20">
-
-            {/* TAB 1: HOME */}
-            {activeTab === 'home' && (
-              <div>
-                {/* Hero Section */}
-                <section className="relative pt-24 pb-20 md:pt-36 md:pb-28 text-center overflow-hidden">
-                  <div className="absolute inset-0 z-0 opacity-20">
-                    <img 
-                      src="/img/service-golden-hour.jpg" 
-                      onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=2000&auto=format&fit=crop'; }}
-                      className="w-full h-full object-cover" 
-                      alt="Madinah"
-                    />
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber/15 rounded-full blur-[130px]" />
-
-                  <div className="max-w-4xl mx-auto px-6 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber/10 border border-amber/30 text-amber text-xs font-bold uppercase tracking-[0.2em] mb-6">
-                      <i data-lucide="sparkles" className="w-3.5 h-3.5"></i>
-                      <span>Madinah Al-Munawwarah &amp; Makkah</span>
-                    </div>
-
-                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold text-foreground mb-6 leading-tight">
-                      Dokumentasi Visual Bersejarah di <span className="text-amber italic">Tanah Suci</span>
-                    </h1>
-
-                    <p className="text-muted text-base sm:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-10">
-                      Jasa foto profesional dan video sinematik 4K untuk jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour di sudut-sudut terbaik Kota Nabi.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                      <button
-                        onClick={() => { setActiveTab('booking'); setBookingStep(1); }}
-                        className="w-full sm:w-auto px-8 py-4 rounded-full bg-amber hover:bg-amber-400 text-black text-xs font-bold uppercase tracking-wider shadow-glow-amber transition-all hover:scale-105 flex items-center justify-center gap-2"
-                      >
-                        <i data-lucide="calendar" className="w-4 h-4"></i>
-                        Pesan Jadwal Sesi
-                      </button>
-
-                      <button
-                        onClick={() => setActiveTab('portfolio')}
-                        className="w-full sm:w-auto px-8 py-4 rounded-full bg-card hover:bg-secondary text-foreground text-xs font-bold uppercase tracking-wider border border-border transition-all flex items-center justify-center gap-2"
-                      >
-                        <i data-lucide="image" className="w-4 h-4 text-amber"></i>
-                        Lihat Galeri Foto
-                      </button>
-                    </div>
-                  </div>
-                </section>
-
-                {/* Infinite Moving Marquee Portfolio Strip */}
-                <div className="py-6 bg-card/60 border-y border-border overflow-hidden">
-                  <div className="max-w-[1400px] mx-auto px-6 mb-3 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-widest text-amber flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-amber animate-ping"></span>
-                      📸 Live Portfolio Showcase
-                    </span>
-                    <button 
-                      onClick={() => setActiveTab('portfolio')}
-                      className="text-xs font-semibold text-muted hover:text-amber"
-                    >
-                      Lihat Semua Portofolio →
-                    </button>
-                  </div>
-                  
-                  <div className="flex overflow-hidden select-none [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-                    <div className="flex gap-4 animate-marquee shrink-0 hover:[animation-play-state:paused] py-2">
-                      {portfolio.length > 0 ? (
-                        [...portfolio, ...portfolio].map((item, idx) => (
-                          <div
-                            key={idx}
-                            onClick={() => setLightboxImg(item)}
-                            className="relative w-64 h-80 rounded-2xl overflow-hidden cursor-pointer shrink-0 border border-border shadow-md group"
-                          >
-                            <img src={item.image_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-4 flex flex-col justify-end text-white">
-                              <span className="text-[9px] font-extrabold uppercase bg-amber text-black px-2 py-0.5 rounded self-start mb-1">
-                                {item.category || 'Madinah'}
-                              </span>
-                              <h4 className="text-xs font-bold font-serif line-clamp-1">{item.title}</h4>
-                              <p className="text-[10px] text-white/70 mt-0.5">📍 {item.location || 'Madinah'}</p>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="p-4 text-xs text-muted">Memuat galeri karya...</div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* About Photographer */}
-                <section className="py-20 max-w-[1400px] mx-auto px-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    <div className="lg:col-span-5 relative">
-                      <div className="rounded-3xl overflow-hidden border border-border shadow-2xl relative">
-                        <img 
-                          src={photographer?.avatar_url || '/img/photographer-1.jpg'} 
-                          alt="Photographer"
-                          className="w-full h-[400px] object-cover"
-                        />
-                        <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-card/90 backdrop-blur-md border border-border flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-bold text-amber">Studio Berpengalaman</p>
-                            <p className="text-sm font-bold font-serif">{photographer?.name || 'UMROH LENS Studio'}</p>
-                          </div>
-                          <i data-lucide="award" className="w-6 h-6 text-amber"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="lg:col-span-7 space-y-6">
-                      <p className="text-xs font-bold text-amber uppercase tracking-[0.25em]">TENTANG FOTOGRAFER</p>
-                      <h2 className="text-3xl sm:text-4xl font-serif font-bold leading-tight">
-                        Fotografer Muslim Indonesia di Kota Suci
-                      </h2>
-                      <p className="text-muted text-sm sm:text-base leading-relaxed font-light">
-                        {photographer?.bio || 'Berpengalaman mendampingi ribuan jemaah Umrah, pasangan, dan keluarga Indonesia untuk mengabadikan momen sakral penuh kehangatan dengan standar estetika visual kelas atas dan pemahaman mendalam tentang adab di Tanah Suci.'}
-                      </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        {[
-                          '🌟 5+ Tahun di Madinah & Makkah',
-                          '📸 1.200+ Sesi Terlaksana',
-                          '🇮🇩 Bahasa Indonesia Ramah & Sabar',
-                          '⚡ 24-48 Jam Pengiriman Drive'
-                        ].map((b, i) => (
-                          <div key={i} className="flex items-center gap-2 p-3 rounded-xl bg-card border border-border text-xs font-medium">
-                            <i data-lucide="check-circle-2" className="w-4 h-4 text-amber shrink-0"></i>
-                            <span>{b}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                {/* Featured Services */}
-                <section className="py-20 bg-card/40 border-t border-border">
-                  <div className="max-w-[1400px] mx-auto px-6">
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-amber mb-2">PILIHAN LAYANAN</p>
-                        <h2 className="text-3xl font-serif font-bold">Koleksi Layanan Foto &amp; Sinematik</h2>
-                      </div>
-                      <button 
-                        onClick={() => setActiveTab('services')}
-                        className="text-xs font-bold text-amber hover:underline self-start"
-                      >
-                        Lihat Semua Paket →
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {services.slice(0, 3).map(s => (
-                        <div key={s.id} className="rounded-3xl bg-card border border-border overflow-hidden flex flex-col justify-between group hover:border-amber/50 hover:shadow-glow-subtle transition-all">
-                          <div className="h-48 relative overflow-hidden">
-                            <img src={s.cover_image || '/img/service-portrait.jpg'} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          </div>
-                          <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                            <div>
-                              <h3 className="text-lg font-serif font-bold text-foreground">{s.name}</h3>
-                              <p className="text-xs text-muted mt-1 leading-relaxed line-clamp-2">{s.description}</p>
-                            </div>
-                            <div className="pt-4 border-t border-border flex items-center justify-between">
-                              <div>
-                                <span className="text-base font-bold text-amber font-serif block">{formatSAR(s.starting_price)}</span>
-                                <span className="text-[11px] text-muted">~ {formatIDR(s.starting_price)}</span>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setSelectedServiceId(s.id);
-                                  if (s.packages && s.packages.length) setSelectedPackageId(s.packages[0].id);
-                                  setActiveTab('booking');
-                                  setBookingStep(2);
-                                }}
-                                className="px-4 py-2 rounded-full bg-amber text-black text-xs font-bold hover:bg-amber-400 transition-colors"
-                              >
-                                Pilih Paket
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-              </div>
-            )}
-
-            {/* TAB 2: SERVICES & PRICING */}
-            {activeTab === 'services' && (
-              <div className="max-w-[1400px] mx-auto px-6 py-12">
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber">PILIHAN PAKET LENGKAP</span>
-                  <h1 className="text-4xl font-serif font-bold my-3">Katalog Layanan &amp; Daftar Harga</h1>
-                  <p className="text-muted text-sm">Tarif transparan dalam Saudi Riyal (SAR) &amp; Rupiah (IDR) dengan jaminan kepuasan visual.</p>
-                </div>
-
-                <div className="space-y-12">
-                  {services.map(s => (
-                    <div key={s.id} className="rounded-3xl bg-card border border-border overflow-hidden p-8 shadow-sm">
-                      <div className="flex flex-col lg:flex-row gap-8 items-start mb-8 pb-8 border-b border-border">
-                        <div className="w-full lg:w-4/12 h-60 rounded-2xl overflow-hidden">
-                          <img src={s.cover_image || '/img/service-portrait.jpg'} alt={s.name} className="w-full h-full object-cover" />
-                        </div>
-                        <div className="w-full lg:w-8/12 space-y-3">
-                          <span className="text-xs font-bold text-amber uppercase tracking-wider">LAYANAN UTAMA</span>
-                          <h2 className="text-2xl font-serif font-bold">{s.name}</h2>
-                          <p className="text-sm text-muted leading-relaxed">{s.description}</p>
-                          <div className="pt-2 flex items-center gap-4 text-xs font-semibold text-foreground">
-                            <span>⏱️ Durasi standar: {s.duration_minutes || 60} Menit</span>
-                            <span>📸 Mulai dari {formatSAR(s.starting_price)}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Package Tiers Grid */}
-                      <h4 className="text-sm font-bold uppercase tracking-wider text-muted mb-4">Pilihan Tingkatan Paket ({s.packages?.length || 0} Tiers):</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {(s.packages || []).map(p => (
-                          <div key={p.id} className="p-6 rounded-2xl bg-secondary border border-border flex flex-col justify-between space-y-4">
-                            <div>
-                              <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-serif font-bold text-base">{p.name}</h3>
-                              </div>
-                              <p className="text-xs text-muted">{p.description}</p>
-                              <div className="mt-4 space-y-2 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <i data-lucide="clock" className="w-3.5 h-3.5 text-amber"></i>
-                                  <span>{p.duration_minutes} Menit Sesi Foto</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <i data-lucide="sparkles" className="w-3.5 h-3.5 text-amber"></i>
-                                  <span>{p.edited_photos} Foto Edit Warna Terbaik</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <i data-lucide="hard-drive" className="w-3.5 h-3.5 text-amber"></i>
-                                  <span>Semua File Mentah (Google Drive)</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="pt-4 border-t border-border/60 flex items-center justify-between">
-                              <div>
-                                <span className="text-lg font-serif font-bold text-amber block">{formatSAR(p.price)}</span>
-                                <span className="text-[11px] text-muted">~ {formatIDR(p.price)}</span>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setSelectedServiceId(s.id);
-                                  setSelectedPackageId(p.id);
-                                  setActiveTab('booking');
-                                  setBookingStep(2);
-                                }}
-                                className="px-4 py-2 rounded-full bg-amber hover:bg-amber-400 text-black text-xs font-bold shadow-sm"
-                              >
-                                Pilih
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: PORTFOLIO */}
-            {activeTab === 'portfolio' && (
-              <div className="max-w-[1400px] mx-auto px-6 py-12">
-                <div className="text-center max-w-3xl mx-auto mb-12">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber">GALERI FOTO &amp; VIDEO</span>
-                  <h1 className="text-4xl font-serif font-bold my-3">Koleksi Karya di Tanah Suci</h1>
-                  <p className="text-muted text-sm">Dokumentasi nyata momen sakral ibadah di Masjid Nabawi &amp; Makkah.</p>
-                </div>
-
-                {/* Filter Pills */}
-                <div className="flex gap-2 flex-wrap justify-center mb-10">
-                  {[
-                    { id: 'all', label: 'Semua Foto' },
-                    { id: 'nabawi', label: 'Masjid Nabawi' },
-                    { id: 'couple', label: 'Couple' },
-                    { id: 'portrait', label: 'Portrait' },
-                    { id: 'family', label: 'Family' },
-                    { id: 'uhud', label: 'Uhud & Quba' },
-                    { id: 'cinematic', label: 'Cinematic Reels' }
-                  ].map(f => (
-                    <button
-                      key={f.id}
-                      onClick={() => setPortFilter(f.id)}
-                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                        portFilter === f.id ? 'bg-amber text-black font-bold' : 'bg-card border border-border text-muted hover:text-foreground'
-                      }`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Portfolio Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredPortfolio.map(item => (
-                    <div 
-                      key={item.id}
-                      onClick={() => setLightboxImg(item)}
-                      className="group relative h-96 rounded-3xl overflow-hidden cursor-pointer border border-border shadow-md"
-                    >
-                      <img src={item.image_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-6 flex flex-col justify-end text-white">
-                        <span className="text-[10px] font-extrabold uppercase bg-amber text-black px-2.5 py-0.5 rounded self-start mb-2">
-                          {item.category || 'Madinah'}
-                        </span>
-                        <h3 className="text-base font-serif font-bold">{item.title}</h3>
-                        <p className="text-xs text-white/70 mt-1">📍 {item.location || 'Madinah'}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: BOOKING WIZARD */}
-            {activeTab === 'booking' && (
-              <div className="max-w-[840px] mx-auto px-6 py-12">
-                <div className="text-center mb-10">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber">RESERVASI SESI FOTO</span>
-                  <h1 className="text-3xl font-serif font-bold my-2">Booking Wizard</h1>
-                  <p className="text-muted text-xs">Pilih paket, waktu, dan konfirmasi jadwal sesi foto Anda di Madinah &amp; Makkah.</p>
-                </div>
-
-                {/* Error Banner */}
-                {bookingError && (
-                  <div className="mb-6 p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-xs font-medium flex items-center gap-2">
-                    <i data-lucide="alert-circle" className="w-4 h-4 shrink-0"></i>
-                    <span>{bookingError}</span>
-                  </div>
-                )}
-
-                {/* Steps Bar */}
-                <div className="flex justify-between items-center mb-8 p-3 bg-card border border-border rounded-2xl text-xs font-bold">
-                  {['1. Layanan', '2. Jadwal & Lokasi', '3. Data Jemaah', '4. Selesai'].map((st, i) => (
-                    <span 
-                      key={i} 
-                      className={`px-3 py-1.5 rounded-full transition-all ${
-                        bookingStep === i + 1 
-                          ? 'bg-amber text-black shadow-glow-amber' 
-                          : bookingStep > i + 1 
-                            ? 'text-amber' 
-                            : 'text-muted'
-                      }`}
-                    >
-                      {st}
-                    </span>
-                  ))}
-                </div>
-
-                {/* STEP 1: Select Service & Package */}
-                {bookingStep === 1 && (
-                  <div className="space-y-6">
-                    <h2 className="text-lg font-serif font-bold">1. Pilih Layanan Foto:</h2>
-                    <div className="space-y-3">
-                      {services.map(s => (
-                        <div
-                          key={s.id}
-                          onClick={() => {
-                            setSelectedServiceId(s.id);
-                            if (s.packages && s.packages.length) setSelectedPackageId(s.packages[0].id);
-                          }}
-                          className={`p-5 rounded-2xl border cursor-pointer flex justify-between items-center transition-all ${
-                            selectedServiceId === s.id ? 'bg-card border-amber ring-1 ring-amber' : 'bg-card/70 border-border hover:border-muted'
-                          }`}
-                        >
-                          <div>
-                            <h4 className="font-serif font-bold text-base">{s.name}</h4>
-                            <p className="text-xs text-muted mt-0.5">{s.duration_minutes} Menit • Mulai {formatSAR(s.starting_price)}</p>
-                          </div>
-                          <span className="text-xs font-bold text-amber font-serif">{formatSAR(s.starting_price)}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Tier Selection */}
-                    {availablePackages.length > 0 && (
-                      <div className="pt-4 space-y-3">
-                        <h3 className="text-sm font-serif font-bold">Pilih Tingkatan Paket:</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {availablePackages.map(p => (
-                            <div
-                              key={p.id}
-                              onClick={() => setSelectedPackageId(p.id)}
-                              className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                                selectedPackageId === p.id ? 'bg-secondary border-amber ring-1 ring-amber' : 'bg-card border-border'
-                              }`}
-                            >
-                              <p className="font-serif font-bold text-sm">{p.name}</p>
-                              <p className="text-xs font-bold text-amber mt-1">{formatSAR(p.price)}</p>
-                              <p className="text-[11px] text-muted mt-1">{p.duration_minutes} min • {p.edited_photos} edit</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => setBookingStep(2)}
-                      className="w-full py-4 rounded-full bg-amber text-black text-xs font-bold uppercase tracking-wider mt-6 shadow-glow-amber hover:bg-amber-400 transition-all"
-                    >
-                      Lanjut ke Pilih Tanggal &amp; Lokasi →
-                    </button>
-                  </div>
-                )}
-
-                {/* STEP 2: Select Date, Location & Slot */}
-                {bookingStep === 2 && (
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center">
-                      <h2 className="text-lg font-serif font-bold">2. Pilih Tanggal Sesi:</h2>
-                      <span className="text-xs text-muted font-mono">{selectedDate}</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
-                      {upcomingDays.map(d => (
-                        <button
-                          key={d.dateStr}
-                          onClick={() => setSelectedDate(d.dateStr)}
-                          className={`p-3 rounded-2xl border text-center transition-all ${
-                            selectedDate === d.dateStr ? 'bg-amber text-black font-bold shadow-glow-amber' : 'bg-card border-border hover:border-amber/50'
-                          }`}
-                        >
-                          <span className="text-[10px] block opacity-80">{d.dayName}</span>
-                          <span className="text-lg font-serif font-bold block">{d.dayNum}</span>
-                          <span className="text-[10px] block opacity-70">{d.monthName}</span>
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Location Choice */}
-                    <div className="pt-2 space-y-2">
-                      <label className="text-xs font-bold block">Pilih Lokasi Pemotretan:</label>
-                      <select 
-                        value={selectedLocationId} 
-                        onChange={e => setSelectedLocationId(e.target.value)}
-                        className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground focus:outline-none focus:border-amber"
-                      >
-                        {locations.map(loc => (
-                          <option key={loc.id} value={loc.id}>
-                            📍 {loc.name} {loc.description ? `— ${loc.description}` : ''}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Time Slot Choice */}
-                    <div className="pt-2 space-y-3">
-                      <label className="text-xs font-bold block">Pilih Waktu Sesi (Waktu Madinah):</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {[
-                          { slot: '06:15', label: '06:15 - 07:15 (Sunrise Golden Hour Ba’da Shubuh)' },
-                          { slot: '07:30', label: '07:30 - 08:30 (Morning Bright Sunshine)' },
-                          { slot: '16:00', label: '16:00 - 17:30 (Sunset Golden Hour Menjelang Maghrib)' },
-                          { slot: '20:00', label: '20:00 - 21:30 (Night Illuminations Ba’da Isya)' }
-                        ].map((s, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setSelectedSlot(s.slot)}
-                            className={`p-4 rounded-2xl border text-left text-xs font-semibold transition-all ${
-                              selectedSlot === s.slot ? 'bg-card border-amber ring-1 ring-amber text-amber font-bold' : 'bg-card/70 border-border hover:border-muted'
-                            }`}
-                          >
-                            {s.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-4 pt-6">
-                      <button onClick={() => setBookingStep(1)} className="px-6 py-3 rounded-full bg-secondary text-xs font-semibold">Kembali</button>
-                      <button onClick={() => setBookingStep(3)} className="flex-1 py-3 rounded-full bg-amber text-black text-xs font-bold uppercase tracking-wider shadow-glow-amber hover:bg-amber-400">Lanjut ke Data Jemaah →</button>
-                    </div>
-                  </div>
-                )}
-
-                {/* STEP 3: Client Info & Optional Payment Proof */}
-                {bookingStep === 3 && (
-                  <div className="space-y-5">
-                    <h2 className="text-lg font-serif font-bold">3. Lengkapi Data Pemesan:</h2>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold block mb-1">Nama Lengkap Jemaah *</label>
-                        <input 
-                          type="text" 
-                          required
-                          placeholder="Contoh: H. Ahmad Fauzi"
-                          value={clientName} 
-                          onChange={e => setClientName(e.target.value)} 
-                          className="w-full p-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-amber"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold block mb-1">Nomor WhatsApp Aktif *</label>
-                        <input 
-                          type="tel" 
-                          required
-                          placeholder="Contoh: 081234567890"
-                          value={clientWa} 
-                          onChange={e => setClientWa(e.target.value)} 
-                          className="w-full p-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-amber"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold block mb-1">Nama Hotel di Madinah / Makkah</label>
-                        <input 
-                          type="text" 
-                          placeholder="Contoh: Dar Al Taqwa (Depan Gate 22)"
-                          value={clientHotel} 
-                          onChange={e => setClientHotel(e.target.value)} 
-                          className="w-full p-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-amber"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold block mb-1">Jumlah Orang (Pax)</label>
-                        <input 
-                          type="number" 
-                          min="1"
-                          max="20"
-                          value={clientPax} 
-                          onChange={e => setClientPax(e.target.value)} 
-                          className="w-full p-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-amber"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold block mb-1">Permintaan Khusus / Catatan</label>
-                      <input 
-                        type="text" 
-                        placeholder="Contoh: Bawa payung/properti, ingin spot dekat Raudhah"
-                        value={clientNotes} 
-                        onChange={e => setClientNotes(e.target.value)} 
-                        className="w-full p-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-amber"
-                      />
-                    </div>
-
-                    {/* Bank Info Card */}
-                    <div className="p-5 rounded-2xl bg-secondary/80 border border-border space-y-3 text-xs">
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-foreground">💳 Info Rekening Transfer Deposit (30%):</span>
-                        <span className="font-bold text-amber">{formatSAR((currentPackage?.price || 350) * 0.3)} (~ {formatIDR((currentPackage?.price || 350) * 0.3)})</span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        <div className="p-3 bg-card rounded-xl border border-border">
-                          <p className="font-bold text-foreground">🇮🇩 Bank Indonesia (Rupiah)</p>
-                          <p className="text-muted mt-1">{paymentInfo?.bankIDR?.name || 'Bank Central Asia (BCA)'}</p>
-                          <p className="font-mono font-bold text-amber mt-0.5">{paymentInfo?.bankIDR?.account || '5420123456'}</p>
-                          <p className="text-[11px] text-muted">a.n. {paymentInfo?.bankIDR?.holder || 'WAHYU AFRIANSYAH'}</p>
-                        </div>
-                        <div className="p-3 bg-card rounded-xl border border-border">
-                          <p className="font-bold text-foreground">🇸🇦 Saudi Bank (SAR)</p>
-                          <p className="text-muted mt-1">{paymentInfo?.bankSAR?.name || 'Al Rajhi Bank'}</p>
-                          <p className="font-mono font-bold text-amber mt-0.5">{paymentInfo?.bankSAR?.account || 'SA84 8000 0123 4567 8901 2345'}</p>
-                          <p className="text-[11px] text-muted">a.n. {paymentInfo?.bankSAR?.holder || 'UMROH LENS'}</p>
-                        </div>
-                      </div>
-
-                      {/* Upload Proof Input */}
-                      <div className="pt-2">
-                        <label className="text-xs font-bold block mb-1">Upload Bukti Transfer DP (Opsional):</label>
-                        <input 
-                          type="file" 
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          className="w-full text-xs text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber file:text-black hover:file:bg-amber-400 cursor-pointer"
-                        />
-                        {paymentProofBase64 && (
-                          <span className="text-[11px] text-emerald-400 font-semibold block mt-1">✓ Bukti transfer siap dilampirkan</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-4 pt-4">
-                      <button onClick={() => setBookingStep(2)} className="px-6 py-3 rounded-full bg-secondary text-xs font-semibold">Kembali</button>
-                      <button 
-                        onClick={handleSubmitBooking} 
-                        disabled={isSubmitting}
-                        className="flex-1 py-3.5 rounded-full bg-amber text-black text-xs font-bold uppercase tracking-wider shadow-glow-amber hover:bg-amber-400 disabled:opacity-50"
-                      >
-                        {isSubmitting ? 'Memproses Reservasi...' : 'Konfirmasi Reservasi Sekarang →'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* STEP 4: Confirmation Success */}
-                {bookingStep === 4 && confirmedBooking && (
-                  <div className="space-y-6 text-center">
-                    <div className="p-8 rounded-3xl bg-card border border-amber/40 shadow-xl space-y-5">
-                      <i data-lucide="check-circle-2" className="w-14 h-14 text-amber mx-auto"></i>
-                      <h2 className="text-2xl font-serif font-bold">Reservasi Berhasil Dibuat!</h2>
-                      
-                      <div className="p-4 bg-secondary rounded-2xl inline-block border border-border">
-                        <span className="text-xs text-muted block">Kode Booking Anda:</span>
-                        <span className="text-2xl font-mono font-bold text-amber">{confirmedBooking.bookingCode}</span>
-                      </div>
-
-                      <div className="max-w-md mx-auto p-4 bg-card rounded-2xl border border-border text-left text-xs space-y-2 text-muted">
-                        <div className="flex justify-between"><span>Nama Jemaah:</span><strong className="text-foreground">{clientName}</strong></div>
-                        <div className="flex justify-between"><span>Paket:</span><strong className="text-foreground">{currentService?.name} ({currentPackage?.name})</strong></div>
-                        <div className="flex justify-between"><span>Jadwal:</span><strong className="text-foreground">{confirmedBooking.date} ({confirmedBooking.startTime} - {confirmedBooking.endTime})</strong></div>
-                        <div className="flex justify-between"><span>Total Biaya:</span><strong className="text-amber">{formatSAR(confirmedBooking.totalPrice)}</strong></div>
-                      </div>
-
-                      <p className="text-xs text-muted">Klik tombol di bawah ini untuk mengirimkan detail reservasi langsung ke WhatsApp Admin kami.</p>
-                      
-                      <a
-                        href={confirmedBooking.whatsappUrl || `https://wa.me/${waAdminNumber}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-105"
-                      >
-                        <i data-lucide="message-circle" className="w-5 h-5"></i>
-                        Kirim Konfirmasi ke WhatsApp Admin
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB 5: MY BOOKING (Cek Reservasi) */}
-            {activeTab === 'my-booking' && (
-              <div className="max-w-[800px] mx-auto px-6 py-12">
-                <div className="text-center mb-10">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber">LACAK RESERVASI</span>
-                  <h1 className="text-3xl font-serif font-bold my-2">Cek Status Booking Saya</h1>
-                  <p className="text-muted text-xs">Pantau status jadwal, konfirmasi DP, dan link pengiriman Google Drive.</p>
-                </div>
-
-                <form onSubmit={handleSearchBooking} className="flex gap-2 mb-8 bg-card p-2 rounded-2xl border border-border shadow-sm">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Masukkan Kode Booking (contoh: MDN-2026-0001)..."
-                    className="flex-1 px-4 py-2.5 bg-transparent text-sm focus:outline-none text-foreground"
-                  />
-                  <button type="submit" className="px-6 py-2.5 rounded-xl bg-amber text-black text-xs font-bold uppercase hover:bg-amber-400">
-                    {isSearching ? 'Mencari...' : 'Cari'}
-                  </button>
-                </form>
-
-                {hasSearched && (
-                  <div>
-                    {searchResult ? (
-                      <div className="p-6 rounded-3xl bg-card border border-border space-y-5 shadow-md">
-                        <div className="flex justify-between items-center border-b border-border pb-4">
-                          <div>
-                            <span className="text-xs text-muted block">Kode Booking</span>
-                            <span className="text-xl font-mono font-bold text-amber">{searchResult.booking_code || searchResult.bookingCode}</span>
-                          </div>
-                          <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                            {searchResult.status || 'CONFIRMED'}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                          <div>
-                            <span className="text-muted block">Nama Jemaah:</span>
-                            <span className="font-semibold text-foreground text-sm">{searchResult.client?.name || searchResult.client_name || '-'}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted block">Layanan:</span>
-                            <span className="font-semibold text-foreground text-sm">{searchResult.service?.name || searchResult.service_name || '-'}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted block">Tanggal &amp; Waktu:</span>
-                            <span className="font-semibold text-foreground text-sm">{searchResult.date} ({searchResult.start_time} - {searchResult.end_time})</span>
-                          </div>
-                          <div>
-                            <span className="text-muted block">Status Pembayaran:</span>
-                            <span className="font-semibold text-amber text-sm">{searchResult.payment_status || 'DEPOSIT_PAID'}</span>
-                          </div>
-                        </div>
-
-                        <div className="pt-4 border-t border-border flex justify-between items-center">
-                          <span className="text-xs text-muted">Total: {formatSAR(searchResult.total_price || searchResult.totalPrice)}</span>
-                          <a 
-                            href={`https://wa.me/${waAdminNumber}?text=Halo%20Admin%20Umroh%20Lens,%20saya%20ingin%20tanya%20jadwal%20booking%20${searchResult.booking_code || searchResult.bookingCode}`}
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-full bg-secondary text-xs font-semibold text-amber hover:bg-amber hover:text-black transition-colors"
-                          >
-                            Hubungi Admin →
-                          </a>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center p-8 bg-card border border-border rounded-2xl text-xs text-muted">
-                        Data booking tidak ditemukan. Pastikan Anda memasukkan kode booking yang benar (contoh: <code className="text-amber">MDN-2026-0001</code>).
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB 6: FAQ */}
-            {activeTab === 'faq' && (
-              <div className="max-w-[860px] mx-auto px-6 py-12">
-                <div className="text-center mb-12">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber">BANTUAN &amp; FAQ</span>
-                  <h1 className="text-4xl font-serif font-bold my-3">Pertanyaan Yang Sering <span className="text-amber italic">Diajukan</span></h1>
-                  <p className="text-muted text-sm">Temukan jawaban seputar pemesanan, perizinan, dan penyerahan file foto.</p>
-                </div>
-
-                <div className="space-y-4">
-                  {FAQS.map((faq, idx) => (
-                    <details key={idx} className="group rounded-2xl bg-card border border-border overflow-hidden open:border-amber/40 transition-all">
-                      <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-semibold text-base">
-                        <span>{faq.q}</span>
-                        <span className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center shrink-0 group-open:bg-amber group-open:text-black transition-colors">
-                          <i data-lucide="chevron-down" className="w-4 h-4 text-amber group-open:text-black group-open:rotate-180 transition-transform"></i>
-                        </span>
-                      </summary>
-                      <div className="px-6 pb-6 text-sm text-muted leading-relaxed border-t border-border/40 pt-4">
-                        {faq.a}
-                      </div>
-                    </details>
-                  ))}
-                </div>
-
-                <div className="mt-12 p-8 rounded-3xl bg-card border border-border text-center">
-                  <h3 className="text-lg font-serif font-bold mb-2">Masih Punya Pertanyaan Lain?</h3>
-                  <p className="text-xs text-muted mb-6">Hubungi fotografer dan tim admin kami langsung di WhatsApp.</p>
-                  <a
-                    href={`https://wa.me/${waAdminNumber}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber text-black text-xs font-bold uppercase tracking-wider shadow-glow-amber"
-                  >
-                    <i data-lucide="message-circle" className="w-4 h-4"></i>
-                    Chat WhatsApp Admin
-                  </a>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 7: ABOUT */}
-            {activeTab === 'about' && (
-              <div className="max-w-[1000px] mx-auto px-6 py-12">
-                <div className="text-center mb-12">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber">TENTANG KAMI</span>
-                  <h1 className="text-4xl font-serif font-bold my-3">UMROH LENS Visual Studio</h1>
-                </div>
-                <div className="p-8 rounded-3xl bg-card border border-border space-y-6 text-sm leading-relaxed text-muted shadow-sm">
-                  <p>
-                    <strong className="text-foreground">UMROH LENS</strong> adalah platform layanan dokumentasi foto dan video sinematik profesional yang berbasis langsung di Madinah Al-Munawwarah dan Makkah Al-Mukarramah, dirancang khusus untuk melayani para tamu Allah (Dhuyufurrahman) dari Indonesia.
-                  </p>
-                  <p>
-                    Kami memadukan standar estetika visual kelas atas (Sony Full-Frame 4K, Lensa G-Master, Cinematic Color Grading) dengan kehangatan komunikasi dan kesabaran khas Indonesia.
-                  </p>
-                  <div className="pt-4 border-t border-border grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                    <div className="p-4 bg-secondary rounded-2xl">
-                      <p className="text-2xl font-serif font-bold text-amber">1.200+</p>
-                      <p className="text-xs text-muted mt-1">Sesi Foto Terlaksana</p>
-                    </div>
-                    <div className="p-4 bg-secondary rounded-2xl">
-                      <p className="text-2xl font-serif font-bold text-amber">100%</p>
-                      <p className="text-xs text-muted mt-1">Fotografer Muslim Indonesia</p>
-                    </div>
-                    <div className="p-4 bg-secondary rounded-2xl">
-                      <p className="text-2xl font-serif font-bold text-amber">24-48 Jam</p>
-                      <p className="text-xs text-muted mt-1">Pengiriman File Google Drive</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </main>
-
-          {/* ========== FOOTER ========== */}
-          <footer className="mt-20 border-t border-border bg-card/60 py-12">
-            <div className="max-w-[1400px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-muted">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-amber"></span>
-                <span>© 2026 UMROH LENS Visual Media. Indonesia — Saudi Arabia.</span>
-              </div>
-              <div className="flex gap-4">
-                <button onClick={() => setActiveTab('faq')} className="hover:text-amber">FAQ</button>
-                <button onClick={() => setActiveTab('my-booking')} className="hover:text-amber">Cek Reservasi</button>
-                <a href={`https://wa.me/${waAdminNumber}`} target="_blank" rel="noopener noreferrer" className="hover:text-amber">WhatsApp Admin</a>
-                <a href="/admin/login.html" className="text-muted/60 hover:text-amber">🔒 Login Admin</a>
-              </div>
-            </div>
-          </footer>
-
-          {/* Floating WhatsApp Action */}
-          <a
-            href={`https://wa.me/${waAdminNumber}?text=Halo%20Admin%20Umroh%20Lens,%20saya%20ingin%20konsultasi%20jadwal%20foto%20di%20Tanah%20Suci.`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110"
-            title="Chat WhatsApp"
-          >
-            <i data-lucide="message-circle" className="w-7 h-7"></i>
-          </a>
-
-          {/* Lightbox Modal */}
-          {lightboxImg && (
-            <div 
-              onClick={() => setLightboxImg(null)}
-              className="fixed inset-0 z-50 bg-black/92 backdrop-blur-md flex items-center justify-center p-4"
-            >
-              <div className="max-w-3xl w-full" onClick={e => e.stopPropagation()}>
-                <img src={lightboxImg.image_url || lightboxImg.img} alt={lightboxImg.title} className="w-full max-h-[75vh] object-contain rounded-2xl mb-4" />
-                <div className="flex justify-between items-center text-white">
-                  <div>
-                    <h4 className="font-serif font-bold text-lg">{lightboxImg.title}</h4>
-                    <p className="text-xs text-white/70">📍 {lightboxImg.location || 'Madinah'}</p>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      setLightboxImg(null);
-                      setActiveTab('booking');
-                      setBookingStep(1);
-                    }}
-                    className="px-5 py-2 rounded-full bg-amber text-black text-xs font-bold shadow-glow-amber"
-                  >
-                    Pesan Sesi Ini
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
+    <div class="nav-links">
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
+      <a href="#about" data-i18n="nav_about">About</a>
+      <a href="#faq" data-i18n="nav_faq">FAQ</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <script src="/js/i18n.js"></script>
+      <script>document.write(renderLanguageSwitcher());</script>
+      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Madinah Al-Munawwarah</p>
+    <h1 data-i18n="hero_title">Dokumentasi Foto Bersejarah di Kota Nabi</h1>
+    <p data-i18n="hero_sub">Jasa foto profesional untuk jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour di sudut-sudut terbaik kota Madinah.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/booking.html" data-i18n="hero_cta_book">Pesan Jadwal Sesi</a>
+      <a class="btn btn-ghost" href="/portfolio.html" data-i18n="hero_cta_view">Lihat Galeri Foto</a>
+    </div>
+  </div>
+</header>
+
+<!-- Dynamic Animated Infinite Moving Photo Showcase -->
+<div class="marquee-wrapper" style="overflow:hidden; position:relative; width:100%; padding:28px 0; background:var(--ivory); border-bottom:1px solid var(--line); mask-image:linear-gradient(to right, transparent, black 8%, black 92%, transparent); -webkit-mask-image:linear-gradient(to right, transparent, black 8%, black 92%, transparent);">
+  <div style="display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 16px auto; padding:0 24px;">
+    <span class="eyebrow" style="color:var(--gold);">📸 Live Portfolio Showcase</span>
+    <a href="/portfolio.html" style="font-size:0.8rem; color:var(--charcoal); text-decoration:none; font-weight:600;">Lihat Semua Portofolio →</a>
+  </div>
+  <div class="marquee-track" id="home-marquee-track" style="display:flex; gap:18px; width:max-content; animation:scrollMarquee 38s linear infinite;">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<style>
+@keyframes scrollMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+.h-marquee-card {
+  width: 280px;
+  height: 340px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.h-marquee-card:hover {
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+}
+.h-marquee-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.h-marquee-card:hover img {
+  transform: scale(1.06);
+}
+.h-marquee-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 14px 12px 14px;
+  background: linear-gradient(to top, rgba(17,15,14,0.92) 0%, transparent 100%);
+  color: #fff;
+}
+.h-marquee-tag {
+  display: inline-block;
+  background: rgba(212,163,89,0.9);
+  color: #1c1917;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+.h-marquee-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin: 0;
+  line-height: 1.2;
+}
+</style>
+
+<!-- About Photographer Section -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="photographer-profile-box" id="photographer-container">
+      <div class="photographer-avatar-frame" id="p-avatar-img" style="background-image: url('/img/photographer-1.jpg');"></div>
+      <div>
+        <p class="eyebrow" style="color:var(--gold);" data-i18n="nav_about">TENTANG FOTOGRAFER</p>
+        <h2 id="p-display-name" style="margin-top:8px; font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.2rem);">UMROH LENS Photography Studio</h2>
+        <p id="p-display-bio" style="margin-top:16px; color:var(--charcoal-soft); font-size:0.98rem; line-height:1.7;">
+          Fotografer profesional berbasis di Madinah Al-Munawwarah, berpengalaman mengabadikan momen sakral jemaah Umrah, pasangan, dan keluarga Indonesia di sekitar Masjid Nabawi dan situs bersejarah Kota Madinah. Mengutamakan pendekatan natural, ramah, dan memandu setiap sudut pose terbaik.
+        </p>
+        
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;">
+          <span class="cred-badge">🌟 5+ Tahun di Madinah</span>
+          <span class="cred-badge">📸 1.000+ Sesi Terlaksana</span>
+          <span class="cred-badge">🇮🇩 Bahasa Indonesia Ramah</span>
+          <span class="cred-badge">⚡ 24-48 Jam Pengiriman File</span>
         </div>
-      );
-    }
+      </div>
+    </div>
+  </div>
+</section>
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script>
+<hr class="hairline">
+
+<!-- Services Section -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow" data-i18n="nav_services">Pilihan Layanan</p>
+    <h2 style="margin-top:14px; margin-bottom:44px;" data-i18n="sec_services_title">Koleksi Layanan Foto &amp; Sinematik</h2>
+  </div>
+  <div class="container">
+    <div class="grid-3" id="services-grid"></div>
+  </div>
+  <div class="container" style="margin-top:36px; text-align:center;">
+    <a class="btn btn-ghost" href="/services.html">Lihat Semua Layanan &amp; Paket Detail →</a>
+  </div>
+</section>
+
+<hr class="hairline">
+
+<section class="section" style="background:var(--ivory);">
+  <div class="container">
+    <p class="eyebrow" data-i18n="why_choose_title">KEUNGGULAN KAMI</p>
+    <h2 style="margin-top:14px; margin-bottom:44px;" data-i18n="why_choose_sub">Abadikan Perjalanan Suci Anda dengan Standar VVIP</h2>
+    <div class="grid-3" style="gap:24px;">
+      <div style="background:#fff; padding:32px 24px; border:1px solid var(--line); border-radius:4px;">
+        <div style="font-size:2rem; margin-bottom:12px;">📸</div>
+        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Fotografer Bahasa Indonesia</h3>
+        <p style="color:var(--charcoal-soft); font-size:0.9rem; line-height:1.6;">Tim fotografer muslim profesional yang ramah keluarga &amp; lansia, siap memandu sudut pose terbaik di sekitar Masjid Nabawi.</p>
+      </div>
+      <div style="background:#fff; padding:32px 24px; border:1px solid var(--line); border-radius:4px;">
+        <div style="font-size:2rem; margin-bottom:12px;">🎬</div>
+        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Cinematic Reels &amp; Drone 4K</h3>
+        <p style="color:var(--charcoal-soft); font-size:0.9rem; line-height:1.6;">Video sinematik 60s siap tayang di Instagram &amp; TikTok dengan color grading islami serta sudut pemandangan udara yang memukau.</p>
+      </div>
+      <div style="background:#fff; padding:32px 24px; border:1px solid var(--line); border-radius:4px;">
+        <div style="font-size:2rem; margin-bottom:12px;">⚡</div>
+        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Fast Google Drive Delivery</h3>
+        <p style="color:var(--charcoal-soft); font-size:0.9rem; line-height:1.6;">Semua file foto original (RAW) plus foto editan high-resolution dikirim via tautan Google Drive privat dalam 24-48 jam.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline">
+
+<section class="section" id="faq">
+  <div class="container" style="max-width:760px;">
+    <p class="eyebrow">FAQ</p>
+    <h2 style="margin-top:14px; margin-bottom:36px;">Pertanyaan Umum Jemaah</h2>
+    <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
+      <h3 style="font-size:1.05rem;">Apakah fotografer bisa memandu pose dan lokasi terbaik?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Tentu! Fotografer kami sangat mengenal sudut-sudut terbaik dan waktu pencahayaan golden hour terindah di sekitar Masjid Nabawi, Quba, dan Uhud.</p>
+    </div>
+    <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
+      <h3 style="font-size:1.05rem;">Berapa deposit yang diperlukan untuk konfirmasi jadwal?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Deposit sebesar 30% via transfer Bank BSI / BCA (Rupiah) atau Al Rajhi (SAR). Sisa pembayaran diselesaikan saat sesi di Madinah.</p>
+    </div>
+    <div class="faq-item" style="padding:20px 0;">
+      <h3 style="font-size:1.05rem;">Apakah jadwal sesi foto bisa diubah (reschedule)?</h3>
+      <p style="color:var(--charcoal-soft); margin-top:8px;">Bisa. Anda dapat mengajukan permohonan reschedule langsung dari halaman Cek Reservasi Saya secara mudah dan cepat.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div>
+      <h3 style="font-family:var(--font-display); font-size:1.2rem;">UMROH LENS Madinah</h3>
+      <p style="opacity:0.7; margin-top:10px; max-width:280px; font-size:0.9rem;">Jasa dokumentasi foto &amp; video sinematik profesional di Madinah Al-Munawwarah.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <a href="/portfolio.html">Portofolio</a>
+        <a href="/services.html">Layanan &amp; Paket</a>
+        <a href="/booking.html">Pesan Sesi Foto</a>
+        <a href="https://instagram.com/umrohlens" target="_blank" rel="noopener" style="color:#E1306C; font-weight:500;">📸 Instagram (@umrohlens)</a>
+      </div>
+      <div class="footer-col">
+        <a href="/my-booking.html">Cek Reservasi Saya</a>
+        <a href="#about">Tentang Kami</a>
+        <a href="#faq">FAQ</a>
+        <a href="/admin/login.html" style="color:var(--gold); font-weight:500;">🔑 Portal Admin</a>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© 2026 UMROH LENS, Madinah</span>
+    <div style="display:flex; gap:16px; align-items:center;">
+      <a href="https://instagram.com/umrohlens" target="_blank" rel="noopener" style="color:inherit; opacity:0.7; text-decoration:none; font-size:0.8rem;">📸 Instagram</a>
+      <a href="/admin/login.html" style="color:inherit; opacity:0.6; text-decoration:none; font-size:0.75rem;">🔒 Login Admin</a>
+      <span>Asia/Riyadh</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/social-widget.js"></script>
+
+<script>
+// Load photographer details
+fetch('/api/photographers')
+  .then(r => r.json())
+  .then(list => {
+    if (list && list.length > 0) {
+      const p = list[0];
+      if (p.name) document.getElementById('p-display-name').textContent = p.name;
+      if (p.bio) document.getElementById('p-display-bio').textContent = p.bio;
+      if (p.avatar_url) document.getElementById('p-avatar-img').style.backgroundImage = `url('${p.avatar_url}')`;
+    }
+  })
+  .catch(() => {});
+
+// Load live portfolio marquee strip
+fetch('/api/portfolio')
+  .then(r => r.json())
+  .then(items => {
+    const track = document.getElementById('home-marquee-track');
+    if (!items || items.length === 0 || !track) return;
+    const loopItems = [...items, ...items];
+    track.innerHTML = loopItems.map(p => `
+      <div class="h-marquee-card" onclick="window.location.href='/portfolio.html'">
+        <img src="${p.image_url}" alt="${p.title}" loading="lazy">
+        <div class="h-marquee-overlay">
+          <span class="h-marquee-tag">${p.category || 'Madinah'}</span>
+          <h4 class="h-marquee-title">${p.title}</h4>
+        </div>
+      </div>
+    `).join('');
+  })
+  .catch(() => {});
+
+// Load services cards with photos
+fetch('/api/services')
+  .then(r => r.json())
+  .then(services => {
+    const grid = document.getElementById('services-grid');
+    grid.innerHTML = services.slice(0,6).map(s => `
+      <a class="service-card" href="/booking.html?service=${s.slug}" style="display:block; text-decoration:none; color:inherit;">
+        <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; height:200px; border-radius:4px; margin-bottom:14px;"></div>
+        <h3 style="font-family:var(--font-display); font-size:1.25rem;">${s.name}</h3>
+        <p style="color:var(--charcoal-soft); font-size:0.9rem; margin-top:8px; line-height:1.5;">${s.description}</p>
+        <div class="service-meta" style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:10px;">
+          <span style="font-size:0.8rem; color:var(--charcoal-soft);">${s.duration_minutes} min</span>
+          <span class="service-price" style="font-weight:600; color:var(--gold);">Mulai ${s.currency} ${s.starting_price}</span>
+        </div>
+      </a>
+    `).join('');
+  });
+</script>
 </body>
 </html>
