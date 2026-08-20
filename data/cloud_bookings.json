@@ -1,57 +1,6 @@
 {
-  "lastUpdated": "2026-08-20T07:27:39.207Z",
-  "bookings": [
-    {
-      "booking_code": "MDN-2026-0001",
-      "client_name": "H. Ahmad Fauzi (Production Live)",
-      "client_email": "fauzi.prod@example.com",
-      "client_phone": "+6281234567890",
-      "client_country": "Indonesia",
-      "service_id": 1,
-      "service_name": "Madinah Portrait",
-      "package_id": 1,
-      "package_name": "Essential",
-      "location_id": 1,
-      "location_name": "Masjid Nabawi Area",
-      "date": "2026-09-22",
-      "start_time": "16:00",
-      "end_time": "16:30",
-      "total_price": 350,
-      "deposit_amount": 105,
-      "currency": "SAR",
-      "status": "PENDING",
-      "payment_status": "PENDING",
-      "occasion": "Umrah",
-      "number_of_people": 2,
-      "proof_url": null,
-      "created_at": "2026-08-20T06:39:57.856Z"
-    },
-    {
-      "booking_code": "MDN-2026-0002",
-      "client_name": "Audit Test User",
-      "client_email": "audit@example.com",
-      "client_phone": "+6281234567890",
-      "client_country": "Indonesia",
-      "service_id": 1,
-      "service_name": "Madinah Portrait",
-      "package_id": 1,
-      "package_name": "Essential",
-      "location_id": 1,
-      "location_name": "Masjid Nabawi Area",
-      "date": "2026-09-25",
-      "start_time": "06:30",
-      "end_time": "07:00",
-      "total_price": 350,
-      "deposit_amount": 105,
-      "currency": "SAR",
-      "status": "PENDING",
-      "payment_status": "UNPAID",
-      "occasion": "Umrah",
-      "number_of_people": 2,
-      "proof_url": null,
-      "created_at": "2026-08-20T07:27:37.735Z"
-    }
-  ],
+  "lastUpdated": "2026-08-20T07:31:19.503Z",
+  "bookings": [],
   "settings": {
     "admin_whatsapp": "+6282175272547",
     "admin_whatsapp_2": "+6281234567890",
@@ -627,5 +576,5 @@
       "active": 1
     }
   ],
-  "count": 2
+  "count": 0
 }
