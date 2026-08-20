@@ -85,32 +85,53 @@ router.get('/availability/month', (req, res) => {
 
 // GET /api/payment-info — returns bank account details, dual WhatsApp numbers, and Instagram info
 router.get('/payment-info', async (req, res) => {
-  try { await syncCloudSettingsToDb(db); } catch(e) {}
-  const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
-  const s = {};
-  settingsRows.forEach(r => { s[r.key] = r.value; });
-  const wa = s.admin_whatsapp || '+966501234567';
-  const wa2 = s.admin_whatsapp_2 || '+6281234567890';
-  const igUrl = s.instagram_url || 'https://instagram.com/umrohlens';
-  const igHandle = s.instagram_handle || '@umrohlens';
-  res.json({
-    adminWhatsApp: wa,
-    whatsappNumber: wa,
-    adminWhatsApp2: wa2,
-    instagramUrl: igUrl,
-    instagramHandle: igHandle,
-    bankSAR: {
-      name: s.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)',
-      account: s.bank_sar_account || 'SA84 8000 0123 4567 8901 2345',
-      holder: s.bank_sar_holder || 'UMROH LENS Photography Studio'
-    },
-    bankIDR: {
-      name: s.bank_idr_name || 'Bank Syariah Indonesia (BSI) / BCA',
-      account: s.bank_idr_account || '7123456789 (BSI) / 5420123456 (BCA)',
-      holder: s.bank_idr_holder || 'UMROH LENS Photography',
-      rate: Number(s.idr_sar_rate) || 4200
-    }
-  });
+  try {
+    try { await syncCloudSettingsToDb(db); } catch(e) {}
+    const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
+    const s = {};
+    settingsRows.forEach(r => { s[r.key] = r.value; });
+    const wa = s.admin_whatsapp || '+6282175272547';
+    const wa2 = s.admin_whatsapp_2 || '+6281234567890';
+    const igUrl = s.instagram_url || 'https://instagram.com/umrohlens';
+    const igHandle = s.instagram_handle || '@umrohlens';
+    res.json({
+      adminWhatsApp: wa,
+      whatsappNumber: wa,
+      adminWhatsApp2: wa2,
+      instagramUrl: igUrl,
+      instagramHandle: igHandle,
+      bankSAR: {
+        name: s.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)',
+        account: s.bank_sar_account || 'SA84 8000 0123 4567 8901 2345',
+        holder: s.bank_sar_holder || 'UMROH LENS Photography Studio'
+      },
+      bankIDR: {
+        name: s.bank_idr_name || 'Bank Central Asia (BCA)',
+        account: s.bank_idr_account || '5420123456 (BCA)',
+        holder: s.bank_idr_holder || 'WAHYU AFRIANSYAH',
+        rate: Number(s.idr_sar_rate) || 4200
+      }
+    });
+  } catch (err) {
+    res.json({
+      adminWhatsApp: '+6282175272547',
+      whatsappNumber: '+6282175272547',
+      adminWhatsApp2: '+6281234567890',
+      instagramUrl: 'https://instagram.com/umrohlens',
+      instagramHandle: '@umrohlens',
+      bankSAR: {
+        name: 'Al Rajhi Bank (Saudi Arabia)',
+        account: 'SA84 8000 0123 4567 8901 2345',
+        holder: 'UMROH LENS Photography Studio'
+      },
+      bankIDR: {
+        name: 'Bank Central Asia (BCA)',
+        account: '5420123456 (BCA)',
+        holder: 'WAHYU AFRIANSYAH',
+        rate: 4200
+      }
+    });
+  }
 });
 
 // POST /api/bookings — creates a booking with full server-side re-validation.
