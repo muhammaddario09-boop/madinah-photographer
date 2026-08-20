@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-20T06:17:28.660Z",
+  "lastUpdated": "2026-08-20T06:20:12.042Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -19,7 +19,7 @@
       "total_price": 950,
       "deposit_amount": 285,
       "currency": "SAR",
-      "status": "PENDING",
+      "status": "CONFIRMED",
       "payment_status": "DEPOSIT_PAID",
       "occasion": "Umrah",
       "number_of_people": "1",
