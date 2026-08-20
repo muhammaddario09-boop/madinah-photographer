@@ -423,7 +423,7 @@ router.get('/portfolio', (req, res) => {
   }
 });
 
-router.post('/portfolio', (req, res) => {
+router.post('/portfolio', async (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   if (!image_url) return res.status(400).json({ error: 'Image URL is required.' });
   const info = db.prepare(
@@ -431,22 +431,22 @@ router.post('/portfolio', (req, res) => {
      VALUES (?,?,?,?,?,?,?)`
   );
   info.run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
-  recordPortfolioToCloud(db).catch(() => {});
+  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.put('/portfolio/:id', (req, res) => {
+router.put('/portfolio/:id', async (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   db.prepare(
     `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
   ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
-  recordPortfolioToCloud(db).catch(() => {});
+  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
-router.delete('/portfolio/:id', (req, res) => {
+router.delete('/portfolio/:id', async (req, res) => {
   db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
-  recordPortfolioToCloud(db).catch(() => {});
+  await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
