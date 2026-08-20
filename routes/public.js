@@ -27,7 +27,22 @@ router.get('/locations', (req, res) => {
 });
 
 router.get('/photographers', (req, res) => {
-  res.json(db.prepare(`SELECT id, name, bio, avatar_url FROM photographers WHERE active=1`).all());
+  try {
+    const list = db.prepare(`SELECT id, name, bio, avatar_url FROM photographers WHERE active=1`).all();
+    res.json(list.length ? list : [{
+      id: 1,
+      name: 'UMROH LENS',
+      bio: 'Fotografer profesional berbasis di Madinah Al-Munawwarah.',
+      avatar_url: '/img/photographer-1.jpg'
+    }]);
+  } catch (e) {
+    res.json([{
+      id: 1,
+      name: 'UMROH LENS',
+      bio: 'Fotografer profesional berbasis di Madinah Al-Munawwarah.',
+      avatar_url: '/img/photographer-1.jpg'
+    }]);
+  }
 });
 
 // GET /api/availability?photographerId=1&date=2026-08-25&duration=60
