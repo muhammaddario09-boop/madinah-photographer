@@ -7,6 +7,91 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
+<style>
+  /* Infinite Auto-Moving Carousel Marquee */
+  .marquee-wrapper {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    padding: 24px 0 36px 0;
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: scrollMarquee 42s linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes scrollMarquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-card {
+    width: 320px;
+    height: 380px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .marquee-card:hover {
+    transform: scale(1.04) translateY(-6px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.22);
+  }
+  .marquee-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .marquee-card:hover img {
+    transform: scale(1.08);
+  }
+  .marquee-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 18px 16px 18px;
+    background: linear-gradient(to top, rgba(17, 15, 14, 0.95) 0%, rgba(17, 15, 14, 0.5) 60%, transparent 100%);
+    color: #fff;
+  }
+  .marquee-badge {
+    display: inline-block;
+    background: rgba(212, 163, 89, 0.9);
+    color: #1c1917;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .marquee-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .marquee-loc {
+    font-size: 0.78rem;
+    color: var(--gold-soft);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Gallery Grid */
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -30,6 +115,7 @@
     background-size: cover;
     background-position: center;
     position: relative;
+    transition: transform 0.4s ease;
   }
   .portfolio-badge {
     position: absolute;
@@ -80,7 +166,7 @@
     display: none;
     position: fixed;
     top:0; left:0; width:100vw; height:100vh;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.92);
     z-index: 9999;
     align-items: center;
     justify-content: center;
@@ -91,15 +177,15 @@
   }
   .lightbox-img {
     max-width: 90vw;
-    max-height: 85vh;
-    border-radius: 4px;
+    max-height: 82vh;
+    border-radius: 6px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   }
   .lightbox-close {
     position: absolute;
     top: 20px;
     right: 28px;
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: #fff;
     cursor: pointer;
   }
@@ -124,25 +210,36 @@
   </div>
 </nav>
 
-<section class="section-tight">
+<section class="section-tight" style="padding-bottom:10px;">
   <div class="container">
     <p class="eyebrow" data-i18n="sec_portfolio_title">Koleksi Foto Terpilih</p>
-    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="nav_portfolio">Portofolio</h1>
+    <h1 style="font-size:clamp(2.2rem,4.4vw,3.2rem); margin-top:14px;" data-i18n="nav_portfolio">Portofolio &amp; Live Showcase</h1>
+    <p style="color:var(--charcoal-soft); max-width:640px; margin-top:8px;">Momen keindahan ibadah di Masjid Nabawi, ziarah bersejarah, dan potret sinematik para jemaah di Kota Suci Madinah.</p>
   </div>
 </section>
 
-<section class="section" style="padding-top:10px;">
+<!-- Animated Infinite Auto-Sliding Marquee Strip -->
+<div class="marquee-wrapper">
+  <div class="marquee-track" id="marquee-track">
+    <!-- Populated dynamically via JS -->
+  </div>
+</div>
+
+<section class="section" style="padding-top:20px;">
   <div class="container">
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px;" id="filter-pills">
-      <button class="filter-btn active" data-filter="all">Semua Foto</button>
-      <button class="filter-btn" data-filter="Masjid Nabawi">Masjid Nabawi</button>
-      <button class="filter-btn" data-filter="Couple">Couple</button>
-      <button class="filter-btn" data-filter="Portrait">Portrait</button>
-      <button class="filter-btn" data-filter="Family">Family</button>
-      <button class="filter-btn" data-filter="Umrah">Umrah</button>
-      <button class="filter-btn" data-filter="Uhud">Uhud</button>
-      <button class="filter-btn" data-filter="Cinematic">Cinematic Reels</button>
-      <button class="filter-btn" data-filter="Drone">Drone</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+      <h2 style="font-family:var(--font-display); font-size:1.6rem; margin:0;">Semua Galeri Foto</h2>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;" id="filter-pills">
+        <button class="filter-btn active" data-filter="all">Semua Foto</button>
+        <button class="filter-btn" data-filter="Masjid Nabawi">Masjid Nabawi</button>
+        <button class="filter-btn" data-filter="Couple">Couple</button>
+        <button class="filter-btn" data-filter="Portrait">Portrait</button>
+        <button class="filter-btn" data-filter="Family">Family</button>
+        <button class="filter-btn" data-filter="Umrah">Umrah</button>
+        <button class="filter-btn" data-filter="Uhud">Uhud &amp; Quba</button>
+        <button class="filter-btn" data-filter="Cinematic">Cinematic Reels</button>
+        <button class="filter-btn" data-filter="Drone">Drone</button>
+      </div>
     </div>
   </div>
 
@@ -184,6 +281,24 @@ function closeLightbox() {
   document.getElementById('lightbox').classList.remove('active');
 }
 
+function renderMarquee(items) {
+  const track = document.getElementById('marquee-track');
+  if (!items || items.length === 0) return;
+
+  // Duplicate items twice to ensure seamless infinite loop
+  const loopItems = [...items, ...items];
+  track.innerHTML = loopItems.map(p => `
+    <div class="marquee-card" onclick="openLightbox('${p.image_url}')">
+      <img src="${p.image_url}" alt="${p.title}" loading="lazy">
+      <div class="marquee-overlay">
+        <span class="marquee-badge">${p.category || 'Madinah'}</span>
+        <div class="marquee-title">${p.title}</div>
+        <div class="marquee-loc">📍 ${p.location || 'Madinah'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderGallery(items) {
   const container = document.getElementById('gallery');
   if (!items || items.length === 0) {
@@ -209,6 +324,7 @@ fetch('/api/portfolio')
   .then(r => r.json())
   .then(items => {
     allItems = items;
+    renderMarquee(allItems);
     renderGallery(allItems);
 
     // Setup filter listeners

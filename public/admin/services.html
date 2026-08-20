@@ -136,15 +136,17 @@ async function loadData() {
   main.innerHTML = `<h1 class="admin-h1">Services & Price List Manager</h1><p class="admin-sub">Loading catalog...</p>`;
 
   try {
-    const [svcRes, photoRes, setRes] = await Promise.all([
+    const [svcRes, photoRes, setRes, locRes] = await Promise.all([
       adminFetch('/api/admin/services-full'),
       adminFetch('/api/admin/photographer'),
-      adminFetch('/api/admin/settings').catch(() => null)
+      adminFetch('/api/admin/settings').catch(() => null),
+      adminFetch('/api/admin/locations').catch(() => null)
     ]);
 
     const services = svcRes.ok ? await svcRes.json() : [];
     const photographer = photoRes.ok ? await photoRes.json() : {};
     const settings = (setRes && setRes.ok) ? await setRes.json() : {};
+    const locations = (locRes && locRes.ok) ? await locRes.json() : [];
 
     if (!Array.isArray(services)) {
       throw new Error('Invalid services catalog format');
@@ -241,6 +243,40 @@ async function loadData() {
           <textarea id="p-bio" rows="2">${photographer.bio || ''}</textarea>
         </div>
         <button class="btn btn-primary" onclick="savePhotographer()" style="padding:8px 18px; font-size:0.8rem;">Save Photographer Profile</button>
+      </div>
+
+      <!-- Locations & Shooting Spots Section -->
+      <div class="service-card" style="border-left: 4px solid #3E5B2A; background:#fafcf8;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 style="font-family:var(--font-display); font-size:1.3rem;">📍 Shooting Locations &amp; Spots</h2>
+            <p style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:2px;">Daftar lokasi pemotretan yang muncul saat klien melakukan booking.</p>
+          </div>
+          <button class="btn" onclick="addNewLocationPrompt()" style="background:#3E5B2A; color:#fff; padding:6px 14px; font-size:0.78rem; border-radius:3px; border:none; cursor:pointer;">➕ Tambah Lokasi Baru</button>
+        </div>
+
+        <div id="locations-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+          ${(locations || []).map(loc => `
+            <div class="pkg-card" data-loc-id="${loc.id}" style="background:#fff; border:1px solid #d0dec4;">
+              <div class="form-row">
+                <label>Nama Tempat / Spot</label>
+                <input type="text" class="loc-name" value="${loc.name}" style="font-weight:600;">
+              </div>
+              <div class="form-row">
+                <label>Deskripsi Lokasi</label>
+                <input type="text" class="loc-desc" value="${loc.description || ''}">
+              </div>
+              <div class="form-row">
+                <label>Waktu Perjalanan / Buffer (Menit)</label>
+                <input type="number" class="loc-buffer" value="${loc.travel_buffer_minutes || 15}">
+              </div>
+              <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="btn btn-primary" onclick="saveLocation(${loc.id})" style="flex:1; padding:6px; font-size:0.75rem; background:#3E5B2A;">Simpan Lokasi</button>
+                <button onclick="deleteLocation(${loc.id}, '${loc.name}')" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:6px 10px; font-size:0.75rem; border-radius:3px; cursor:pointer;">🗑️</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
       </div>
 
       <h2 style="font-family:var(--font-display); font-size:1.3rem; margin: 36px 0 16px 0;">Services & Packages Catalog</h2>
@@ -411,6 +447,57 @@ async function savePackage(id) {
     body: JSON.stringify({ name, price, duration_minutes, edited_photos, deposit_percentage, description })
   });
   showToast(`Package "${name}" price updated to SAR ${price}!`);
+}
+
+async function saveLocation(id) {
+  const card = document.querySelector(`.pkg-card[data-loc-id="${id}"]`);
+  const name = card.querySelector('.loc-name').value.trim();
+  const description = card.querySelector('.loc-desc').value.trim();
+  const travel_buffer_minutes = card.querySelector('.loc-buffer').value.trim();
+
+  if (!name) {
+    alert('Nama lokasi tidak boleh kosong.');
+    return;
+  }
+
+  await adminFetch(`/api/admin/locations/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ name, description, travel_buffer_minutes })
+  });
+  showToast(`Lokasi "${name}" berhasil disimpan!`);
+}
+
+async function addNewLocationPrompt() {
+  const name = prompt('Masukkan nama lokasi / spot pemotretan baru di Madinah (contoh: Jabal Magnet, Masjid Qiblatain):');
+  if (!name || !name.trim()) return;
+
+  const description = prompt('Masukkan deskripsi singkat lokasi:', 'Spot pemotretan bersejarah di Madinah') || '';
+  const buffer = prompt('Waktu perjalanan / buffer (menit):', '20') || '20';
+
+  const res = await adminFetch('/api/admin/locations', {
+    method: 'POST',
+    body: JSON.stringify({ name: name.trim(), description: description.trim(), travel_buffer_minutes: Number(buffer) || 15 })
+  });
+
+  if (res.ok) {
+    showToast(`Lokasi "${name}" berhasil ditambahkan!`);
+    loadData();
+  } else {
+    const d = await res.json();
+    alert(d.error || 'Gagal menambahkan lokasi');
+  }
+}
+
+async function deleteLocation(id, name) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus lokasi "${name}"?`)) return;
+  const res = await adminFetch(`/api/admin/locations/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    showToast(`Lokasi "${name}" dihapus.`);
+    loadData();
+  } else {
+    const d = await res.json();
+    alert(d.error || 'Gagal menghapus lokasi');
+  }
 }
 
 loadData();

@@ -4,26 +4,36 @@ const db = require('../db');
 const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
-const { recordBookingToCloud, syncCloudBookingsToDb, syncCloudSettingsToDb, syncCloudPortfolioToDb } = require('../lib/cloudStore');
+const {
+  recordBookingToCloud,
+  syncCloudBookingsToDb,
+  syncCloudSettingsToDb,
+  syncCloudPortfolioToDb,
+  syncCloudServicesToDb,
+  syncCloudLocationsToDb
+} = require('../lib/cloudStore');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
   return row ? Number(row.value) : 30;
 }
 
-router.get('/services', (req, res) => {
+router.get('/services', async (req, res) => {
+  try { await syncCloudServicesToDb(db); } catch(e) {}
   const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order`).all();
   res.json(services);
 });
 
-router.get('/services/:slug', (req, res) => {
+router.get('/services/:slug', async (req, res) => {
+  try { await syncCloudServicesToDb(db); } catch(e) {}
   const service = db.prepare(`SELECT * FROM services WHERE slug=? AND active=1`).get(req.params.slug);
   if (!service) return res.status(404).json({ error: 'Service not found' });
   const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1`).all(service.id);
   res.json({ ...service, packages });
 });
 
-router.get('/locations', (req, res) => {
+router.get('/locations', async (req, res) => {
+  try { await syncCloudLocationsToDb(db); } catch(e) {}
   res.json(db.prepare(`SELECT * FROM locations WHERE active=1`).all());
 });
 

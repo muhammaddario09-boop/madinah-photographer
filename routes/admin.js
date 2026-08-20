@@ -138,8 +138,11 @@ const {
   recordSettingsToCloud,
   recordPortfolioToCloud,
   recordServicesToCloud,
+  recordLocationsToCloud,
   syncCloudSettingsToDb,
-  syncCloudPortfolioToDb
+  syncCloudPortfolioToDb,
+  syncCloudServicesToDb,
+  syncCloudLocationsToDb
 } = require('../lib/cloudStore');
 
 router.get('/bookings', async (req, res) => {
@@ -307,7 +310,8 @@ router.put('/photographer', async (req, res) => {
 });
 
 // --- Services & Price List Manager ---
-router.get('/services-full', (req, res) => {
+router.get('/services-full', async (req, res) => {
+  try { await syncCloudServicesToDb(db); } catch(e) {}
   const services = db.prepare(`SELECT * FROM services ORDER BY sort_order`).all();
   const full = services.map(s => {
     const packages = db.prepare(`SELECT * FROM packages WHERE service_id = ? ORDER BY price`).all(s.id);
@@ -358,6 +362,54 @@ router.delete('/packages/:id', async (req, res) => {
   db.prepare(`DELETE FROM packages WHERE id=?`).run(req.params.id);
   await recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
+});
+
+// --- Locations & Shooting Spots Manager ---
+router.get('/locations', async (req, res) => {
+  try {
+    try { await syncCloudLocationsToDb(db); } catch(e) {}
+    const locations = db.prepare(`SELECT * FROM locations ORDER BY id`).all();
+    res.json(locations);
+  } catch(e) {
+    res.json([]);
+  }
+});
+
+router.post('/locations', async (req, res) => {
+  try {
+    const { name, description, travel_buffer_minutes } = req.body;
+    if (!name) return res.status(400).json({ error: 'Location name is required.' });
+    const info = db.prepare(
+      `INSERT INTO locations (name, description, travel_buffer_minutes) VALUES (?,?,?)`
+    ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15);
+    await recordLocationsToCloud(db).catch(() => {});
+    res.json({ ok: true, id: info.lastInsertRowid });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.put('/locations/:id', async (req, res) => {
+  try {
+    const { name, description, travel_buffer_minutes } = req.body;
+    db.prepare(
+      `UPDATE locations SET name=?, description=?, travel_buffer_minutes=? WHERE id=?`
+    ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15, req.params.id);
+    await recordLocationsToCloud(db).catch(() => {});
+    res.json({ ok: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/locations/:id', async (req, res) => {
+  try {
+    db.prepare(`DELETE FROM locations WHERE id=?`).run(req.params.id);
+    await recordLocationsToCloud(db).catch(() => {});
+    res.json({ ok: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // --- Portfolio & Gallery Manager ---

@@ -81,6 +81,77 @@
   </div>
 </header>
 
+<!-- Dynamic Animated Infinite Moving Photo Showcase -->
+<div class="marquee-wrapper" style="overflow:hidden; position:relative; width:100%; padding:28px 0; background:var(--ivory); border-bottom:1px solid var(--line); mask-image:linear-gradient(to right, transparent, black 8%, black 92%, transparent); -webkit-mask-image:linear-gradient(to right, transparent, black 8%, black 92%, transparent);">
+  <div style="display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 16px auto; padding:0 24px;">
+    <span class="eyebrow" style="color:var(--gold);">📸 Live Portfolio Showcase</span>
+    <a href="/portfolio.html" style="font-size:0.8rem; color:var(--charcoal); text-decoration:none; font-weight:600;">Lihat Semua Portofolio →</a>
+  </div>
+  <div class="marquee-track" id="home-marquee-track" style="display:flex; gap:18px; width:max-content; animation:scrollMarquee 38s linear infinite;">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<style>
+@keyframes scrollMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+.h-marquee-card {
+  width: 280px;
+  height: 340px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.h-marquee-card:hover {
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+}
+.h-marquee-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.h-marquee-card:hover img {
+  transform: scale(1.06);
+}
+.h-marquee-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 14px 12px 14px;
+  background: linear-gradient(to top, rgba(17,15,14,0.92) 0%, transparent 100%);
+  color: #fff;
+}
+.h-marquee-tag {
+  display: inline-block;
+  background: rgba(212,163,89,0.9);
+  color: #1c1917;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+.h-marquee-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin: 0;
+  line-height: 1.2;
+}
+</style>
+
 <!-- About Photographer Section -->
 <section class="section" id="about">
   <div class="container">
@@ -211,6 +282,25 @@ fetch('/api/photographers')
       if (p.bio) document.getElementById('p-display-bio').textContent = p.bio;
       if (p.avatar_url) document.getElementById('p-avatar-img').style.backgroundImage = `url('${p.avatar_url}')`;
     }
+  })
+  .catch(() => {});
+
+// Load live portfolio marquee strip
+fetch('/api/portfolio')
+  .then(r => r.json())
+  .then(items => {
+    const track = document.getElementById('home-marquee-track');
+    if (!items || items.length === 0 || !track) return;
+    const loopItems = [...items, ...items];
+    track.innerHTML = loopItems.map(p => `
+      <div class="h-marquee-card" onclick="window.location.href='/portfolio.html'">
+        <img src="${p.image_url}" alt="${p.title}" loading="lazy">
+        <div class="h-marquee-overlay">
+          <span class="h-marquee-tag">${p.category || 'Madinah'}</span>
+          <h4 class="h-marquee-title">${p.title}</h4>
+        </div>
+      </div>
+    `).join('');
   })
   .catch(() => {});
 
