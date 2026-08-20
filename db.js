@@ -52,11 +52,14 @@ function ensureSettings() {
 ensureSettings();
 
 function ensureAdminUser() {
-  const adminCount = db.prepare(`SELECT COUNT(*) as count FROM users WHERE role='ADMIN'`).get().count;
-  if (adminCount === 0) {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@madinahphoto.com';
-    const adminPass = process.env.ADMIN_PASSWORD || 'AdminMadinah2026!';
-    const passwordHash = hashPassword(adminPass);
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@madinahphoto.com';
+  const adminPass = process.env.ADMIN_PASSWORD || 'AdminMadinah2026!';
+  const passwordHash = hashPassword(adminPass);
+
+  const existing = db.prepare(`SELECT id FROM users WHERE email=? COLLATE NOCASE`).get(adminEmail);
+  if (existing) {
+    db.prepare(`UPDATE users SET password_hash=?, role='ADMIN' WHERE id=?`).run(passwordHash, existing.id);
+  } else {
     db.prepare(`INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'ADMIN')`).run(adminEmail, passwordHash);
   }
 }
