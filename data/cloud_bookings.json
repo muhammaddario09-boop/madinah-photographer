@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-20T08:05:42.953Z",
+  "lastUpdated": "2026-08-20T08:07:22.704Z",
   "bookings": [
     {
       "booking_code": "MDN-2026-0001",
@@ -605,7 +605,7 @@
   "locations": [
     {
       "id": 1,
-      "name": "JABAL UHUD",
+      "name": "jabal uhud",
       "description": "The Prophet's Mosque and surrounding plazas.",
       "travel_buffer_minutes": 15,
       "active": 1
