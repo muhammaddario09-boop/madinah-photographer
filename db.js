@@ -2,18 +2,13 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
 
-const DB_PATH = process.env.DB_PATH || (process.env.VERCEL ? path.join('/tmp', 'data.sqlite') : path.join(__dirname, 'data.sqlite'));
+const DB_PATH = process.env.DB_PATH || (process.env.VERCEL ? ':memory:' : path.join(__dirname, 'data.sqlite'));
 
 let db;
 try {
   db = new Database(DB_PATH, { timeout: 10000 });
-  try { db.pragma('journal_mode = WAL'); } catch(e) {}
-  try { db.pragma('synchronous = NORMAL'); } catch(e) {}
-} catch(err) {
-  // If opening failed (e.g. corrupted or locked), fallback to clean /tmp or memory
-  const fallbackPath = process.env.VERCEL ? `/tmp/data_${Date.now()}.sqlite` : ':memory:';
-  db = new Database(fallbackPath, { timeout: 10000 });
-  try { db.pragma('journal_mode = WAL'); } catch(e) {}
+} catch (err) {
+  db = new Database(':memory:', { timeout: 10000 });
 }
 
 const { hashPassword } = require('./lib/auth');
