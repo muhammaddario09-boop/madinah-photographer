@@ -234,8 +234,8 @@ router.post('/bookings', async (req, res) => {
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
-    // Record to central cloud datastore
-    await recordBookingToCloud({
+    // Record to central cloud datastore non-blocking
+    recordBookingToCloud({
       booking_code: result.bookingCode,
       client_name: b.clientName,
       client_email: b.clientEmail,
@@ -261,7 +261,7 @@ router.post('/bookings', async (req, res) => {
       created_at: new Date().toISOString()
     }).catch(err => console.error('Cloud sync error:', err.message));
 
-    res.status(201).json({
+    return res.status(201).json({
       bookingCode: result.bookingCode,
       id: result.id,
       status: 'PENDING',
@@ -275,7 +275,9 @@ router.post('/bookings', async (req, res) => {
       whatsappUrl,
     });
   } catch (e) {
-    res.status(e.status || 500).json({ error: e.message || 'Your booking could not be completed. Please try again.' });
+    console.error('POST /bookings error:', e);
+    const status = (typeof e.status === 'number' && e.status >= 400 && e.status < 600) ? e.status : 400;
+    return res.status(status).json({ error: e.message || 'Your booking could not be completed. Please try again.' });
   }
 });
 
