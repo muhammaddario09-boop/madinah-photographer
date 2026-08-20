@@ -18,28 +18,40 @@ function bufferMinutes(db) {
   return row ? Number(row.value) : 30;
 }
 
-router.get('/services', async (req, res) => {
-  try { await syncCloudServicesToDb(db); } catch(e) {}
-  const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order`).all();
-  const full = services.map(s => {
-    const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(s.id);
-    return { ...s, packages };
-  });
-  res.json(full);
+router.get('/services', (req, res) => {
+  try {
+    const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order`).all();
+    const full = services.map(s => {
+      const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(s.id);
+      return { ...s, packages };
+    });
+    res.json(full);
+  } catch (err) {
+    console.error('GET /services error:', err.message);
+    res.json([]);
+  }
 });
 
-router.get('/services/:slug', async (req, res) => {
-  try { await syncCloudServicesToDb(db); } catch(e) {}
-  const param = req.params.slug;
-  const service = db.prepare(`SELECT * FROM services WHERE (slug=? OR id=? OR LOWER(slug)=LOWER(?)) AND active=1`).get(param, isNaN(param) ? -1 : Number(param), param);
-  if (!service) return res.status(404).json({ error: 'Service not found' });
-  const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(service.id);
-  res.json({ ...service, packages });
+router.get('/services/:slug', (req, res) => {
+  try {
+    const param = req.params.slug;
+    const service = db.prepare(`SELECT * FROM services WHERE (slug=? OR id=? OR LOWER(slug)=LOWER(?)) AND active=1`).get(param, isNaN(param) ? -1 : Number(param), param);
+    if (!service) return res.status(404).json({ error: 'Service not found' });
+    const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(service.id);
+    res.json({ ...service, packages });
+  } catch (err) {
+    console.error('GET /services/:slug error:', err.message);
+    res.status(404).json({ error: 'Service not found' });
+  }
 });
 
-router.get('/locations', async (req, res) => {
-  try { await syncCloudLocationsToDb(db); } catch(e) {}
-  res.json(db.prepare(`SELECT * FROM locations WHERE active=1`).all());
+router.get('/locations', (req, res) => {
+  try {
+    res.json(db.prepare(`SELECT * FROM locations WHERE active=1 ORDER BY id`).all());
+  } catch (err) {
+    console.error('GET /locations error:', err.message);
+    res.json([]);
+  }
 });
 
 router.get('/photographers', (req, res) => {
@@ -367,9 +379,13 @@ router.post('/bookings/:code/reschedule', async (req, res) => {
   }
 });
 
-router.get('/portfolio', async (req, res) => {
-  try { await syncCloudPortfolioToDb(db); } catch(e) {}
-  res.json(db.prepare(`SELECT * FROM portfolio WHERE active=1 ORDER BY featured DESC, sort_order`).all());
+router.get('/portfolio', (req, res) => {
+  try {
+    res.json(db.prepare(`SELECT * FROM portfolio WHERE active=1 ORDER BY featured DESC, sort_order`).all());
+  } catch(err) {
+    console.error('GET /portfolio error:', err.message);
+    res.json([]);
+  }
 });
 
 module.exports = router;
