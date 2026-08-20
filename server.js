@@ -17,6 +17,10 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Madinah Photographer running at http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Madinah Photographer running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
