@@ -5,15 +5,24 @@ const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
 const { recordBookingToCloud } = require('../lib/cloudStore');
-const { recordBookingToSupabase, fetchPortfolioFromSupabase } = require('../lib/supabase');
+const {
+  recordBookingToSupabase,
+  fetchPortfolioFromSupabase,
+  fetchServicesFromSupabase,
+  fetchLocationsFromSupabase,
+  fetchPhotographersFromSupabase,
+  fetchSettingsFromSupabase
+} = require('../lib/supabase');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
   return row ? Number(row.value) : 30;
 }
 
-router.get('/services', (req, res) => {
+router.get('/services', async (req, res) => {
   try {
+    const supaServices = await fetchServicesFromSupabase();
+    if (supaServices) return res.json(supaServices);
     const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order`).all();
     const full = services.map(s => {
       const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(s.id);
@@ -26,9 +35,14 @@ router.get('/services', (req, res) => {
   }
 });
 
-router.get('/services/:slug', (req, res) => {
+router.get('/services/:slug', async (req, res) => {
   try {
     const param = req.params.slug;
+    const supaServices = await fetchServicesFromSupabase();
+    if (supaServices) {
+      const found = supaServices.find(s => s.slug === param || String(s.id) === param || (s.slug && s.slug.toLowerCase() === param.toLowerCase()));
+      if (found) return res.json(found);
+    }
     const service = db.prepare(`SELECT * FROM services WHERE (slug=? OR id=? OR LOWER(slug)=LOWER(?)) AND active=1`).get(param, isNaN(param) ? -1 : Number(param), param);
     if (!service) return res.status(404).json({ error: 'Service not found' });
     const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(service.id);
@@ -39,8 +53,10 @@ router.get('/services/:slug', (req, res) => {
   }
 });
 
-router.get('/locations', (req, res) => {
+router.get('/locations', async (req, res) => {
   try {
+    const supaLocs = await fetchLocationsFromSupabase();
+    if (supaLocs) return res.json(supaLocs);
     res.json(db.prepare(`SELECT * FROM locations WHERE active=1 ORDER BY id`).all());
   } catch (err) {
     console.error('GET /locations error:', err.message);
@@ -48,8 +64,10 @@ router.get('/locations', (req, res) => {
   }
 });
 
-router.get('/photographers', (req, res) => {
+router.get('/photographers', async (req, res) => {
   try {
+    const supaPhoto = await fetchPhotographersFromSupabase();
+    if (supaPhoto) return res.json(supaPhoto);
     const list = db.prepare(`SELECT id, name, bio, avatar_url FROM photographers WHERE active=1`).all();
     res.json(list.length ? list : [{
       id: 1,
@@ -106,11 +124,14 @@ router.get('/availability/month', (req, res) => {
 });
 
 // GET /api/payment-info — returns bank account details, dual WhatsApp numbers, and Instagram info
-router.get('/payment-info', (req, res) => {
+router.get('/payment-info', async (req, res) => {
   try {
-    const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
-    const s = {};
-    settingsRows.forEach(r => { s[r.key] = r.value; });
+    let s = await fetchSettingsFromSupabase();
+    if (!s) {
+      const settingsRows = db.prepare(`SELECT key, value FROM settings`).all();
+      s = {};
+      settingsRows.forEach(r => { s[r.key] = r.value; });
+    }
     const wa = s.admin_whatsapp || '+6282175272547';
     const wa2 = s.admin_whatsapp_2 || '+6281234567890';
     const igUrl = s.instagram_url || 'https://instagram.com/umrohlens';

@@ -13,7 +13,23 @@ const {
   fetchBookingDetailsFromSupabase,
   updateBookingStatusInSupabase,
   deleteBookingFromSupabase,
-  resetAllBookingsInSupabase
+  resetAllBookingsInSupabase,
+  fetchServicesFromSupabase,
+  updateServiceInSupabase,
+  createServiceInSupabase,
+  deleteServiceInSupabase,
+  updatePackageInSupabase,
+  createPackageInSupabase,
+  deletePackageInSupabase,
+  fetchLocationsFromSupabase,
+  updateLocationInSupabase,
+  createLocationInSupabase,
+  deleteLocationInSupabase,
+  fetchSettingsFromSupabase,
+  updateSettingsInSupabase,
+  fetchPhotographersFromSupabase,
+  updatePhotographerInSupabase,
+  updateUserPasswordInSupabase
 } = require('../lib/supabase');
 
 // Public Login Route
@@ -111,7 +127,7 @@ router.get('/me', (req, res) => {
 });
 
 // Change Password Route
-router.post('/change-password', (req, res) => {
+router.post('/change-password', async (req, res) => {
   const { currentPassword, newPassword } = req.body || {};
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ error: 'Current password and new password are required.' });
@@ -128,6 +144,7 @@ router.post('/change-password', (req, res) => {
 
   const newHash = hashPassword(newPassword);
   db.prepare(`UPDATE users SET password_hash = ? WHERE id = ?`).run(newHash, req.user.id);
+  await updateUserPasswordInSupabase(req.user.email || 'admin@madinahphoto.com', newHash).catch(() => {});
 
   res.json({ ok: true, message: 'Password successfully updated.' });
 });
@@ -327,8 +344,10 @@ router.delete('/availability/overrides/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-router.get('/photographer', (req, res) => {
+router.get('/photographer', async (req, res) => {
   try {
+    const supaPhotos = await fetchPhotographersFromSupabase();
+    if (supaPhotos && supaPhotos[0]) return res.json(supaPhotos[0]);
     const p = db.prepare(`SELECT * FROM photographers ORDER BY id LIMIT 1`).get();
     res.json(p || { name: 'UMROH LENS', avatar_url: '/img/photographer-1.jpg', bio: '' });
   } catch (e) {
@@ -336,9 +355,10 @@ router.get('/photographer', (req, res) => {
   }
 });
 
-router.put('/photographer', (req, res) => {
+router.put('/photographer', async (req, res) => {
   try {
     const { name, bio, avatar_url } = req.body || {};
+    await updatePhotographerInSupabase({ name, bio, avatar_url }).catch(() => {});
     const p = db.prepare(`SELECT id FROM photographers ORDER BY id LIMIT 1`).get();
     if (p) {
       db.prepare(`UPDATE photographers SET name=?, bio=?, avatar_url=? WHERE id=?`)
@@ -359,8 +379,10 @@ router.put('/photographer', (req, res) => {
 });
 
 // --- Services & Price List Manager ---
-router.get('/services-full', (req, res) => {
+router.get('/services-full', async (req, res) => {
   try {
+    const supaServices = await fetchServicesFromSupabase();
+    if (supaServices) return res.json(supaServices);
     const services = db.prepare(`SELECT * FROM services ORDER BY sort_order`).all();
     const full = services.map(s => {
       const packages = db.prepare(`SELECT * FROM packages WHERE service_id = ? ORDER BY price`).all(s.id);
@@ -372,8 +394,14 @@ router.get('/services-full', (req, res) => {
   }
 });
 
-router.put('/services/:id', (req, res) => {
+router.put('/services/:id', async (req, res) => {
   const { name, description, cover_image, starting_price, currency, edited_photos } = req.body;
+  await updateServiceInSupabase(req.params.id, {
+    name, description, cover_image,
+    starting_price: Number(starting_price) || 0,
+    currency: currency || 'SAR',
+    edited_photos: Number(edited_photos) || 0
+  }).catch(() => {});
   db.prepare(
     `UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=? WHERE id=?`
   ).run(name, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, req.params.id);
@@ -381,8 +409,54 @@ router.put('/services/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-router.put('/packages/:id', (req, res) => {
+router.post('/services', async (req, res) => {
+  const { name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order } = req.body;
+  const created = await createServiceInSupabase({
+    name,
+    slug: slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    description: description || '',
+    cover_image: cover_image || '/img/service-golden-hour.jpg',
+    duration_minutes: Number(duration_minutes) || 60,
+    starting_price: Number(starting_price) || 350,
+    currency: currency || 'SAR',
+    edited_photos: Number(edited_photos) || 10,
+    sort_order: Number(sort_order) || 0,
+    active: 1
+  }).catch(() => {});
+
+  const info = db.prepare(
+    `INSERT INTO services (name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order)
+     VALUES (?,?,?,?,?,?,?,?,?)`
+  );
+  const result = info.run(
+    name, slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    description || '', cover_image || '/img/service-golden-hour.jpg',
+    Number(duration_minutes) || 60, Number(starting_price) || 350,
+    currency || 'SAR', Number(edited_photos) || 10, Number(sort_order) || 0
+  );
+  recordServicesToCloud(db).catch(() => {});
+  res.json({ ok: true, id: created ? created.id : result.lastInsertRowid });
+});
+
+router.delete('/services/:id', async (req, res) => {
+  await deleteServiceInSupabase(req.params.id).catch(() => {});
+  db.prepare(`DELETE FROM packages WHERE service_id=?`).run(req.params.id);
+  db.prepare(`DELETE FROM services WHERE id=?`).run(req.params.id);
+  recordServicesToCloud(db).catch(() => {});
+  res.json({ ok: true });
+});
+
+router.put('/packages/:id', async (req, res) => {
   const { name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
+  await updatePackageInSupabase(req.params.id, {
+    name, description,
+    price: Number(price) || 0,
+    currency: currency || 'SAR',
+    duration_minutes: Number(duration_minutes) || 30,
+    edited_photos: Number(edited_photos) || 10,
+    deposit_percentage: Number(deposit_percentage) || 30,
+    cancellation_policy: cancellation_policy || ''
+  }).catch(() => {});
   db.prepare(
     `UPDATE packages SET name=?, description=?, price=?, currency=?, duration_minutes=?, edited_photos=?, deposit_percentage=?, cancellation_policy=? WHERE id=?`
   ).run(
@@ -395,8 +469,21 @@ router.put('/packages/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-router.post('/packages', (req, res) => {
+router.post('/packages', async (req, res) => {
   const { service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy } = req.body;
+  const created = await createPackageInSupabase({
+    service_id: Number(service_id),
+    name,
+    description: description || '',
+    price: Number(price) || 0,
+    currency: currency || 'SAR',
+    duration_minutes: Number(duration_minutes) || 30,
+    edited_photos: Number(edited_photos) || 10,
+    deposit_percentage: Number(deposit_percentage) || 30,
+    cancellation_policy: cancellation_policy || '',
+    active: 1
+  }).catch(() => {});
+
   const info = db.prepare(
     `INSERT INTO packages (service_id, name, description, price, currency, duration_minutes, edited_photos, deposit_percentage, cancellation_policy)
      VALUES (?,?,?,?,?,?,?,?,?)`
@@ -407,18 +494,21 @@ router.post('/packages', (req, res) => {
     Number(deposit_percentage) || 30, cancellation_policy || ''
   );
   recordServicesToCloud(db).catch(() => {});
-  res.json({ ok: true, id: result.lastInsertRowid });
+  res.json({ ok: true, id: created ? created.id : result.lastInsertRowid });
 });
 
-router.delete('/packages/:id', (req, res) => {
+router.delete('/packages/:id', async (req, res) => {
+  await deletePackageInSupabase(req.params.id).catch(() => {});
   db.prepare(`DELETE FROM packages WHERE id=?`).run(req.params.id);
   recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 // --- Locations & Shooting Spots Manager ---
-router.get('/locations', (req, res) => {
+router.get('/locations', async (req, res) => {
   try {
+    const supaLocs = await fetchLocationsFromSupabase();
+    if (supaLocs) return res.json(supaLocs);
     const locations = db.prepare(`SELECT * FROM locations ORDER BY id`).all();
     res.json(locations);
   } catch(e) {
@@ -426,23 +516,36 @@ router.get('/locations', (req, res) => {
   }
 });
 
-router.post('/locations', (req, res) => {
+router.post('/locations', async (req, res) => {
   try {
     const { name, description, travel_buffer_minutes } = req.body;
     if (!name) return res.status(400).json({ error: 'Location name is required.' });
+    const created = await createLocationInSupabase({
+      name: name.trim(),
+      description: description || '',
+      travel_buffer_minutes: Number(travel_buffer_minutes) || 15,
+      active: 1
+    }).catch(() => {});
+
     const info = db.prepare(
       `INSERT INTO locations (name, description, travel_buffer_minutes) VALUES (?,?,?)`
     ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15);
     recordLocationsToCloud(db).catch(() => {});
-    res.json({ ok: true, id: info.lastInsertRowid });
+    res.json({ ok: true, id: created ? created.id : info.lastInsertRowid });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-router.put('/locations/:id', (req, res) => {
+router.put('/locations/:id', async (req, res) => {
   try {
     const { name, description, travel_buffer_minutes } = req.body;
+    await updateLocationInSupabase(req.params.id, {
+      name: name.trim(),
+      description: description || '',
+      travel_buffer_minutes: Number(travel_buffer_minutes) || 15
+    }).catch(() => {});
+
     db.prepare(
       `UPDATE locations SET name=?, description=?, travel_buffer_minutes=? WHERE id=?`
     ).run(name.trim(), description || '', Number(travel_buffer_minutes) || 15, req.params.id);
@@ -453,8 +556,9 @@ router.put('/locations/:id', (req, res) => {
   }
 });
 
-router.delete('/locations/:id', (req, res) => {
+router.delete('/locations/:id', async (req, res) => {
   try {
+    await deleteLocationInSupabase(req.params.id).catch(() => {});
     db.prepare(`DELETE FROM locations WHERE id=?`).run(req.params.id);
     recordLocationsToCloud(db).catch(() => {});
     res.json({ ok: true });
@@ -508,8 +612,10 @@ router.delete('/portfolio/:id', async (req, res) => {
 });
 
 // --- Settings Manager (WhatsApp & Bank Accounts) ---
-router.get('/settings', (req, res) => {
+router.get('/settings', async (req, res) => {
   try {
+    const supaSettings = await fetchSettingsFromSupabase();
+    if (supaSettings) return res.json(supaSettings);
     const rows = db.prepare(`SELECT key, value FROM settings`).all();
     const map = {};
     rows.forEach(r => { map[r.key] = r.value; });
@@ -519,8 +625,9 @@ router.get('/settings', (req, res) => {
   }
 });
 
-router.put('/settings', (req, res) => {
+router.put('/settings', async (req, res) => {
   const settings = req.body || {};
+  await updateSettingsInSupabase(settings).catch(() => {});
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (?, ?)
      ON CONFLICT(key) DO UPDATE SET value=excluded.value`
