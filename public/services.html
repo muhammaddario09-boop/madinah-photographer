@@ -3,80 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Layanan &amp; Paket — UMROH LENS Madinah</title>
+<title>Layanan &amp; Tarif VVIP — UMROH LENS Atelier Madinah</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  .service-apple-row {
-    background: var(--apple-card);
-    border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-lg);
-    padding: 40px;
-    margin-bottom: 32px;
+  .service-lux-row {
+    background: var(--lux-card);
+    border: 1px solid var(--lux-gold-border-subtle);
+    border-radius: 24px;
+    padding: 44px;
+    margin-bottom: 36px;
     display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 40px;
+    grid-template-columns: 360px 1fr;
+    gap: 44px;
     align-items: center;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition: all 0.35s ease;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
   }
-  .service-apple-row:hover {
-    border-color: rgba(229, 195, 120, 0.4);
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  .service-lux-row:hover {
+    border-color: var(--lux-gold);
+    transform: translateY(-5px);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 25px var(--lux-gold-glow);
   }
-  .service-apple-row-thumb {
-    height: 280px;
-    border-radius: var(--apple-radius-md);
+  .service-lux-row-thumb {
+    height: 300px;
+    border-radius: 18px;
     background-size: cover;
     background-position: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--lux-gold-border);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   }
-  .pkg-apple-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-md);
-    padding: 20px 24px;
+  .pkg-lux-badge {
+    background: rgba(18, 18, 24, 0.7);
+    border: 1px solid var(--lux-gold-border-subtle);
+    border-radius: 18px;
+    padding: 24px 26px;
     flex: 1;
-    min-width: 220px;
+    min-width: 230px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: border-color 0.25s ease;
+  }
+  .pkg-lux-badge:hover {
+    border-color: var(--lux-gold);
   }
   @media (max-width: 860px) {
-    .service-apple-row { grid-template-columns: 1fr; padding: 24px; }
-    .service-apple-row-thumb { height: 220px; }
+    .service-lux-row { grid-template-columns: 1fr; padding: 26px; }
+    .service-lux-row-thumb { height: 230px; }
   }
 </style>
 </head>
 <body>
 
-<!-- Apple Frosted Glass Navigation -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a class="nav-mark" href="/">
-      <div class="nav-mark-dot"></div>
-      UMROH LENS <span>Madinah</span>
+<!-- Ultra-Luxury Haute Navigation -->
+<nav class="nav-lux">
+  <div class="nav-lux-inner">
+    <a class="nav-lux-brand" href="/">
+      UMROH LENS <span>Atelier Madinah</span>
     </a>
-    <div class="nav-links">
-      <a href="/portfolio.html">Portfolio</a>
-      <a href="/services.html" style="color:#FFF;">Layanan &amp; Paket</a>
-      <a href="/#pro-features">Keunggulan Pro</a>
+    <div class="nav-lux-links">
+      <a href="/portfolio.html">Portofolio</a>
+      <a href="/services.html" style="color:var(--lux-gold-light);">Layanan &amp; Paket</a>
+      <a href="/#pro-features">Standar VVIP</a>
       <a href="/#about">Fotografer</a>
       <a href="/my-booking.html">Cek Reservasi</a>
     </div>
-    <div style="display:flex; align-items:center; gap:12px;">
+    <div style="display:flex; align-items:center; gap:14px;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
-      <a class="btn-apple btn-apple-primary" href="/booking.html">Pesan Sesi</a>
+      <a class="btn-lux-primary" href="/booking.html">Pesan Sesi</a>
     </div>
   </div>
 </nav>
 
 <!-- Page Header -->
-<header class="section-tight" style="text-align:center; padding-top:80px; padding-bottom:30px;">
+<header class="section-tight" style="text-align:center; padding-top:90px; padding-bottom:30px;">
   <div class="container">
-    <p class="eyebrow">LINEUP LAYANAN &amp; HARGA</p>
-    <h1 class="text-gradient-titanium" style="margin-top:12px;">Pilihan Sesi Foto &amp; Video Pro</h1>
-    <p class="subheading" style="margin:16px auto 0;">Seluruh paket mencakup fotografer mukim Madinah, arahan pose, pengiriman cloud cepat 24-48 jam, dan file RAW original.</p>
+    <p class="eyebrow-lux">LINEUP LAYANAN &amp; TARIF RESMI</p>
+    <h1 class="text-gold-gradient" style="margin-top:14px;">Pilihan Sesi Dokumentasi VVIP</h1>
+    <p class="subheading-lux" style="margin:18px auto 0;">Seluruh paket mencakup fotografer mukim Madinah, arahan pose ramah keluarga, pengiriman private cloud 24-48 jam, dan file RAW original.</p>
   </div>
 </header>
 
@@ -84,17 +89,17 @@
 <section class="section" style="padding-top:20px;">
   <div class="container">
     <div id="services-list">
-      <div style="text-align:center; padding:60px; color:var(--text-secondary);">Memuat daftar layanan...</div>
+      <div style="text-align:center; padding:60px; color:var(--lux-silver);">Memuat daftar layanan eksklusif...</div>
     </div>
   </div>
 </section>
 
-<!-- Minimalist Apple Footer -->
-<footer class="footer-apple">
+<!-- Haute Luxury Footer -->
+<footer class="lux-footer">
   <div class="container">
-    <div class="footer-apple-bottom" style="border-top:none; padding-top:0;">
-      <span>© 2026 UMROH LENS — Dokumentasi Profesional Madinah Al-Munawwarah.</span>
-      <a class="btn-apple btn-apple-primary" href="/booking.html">Pesan Sesi Sekarang →</a>
+    <div class="lux-footer-bottom" style="border-top:none; padding-top:0;">
+      <span>© 2026 UMROH LENS — Atelier Fotografi &amp; Sinematik VVIP Madinah Al-Munawwarah.</span>
+      <a class="btn-lux-primary" href="/booking.html">Pesan Sesi Sekarang →</a>
     </div>
   </div>
 </footer>
@@ -105,39 +110,39 @@ fetch('/api/services')
   .then(services => {
     const container = document.getElementById('services-list');
     if (!services || services.length === 0) {
-      container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:40px 0;">Belum ada layanan yang aktif.</p>';
+      container.innerHTML = '<p style="color:var(--lux-silver); text-align:center; padding:40px 0;">Belum ada layanan yang aktif.</p>';
       return;
     }
 
     container.innerHTML = services.map(s => {
       const pkgs = s.packages || [];
       return `
-        <div class="service-apple-row">
-          <div class="service-apple-row-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
+        <div class="service-lux-row">
+          <div class="service-lux-row-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
           <div>
-            <span class="eyebrow" style="font-size:0.75rem;">${s.slug.toUpperCase()}</span>
-            <h2 style="font-size:1.8rem; margin:6px 0 10px 0;">${s.name}</h2>
-            <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.6; max-width:650px; margin-bottom:24px;">
+            <span class="eyebrow-lux" style="font-size:0.72rem;">${s.slug.toUpperCase()}</span>
+            <h2 style="font-size:1.9rem; margin:8px 0 12px 0;">${s.name}</h2>
+            <p style="color:var(--lux-silver); font-size:0.96rem; line-height:1.6; max-width:680px; margin-bottom:26px;">
               ${s.description}
             </p>
 
-            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
+            <div style="display:flex; gap:18px; flex-wrap:wrap; margin-bottom:26px;">
               ${pkgs.map(p => `
-                <div class="pkg-apple-badge">
+                <div class="pkg-lux-badge">
                   <div>
-                    <div style="font-weight:700; color:#FFF; font-size:1.05rem;">${p.name}</div>
-                    <div style="font-size:0.82rem; color:var(--text-secondary); margin:4px 0 12px 0;">${p.duration_minutes} Menit • ${p.edited_photos || 10} Foto Edit</div>
+                    <div style="font-family:var(--font-serif); font-weight:700; color:#FFF; font-size:1.1rem;">${p.name}</div>
+                    <div style="font-size:0.84rem; color:var(--lux-silver); margin:6px 0 14px 0;">${p.duration_minutes} Menit • ${p.edited_photos || 10} Master Edit</div>
                   </div>
-                  <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid var(--apple-border); padding-top:12px; margin-top:8px;">
-                    <span style="font-family:var(--font-display); font-size:1.3rem; font-weight:800; color:var(--apple-gold-light);">${p.currency || 'SAR'} ${p.price}</span>
-                    <a class="btn-apple btn-apple-primary" href="/booking.html?service=${s.slug}&package=${p.id}" style="padding:7px 16px; font-size:0.8rem;">Pilih ›</a>
+                  <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid var(--lux-gold-border-subtle); padding-top:14px; margin-top:8px;">
+                    <span style="font-family:var(--font-serif); font-size:1.35rem; font-weight:700; color:var(--lux-gold-light);">${p.currency || 'SAR'} ${p.price}</span>
+                    <a class="btn-lux-primary" href="/booking.html?service=${s.slug}&package=${p.id}" style="padding:8px 18px; font-size:0.75rem;">Pilih ◈</a>
                   </div>
                 </div>
               `).join('')}
             </div>
 
-            <a class="btn-link-apple" href="/booking.html?service=${s.slug}">
-              Lihat Ketersediaan Slot Jadwal untuk ${s.name} ›
+            <a href="/booking.html?service=${s.slug}" style="font-family:var(--font-serif); font-size:0.86rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--lux-gold-light); font-weight:600; text-decoration:none;">
+              Lihat Slot Jadwal Eksklusif untuk ${s.name} →
             </a>
           </div>
         </div>
@@ -146,7 +151,7 @@ fetch('/api/services')
   })
   .catch(err => {
     console.error('Failed to load services:', err);
-    document.getElementById('services-list').innerHTML = '<p style="color:var(--text-secondary); text-align:center;">Gagal memuat layanan.</p>';
+    document.getElementById('services-list').innerHTML = '<p style="color:var(--lux-silver); text-align:center;">Gagal memuat layanan.</p>';
   });
 </script>
 
