@@ -131,8 +131,10 @@ async function runProductionTestSuite() {
   // ---------------------------------------------------------------------------
   console.log('\n🛡️ SUITE 3: Booking Engine & Double-Booking Guard (409 Conflict)');
 
-  const randomDay = String(Math.floor(10 + Math.random() * 18)).padStart(2, '0');
-  const dynamicTestDate = `2027-11-${randomDay}`;
+  const randomMonth = String(Math.floor(1 + Math.random() * 12)).padStart(2, '0');
+  const randomDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
+  const randomYear = 2030 + Math.floor(Math.random() * 10);
+  const dynamicTestDate = `${randomYear}-${randomMonth}-${randomDay}`;
 
   it('createBooking generates non-colliding booking code MDN-YYYY-XXXX', () => {
     const b = createBooking(db, {
@@ -246,15 +248,15 @@ async function runProductionTestSuite() {
     );
     assert.strictEqual(ok, true, 'recordBookingToSupabase must return true');
 
-    // Auto-cleanup test client and booking immediately so Supabase remains completely clean
+    // Auto-cleanup test booking and client immediately so Supabase remains completely clean
     try {
-      await supabaseFetch('clients', {
-        method: 'DELETE',
-        query: `?email=eq.suite.test.${randomNum}@madinahphoto.com`
-      });
       await supabaseFetch('bookings', {
         method: 'DELETE',
         query: `?booking_code=eq.${testCode}`
+      });
+      await supabaseFetch('clients', {
+        method: 'DELETE',
+        query: `?email=eq.suite.test.${randomNum}@madinahphoto.com`
       });
     } catch(cleanErr) {}
   });

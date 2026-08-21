@@ -11,7 +11,8 @@ const {
   fetchServicesFromSupabase,
   fetchLocationsFromSupabase,
   fetchPhotographersFromSupabase,
-  fetchSettingsFromSupabase
+  fetchSettingsFromSupabase,
+  fetchBookingByCodeFromSupabase
 } = require('../lib/supabase');
 
 function bufferMinutes(db) {
@@ -339,15 +340,62 @@ router.post('/bookings', async (req, res) => {
   }
 });
 
-router.get('/bookings/:code', (req, res) => {
+router.get('/bookings/:code', async (req, res) => {
   try {
-    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
-    if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+    const rawCode = String(req.params.code || '').trim().toUpperCase();
+
+    // 1. Check Supabase first (cloud primary database)
+    const supaData = await fetchBookingByCodeFromSupabase(rawCode);
+    if (supaData && supaData.booking) {
+      let s = await fetchSettingsFromSupabase();
+      const waNumber = (s?.admin_whatsapp || '+6282175272547').replace(/[^0-9]/g, '');
+      const waText = [
+        `Assalamu'alaikum UMROH LENS,`,
+        `Saya ingin menanyakan reservasi saya:`,
+        ``,
+        `📋 *Booking Code*: ${supaData.booking.booking_code}`,
+        `👤 *Nama*: ${supaData.booking.client_name}`,
+        `📸 *Layanan*: ${supaData.service.name}`,
+        `📅 *Tanggal*: ${supaData.booking.date}`,
+        `⏰ *Waktu*: ${supaData.booking.start_time} - ${supaData.booking.end_time} (Waktu Madinah)`,
+        `💵 *Status Pembayaran*: ${supaData.booking.payment_status}`,
+        ``,
+        `Terima kasih!`
+      ].join('\n');
+      const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
+
+      return res.json({
+        ...supaData,
+        whatsappUrl
+      });
+    }
+
+    // 2. Fallback to local SQLite cache
+    const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=? COLLATE NOCASE`).get(rawCode);
+    if (!booking) return res.status(404).json({ error: 'Booking tidak ditemukan. Pastikan Booking ID Anda benar (Contoh: MDN-2026-0001).' });
+
     const service = booking.service_id ? db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id) : null;
     const pkg = booking.package_id ? db.prepare(`SELECT * FROM packages WHERE id=?`).get(booking.package_id) : null;
     const location = booking.location_id ? db.prepare(`SELECT * FROM locations WHERE id=?`).get(booking.location_id) : null;
     const photographer = booking.photographer_id ? db.prepare(`SELECT * FROM photographers WHERE id=?`).get(booking.photographer_id) : null;
     const client = booking.client_id ? db.prepare(`SELECT * FROM clients WHERE id=?`).get(booking.client_id) : null;
+
+    let s = await fetchSettingsFromSupabase();
+    const waNumber = (s?.admin_whatsapp || '+6282175272547').replace(/[^0-9]/g, '');
+    const waText = [
+      `Assalamu'alaikum UMROH LENS,`,
+      `Saya ingin menanyakan reservasi saya:`,
+      ``,
+      `📋 *Booking Code*: ${booking.booking_code}`,
+      `👤 *Nama*: ${client?.name || 'Client'}`,
+      `📸 *Layanan*: ${service?.name || 'Madinah Photoshoot'}`,
+      `📅 *Tanggal*: ${booking.date}`,
+      `⏰ *Waktu*: ${booking.start_time} - ${booking.end_time} (Waktu Madinah)`,
+      `💵 *Status Pembayaran*: ${booking.payment_status}`,
+      ``,
+      `Terima kasih!`
+    ].join('\n');
+    const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
     res.json({
       booking: {
@@ -359,7 +407,8 @@ router.get('/bookings/:code', (req, res) => {
       service: service || { name: 'Madinah Photoshoot' },
       package: pkg || { name: 'Standard' },
       location: location || { name: 'Madinah Area' },
-      photographer: photographer || { name: 'UMROH LENS' }
+      photographer: photographer || { name: 'UMROH LENS' },
+      whatsappUrl
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
