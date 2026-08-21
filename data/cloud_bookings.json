@@ -1,32 +1,6 @@
 {
   "lastUpdated": "2026-08-21T09:35:15.646Z",
-  "bookings": [
-    {
-      "booking_code": "MDN-2026-0001",
-      "client_name": "asdasdasd",
-      "client_email": "asdsadsa",
-      "client_phone": "223232322",
-      "client_country": "asdasd",
-      "service_id": 1,
-      "service_name": "Madinah Portrait",
-      "package_id": 1,
-      "package_name": "Essential",
-      "location_id": "1",
-      "location_name": "Masjid Nabawi Area",
-      "date": "2026-08-27",
-      "start_time": "12:30",
-      "end_time": "13:00",
-      "total_price": 350,
-      "deposit_amount": 105,
-      "currency": "SAR",
-      "status": "PENDING",
-      "payment_status": "UNPAID",
-      "occasion": "Umrah",
-      "number_of_people": "1",
-      "proof_url": null,
-      "created_at": "2026-08-21T09:34:20.901Z"
-    }
-  ],
+  "bookings": [],
   "settings": {
     "min_booking_notice_hours": "12",
     "max_booking_window_days": "90",
@@ -694,5 +668,6 @@
       "sort_order": 8,
       "active": 1
     }
-  ]
+  ],
+  "count": 0
 }
