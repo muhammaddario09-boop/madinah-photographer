@@ -43,6 +43,8 @@ if (isVercel) {
 
 // Ensure Admin User credentials
 const { hashPassword } = require('./lib/auth');
+const { ensureAdminUserInSupabase } = require('./lib/supabase');
+
 function ensureAdminUser() {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@madinahphoto.com';
   const adminPass = process.env.ADMIN_PASSWORD || 'AdminMadinah2026!';
@@ -54,6 +56,9 @@ function ensureAdminUser() {
   } else {
     db.prepare(`INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'ADMIN')`).run(adminEmail, passwordHash);
   }
+
+  // Ensure Admin is stored in Supabase users table as well
+  ensureAdminUserInSupabase(adminEmail, passwordHash).catch(() => {});
 }
 ensureAdminUser();
 

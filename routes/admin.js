@@ -4,6 +4,7 @@ const db = require('../db');
 const { setStatus } = require('../lib/bookingEngine');
 const { todayRiyadhISODate } = require('../lib/timezone');
 const { verifyPassword, hashPassword, generateToken, verifyToken } = require('../lib/auth');
+const { recordPortfolioToSupabase, deletePortfolioFromSupabase } = require('../lib/supabase');
 
 // Public Login Route
 router.post('/login', (req, res) => {
@@ -457,6 +458,7 @@ router.post('/portfolio', async (req, res) => {
      VALUES (?,?,?,?,?,?,?)`
   );
   info.run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
+  recordPortfolioToSupabase(req.body).catch(() => {});
   await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
@@ -466,12 +468,14 @@ router.put('/portfolio/:id', async (req, res) => {
   db.prepare(
     `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
   ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
+  recordPortfolioToSupabase({ ...req.body, id: req.params.id }).catch(() => {});
   await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 router.delete('/portfolio/:id', async (req, res) => {
   db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
+  deletePortfolioFromSupabase(req.params.id).catch(() => {});
   await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
