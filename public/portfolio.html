@@ -3,231 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Portofolio Mahakarya 4K — UMROH LENS Atelier Madinah</title>
+<title>Portofolio — UMROH LENS Madinah</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  .portfolio-lux-grid {
+  .portfolio-grid-warm {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 32px;
-    margin-top: 44px;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 28px;
+    margin-top: 36px;
   }
-  .portfolio-lux-card {
-    background: var(--lux-card);
-    border: 1px solid var(--lux-gold-border-subtle);
-    border-radius: 20px;
+  .portfolio-card-warm {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.35s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 6px 20px rgba(28, 24, 20, 0.04);
   }
-  .portfolio-lux-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--lux-gold);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 25px var(--lux-gold-glow);
+  .portfolio-card-warm:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+    box-shadow: 0 14px 32px rgba(28, 24, 20, 0.1);
   }
-  .portfolio-lux-thumb {
-    height: 330px;
+  .portfolio-thumb-warm {
+    height: 280px;
     background-size: cover;
     background-position: center;
     position: relative;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    border-bottom: 1px solid var(--line);
+    transition: transform 0.4s ease;
   }
-  .portfolio-lux-card:hover .portfolio-lux-thumb {
-    transform: scale(1.05);
+  .portfolio-card-warm:hover .portfolio-thumb-warm {
+    transform: scale(1.03);
   }
-  .portfolio-lux-badge {
+  .portfolio-badge-warm {
     position: absolute;
-    top: 18px;
-    left: 18px;
-    background: rgba(7, 7, 9, 0.82);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--lux-gold-border);
-    color: var(--lux-gold-light);
-    font-family: var(--font-serif);
+    top: 14px;
+    left: 14px;
+    background: rgba(28, 24, 20, 0.85);
+    backdrop-filter: blur(8px);
+    color: #FFFFFF;
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 6px 14px;
-    border-radius: 9999px;
+    padding: 5px 12px;
+    border-radius: 20px;
   }
-  .portfolio-lux-body {
-    padding: 26px 30px;
+  .portfolio-body-warm {
+    padding: 22px 24px;
   }
-  .portfolio-lux-body h3 {
-    font-size: 1.35rem;
-    margin-bottom: 8px;
-    color: #FFFFFF;
+  .portfolio-body-warm h3 {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
   }
-  .portfolio-lux-body p {
-    color: var(--lux-silver);
-    font-size: 0.94rem;
+  .portfolio-body-warm p {
+    color: var(--charcoal-soft);
+    font-size: 0.9rem;
     line-height: 1.55;
     margin: 0;
   }
-  .portfolio-lux-loc {
+  .portfolio-loc-warm {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.82rem;
-    color: var(--lux-gold);
-    margin-top: 16px;
-    font-weight: 600;
-    font-family: var(--font-serif);
-    letter-spacing: 0.04em;
-  }
-
-  /* Luxury Segmented Filters */
-  .lux-segmented-controls {
-    display: inline-flex;
-    background: rgba(18, 18, 22, 0.8);
-    border: 1px solid var(--lux-gold-border);
-    padding: 6px;
-    border-radius: 9999px;
     gap: 6px;
-    flex-wrap: wrap;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-  }
-  .lux-filter-pill {
-    padding: 10px 22px;
-    font-family: var(--font-serif);
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: var(--gold);
+    margin-top: 14px;
     font-weight: 600;
-    border-radius: 9999px;
-    color: var(--lux-silver);
-    transition: all 0.25s ease;
-    cursor: pointer;
-  }
-  .lux-filter-pill:hover {
-    color: var(--lux-gold-light);
-  }
-  .lux-filter-pill.active {
-    background: linear-gradient(135deg, #F9E7B4 0%, #D4AF37 50%, #B88E28 100%);
-    color: #070709;
-    box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);
   }
 
-  /* Luxury Lightbox Modal */
-  .lightbox-lux {
+  /* Segmented Category Filters */
+  .category-filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .filter-btn-warm {
+    padding: 9px 20px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    border-radius: 30px;
+    border: 1px solid var(--line);
+    background: #FFFFFF;
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .filter-btn-warm:hover, .filter-btn-warm.active {
+    background: var(--charcoal);
+    color: #FFFFFF;
+    border-color: var(--charcoal);
+    box-shadow: 0 4px 14px rgba(28, 24, 20, 0.15);
+  }
+
+  /* Lightbox Modal */
+  .lightbox-modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(4, 4, 6, 0.95);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    background: rgba(18, 16, 14, 0.92);
+    backdrop-filter: blur(10px);
     z-index: 99999;
     align-items: center;
     justify-content: center;
-    padding: 30px;
+    padding: 24px;
   }
-  .lightbox-lux.active { display: flex; }
-  .lightbox-lux-img {
+  .lightbox-modal.active { display: flex; }
+  .lightbox-img-el {
     max-width: 90vw;
     max-height: 84vh;
-    border-radius: 16px;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), 0 0 30px var(--lux-gold-glow);
-    border: 1px solid var(--lux-gold-border);
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   }
-  .lightbox-lux-close {
+  .lightbox-close-btn {
     position: absolute;
-    top: 28px;
-    right: 36px;
+    top: 24px;
+    right: 32px;
     font-size: 2.2rem;
-    color: var(--lux-gold-light);
+    color: #FFFFFF;
     cursor: pointer;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(212, 175, 55, 0.12);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--lux-gold-border);
   }
 
   @media (max-width: 768px) {
-    .portfolio-lux-grid { grid-template-columns: 1fr; }
-    .lux-segmented-controls { width: 100%; justify-content: center; }
+    .portfolio-grid-warm { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- Ultra-Luxury Haute Navigation -->
-<nav class="nav-lux">
-  <div class="nav-lux-inner">
-    <a class="nav-lux-brand" href="/">
-      UMROH LENS <span>Atelier Madinah</span>
-    </a>
-    <div class="nav-lux-links">
-      <a href="/portfolio.html" style="color:var(--lux-gold-light);">Portofolio</a>
-      <a href="/services.html">Layanan &amp; Paket</a>
-      <a href="/#pro-features">Standar VVIP</a>
-      <a href="/#about">Fotografer</a>
-      <a href="/my-booking.html">Cek Reservasi</a>
+<!-- Warm Luxury Editorial Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
+    <div class="nav-links">
+      <a href="/portfolio.html" style="color:var(--gold);">Portfolio</a>
+      <a href="/services.html">Services</a>
+      <a href="/#about">About</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/my-booking.html">My Booking</a>
     </div>
-    <div style="display:flex; align-items:center; gap:14px;">
+    <div style="display:flex; align-items:center; gap:12px;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
-      <a class="btn-lux-primary" href="/booking.html">Pesan Sesi</a>
+      <a class="nav-cta" href="/booking.html">Book a Session</a>
     </div>
   </div>
 </nav>
 
-<!-- Page Hero Header -->
-<header class="section-tight" style="text-align:center; padding-top:90px; padding-bottom:40px;">
+<!-- Page Header -->
+<header class="section-tight" style="text-align:center; padding-top:60px; padding-bottom:20px;">
   <div class="container">
-    <p class="eyebrow-lux">MAHAKARYA DOKUMENTASI RESMI</p>
-    <h1 class="text-gold-gradient" style="margin-top:14px;">Galeri Keagungan Kota Madinah</h1>
-    <p class="subheading-lux" style="margin:18px auto 0;">Koleksi dokumentasi nyata jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami dan standar editorial haute couture.</p>
+    <p class="eyebrow">GALERI DOKUMENTASI RESMI</p>
+    <h1 style="margin-top:12px;">Portofolio Foto di Kota Madinah</h1>
+    <p style="color:var(--charcoal-soft); max-width:640px; margin:14px auto 0; font-size:1.05rem;">Dokumentasi nyata jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami di sudut-sudut terindah kota Nabi.</p>
   </div>
 </header>
 
-<!-- Category Segmented Controls -->
-<section style="text-align:center; margin-bottom:24px;">
-  <div class="container">
-    <div class="lux-segmented-controls">
-      <button class="lux-filter-pill active" onclick="filterGallery('ALL', this)">Semua Mahakarya</button>
-      <button class="lux-filter-pill" onclick="filterGallery('Masjid Nabawi', this)">Masjid Nabawi</button>
-      <button class="lux-filter-pill" onclick="filterGallery('Couple', this)">Couple / Pasangan</button>
-      <button class="lux-filter-pill" onclick="filterGallery('Family', this)">Keluarga</button>
-      <button class="lux-filter-pill" onclick="filterGallery('Umrah', this)">Ibadah Umrah</button>
-      <button class="lux-filter-pill" onclick="filterGallery('Uhud', this)">Jabal Uhud &amp; Quba</button>
-      <button class="lux-filter-pill" onclick="filterGallery('Cinematic', this)">4K Sinematik</button>
-    </div>
+<!-- Category Filter -->
+<div class="container">
+  <div class="category-filter-bar">
+    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)">Semua Foto</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Masjid Nabawi', this)">Masjid Nabawi</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)">Couple / Pasangan</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Family', this)">Keluarga</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)">Ibadah Umrah</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)">Jabal Uhud &amp; Quba</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)">4K Cinematic</button>
   </div>
-</section>
+</div>
 
-<!-- Gallery Grid Section (Live Supabase) -->
+<!-- Gallery Grid (Live Supabase) -->
 <section class="section" style="padding-top:20px;">
   <div class="container">
-    <div class="portfolio-lux-grid" id="gallery-grid">
+    <div class="portfolio-grid-warm" id="gallery-grid">
       <!-- Populated via JS from Supabase /api/portfolio -->
-      <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--lux-silver);">Memuat mahakarya dari Supabase...</div>
+      <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat galeri dari Supabase...</div>
     </div>
   </div>
 </section>
 
 <!-- Lightbox Modal -->
-<div class="lightbox-lux" id="lightbox" onclick="closeLightbox(event)">
-  <div class="lightbox-lux-close" onclick="closeLightbox(event)">×</div>
-  <img class="lightbox-lux-img" id="lightbox-img" src="" alt="Full view">
+<div class="lightbox-modal" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-close-btn" onclick="closeLightbox(event)">×</div>
+  <img class="lightbox-img-el" id="lightbox-img" src="" alt="Full view">
 </div>
 
-<!-- Haute Luxury Footer -->
-<footer class="lux-footer">
-  <div class="container">
-    <div class="lux-footer-bottom" style="border-top:none; padding-top:0;">
-      <span>© 2026 UMROH LENS — Atelier Fotografi &amp; Sinematik VVIP Madinah Al-Munawwarah.</span>
-      <a class="btn-lux-primary" href="/booking.html">Reservasi Sesi VVIP Anda Sekarang →</a>
-    </div>
+<!-- Warm Luxury Editorial Footer -->
+<footer class="footer">
+  <div class="container footer-bottom" style="border-top:none; padding-top:0;">
+    <span>© 2026 UMROH LENS, Madinah Al-Munawwarah.</span>
+    <a class="btn btn-primary" href="/booking.html">Pesan Sesi Foto Anda →</a>
   </div>
 </footer>
 
@@ -242,25 +214,25 @@ fetch('/api/portfolio')
   })
   .catch(err => {
     console.error('Gallery load error:', err);
-    document.getElementById('gallery-grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--lux-silver);">Belum ada foto dalam galeri.</div>`;
+    document.getElementById('gallery-grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--charcoal-soft);">Belum ada foto dalam galeri.</div>`;
   });
 
 function renderGallery(photos) {
   const grid = document.getElementById('gallery-grid');
   if (!photos || photos.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--lux-silver);">Tidak ada foto dalam kategori ini.</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--charcoal-soft);">Tidak ada foto dalam kategori ini.</div>`;
     return;
   }
 
   grid.innerHTML = photos.map(p => `
-    <div class="portfolio-lux-card" onclick="openLightbox('${p.image_url}')">
-      <div class="portfolio-lux-thumb" style="background-image:url('${p.image_url}');">
-        <span class="portfolio-lux-badge">${p.category || 'Madinah'}</span>
+    <div class="portfolio-card-warm" onclick="openLightbox('${p.image_url}')">
+      <div class="portfolio-thumb-warm" style="background-image:url('${p.image_url}');">
+        <span class="portfolio-badge-warm">${p.category || 'Madinah'}</span>
       </div>
-      <div class="portfolio-lux-body">
+      <div class="portfolio-body-warm">
         <h3>${p.title}</h3>
         <p>${p.description || 'Dokumentasi eksklusif di sudut suci Madinah Al-Munawwarah.'}</p>
-        <div class="portfolio-lux-loc">
+        <div class="portfolio-loc-warm">
           📍 <span>${p.location || 'Masjid Nabawi, Madinah'}</span>
         </div>
       </div>
@@ -269,7 +241,7 @@ function renderGallery(photos) {
 }
 
 function filterGallery(category, btn) {
-  document.querySelectorAll('.lux-filter-pill').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-btn-warm').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
   if (category === 'ALL') {
@@ -286,7 +258,7 @@ function openLightbox(url) {
 }
 
 function closeLightbox(e) {
-  if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-lux-close')) {
+  if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close-btn')) {
     document.getElementById('lightbox').classList.remove('active');
   }
 }
