@@ -1,280 +1,292 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>UMROH LENS — Professional Photographer in Madinah Al-Munawwarah</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="description" content="Jasa fotografer profesional di Madinah Al-Munawwarah untuk jemaah Umrah, pasangan, dan keluarga dengan peralatan 4K Full-Frame & Drone.">
 <link rel="stylesheet" href="/css/style.css">
-<style>
-  .photographer-profile-box {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 40px;
-    align-items: center;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 36px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-  }
-  .photographer-avatar-frame {
-    width: 100%;
-    height: 320px;
-    border-radius: 4px;
-    background-size: cover;
-    background-position: center;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  }
-  .cred-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--ivory);
-    border: 1px solid var(--line);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--charcoal);
-  }
-  @media (max-width: 768px) {
-    .photographer-profile-box {
-      grid-template-columns: 1fr;
-      padding: 24px;
-      gap: 24px;
-    }
-    .photographer-avatar-frame {
-      height: 260px;
-    }
-  }
-</style>
 </head>
 <body>
+
+<!-- Apple Frosted Glass Navigation -->
 <nav class="nav">
   <div class="nav-inner">
-    <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
+    <a class="nav-mark" href="/">
+      <div class="nav-mark-dot"></div>
+      UMROH LENS <span>Madinah</span>
+    </a>
     <div class="nav-links">
       <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
-      <a href="/services.html" data-i18n="nav_services">Services</a>
-      <a href="#about" data-i18n="nav_about">About</a>
+      <a href="/services.html" data-i18n="nav_services">Layanan &amp; Paket</a>
+      <a href="#pro-features" data-i18n="nav_about">Keunggulan Pro</a>
+      <a href="#about">Fotografer</a>
       <a href="#faq" data-i18n="nav_faq">FAQ</a>
-      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">Cek Reservasi</a>
     </div>
-    <div style="display:flex; align-items:center; gap:8px;">
+    <div style="display:flex; align-items:center; gap:12px;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
-      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
+      <a class="btn-apple btn-apple-primary" href="/booking.html" data-i18n="nav_book">Pesan Sesi</a>
     </div>
   </div>
 </nav>
 
-<header class="hero">
-  <div class="hero-inner">
-    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Madinah Al-Munawwarah</p>
-    <h1 data-i18n="hero_title">Dokumentasi Foto Bersejarah di Kota Nabi</h1>
-    <p data-i18n="hero_sub">Jasa foto profesional untuk jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour di sudut-sudut terbaik kota Madinah.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="/booking.html" data-i18n="hero_cta_book">Pesan Jadwal Sesi</a>
-      <a class="btn btn-ghost" href="/portfolio.html" data-i18n="hero_cta_view">Lihat Galeri Foto</a>
+<!-- Apple Cinematic Hero Section -->
+<header class="hero-apple">
+  <div class="container" style="position:relative; z-index:2; max-width:980px;">
+    <div class="hero-badge">
+      <div class="pulse-dot"></div>
+      <span data-i18n="hero_eyebrow">Musim Umrah 1447H / 2026 Dibuka — Madinah Al-Munawwarah</span>
+    </div>
+    <h1 class="text-gradient-titanium" data-i18n="hero_title">
+      Abadikan Momen Sakral di Kota Suci.
+    </h1>
+    <p class="subheading" style="margin:22px auto 0;" data-i18n="hero_sub">
+      Dokumentasi fotografi &amp; sinematik 4K berkualitas tinggi untuk jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour terindah di Madinah.
+    </p>
+    <div class="hero-actions-apple">
+      <a class="btn-apple btn-apple-primary" href="/booking.html" data-i18n="hero_cta_book">
+        Pesan Jadwal Sesi →
+      </a>
+      <a class="btn-apple btn-apple-secondary" href="/portfolio.html" data-i18n="hero_cta_view">
+        Lihat Galeri 4K ›
+      </a>
+    </div>
+
+    <!-- Key Metrics Bar -->
+    <div class="metrics-strip">
+      <div class="metric-item">
+        <div class="metric-number">500+</div>
+        <div class="metric-label">Sesi Selesai</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-number">4.9 ★</div>
+        <div class="metric-label">Rating Kepuasan</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-number">24-48 Jam</div>
+        <div class="metric-label">Cloud Delivery</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-number">100%</div>
+        <div class="metric-label">Fotografer Berizin</div>
+      </div>
     </div>
   </div>
 </header>
 
-<!-- Dynamic Animated Infinite Moving Photo Showcase
-   Catatan: Gambar di marquee ini akan di-populate dari API /api/portfolio.
-   Jika belum ada foto, tampilkan placeholder atau foto stock. -->
-<div class="marquee-wrapper" style="overflow:hidden; position:relative; width:100%; padding:28px 0; background:var(--ivory); border-bottom:1px solid var(--line); mask-image:linear-gradient(to right, transparent, black 8%, black 92%, transparent); -webkit-mask-image:linear-gradient(to right, transparent, black 8%, black 92%, transparent);">
-  <div style="display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 16px auto; padding:0 24px;">
-    <span class="eyebrow" style="color:var(--gold);">📸 Live Portfolio Showcase</span>
-    <a href="/portfolio.html" style="font-size:0.8rem; color:var(--charcoal); text-decoration:none; font-weight:600;">Lihat Semua Portofolio →</a>
+<!-- Dynamic Live Moving Photo Showcase (Supabase Powered) -->
+<section class="marquee-wrapper-apple">
+  <div style="display:flex; justify-content:space-between; align-items:center; max-width:1220px; margin:0 auto 18px auto; padding:0 28px;">
+    <span class="eyebrow">📸 Live Gallery Stream</span>
+    <a class="btn-link-apple" href="/portfolio.html">Jelajahi Semua Foto ›</a>
   </div>
-  <div class="marquee-track" id="home-marquee-track" style="display:flex; gap:18px; width:max-content; animation:scrollMarquee 38s linear infinite;">
-    <!-- Populated by JS -->
+  <div class="marquee-track-apple" id="home-marquee-track">
+    <!-- Populated dynamically via JS from Supabase /api/portfolio -->
   </div>
-</div>
+</section>
 
-<style>
-@keyframes scrollMarquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-.h-marquee-card {
-  width: 280px;
-  height: 340px;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  flex-shrink: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.h-marquee-card:hover {
-  transform: scale(1.04) translateY(-4px);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.18);
-}
-.h-marquee-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-.h-marquee-card:hover img {
-  transform: scale(1.06);
-}
-.h-marquee-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px 14px 12px 14px;
-  background: linear-gradient(to top, rgba(17,15,14,0.92) 0%, transparent 100%);
-  color: #fff;
-}
-.h-marquee-tag {
-  display: inline-block;
-  background: rgba(212,163,89,0.9);
-  color: #1c1917;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: 3px;
-  margin-bottom: 4px;
-}
-.h-marquee-title {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  margin: 0;
-  line-height: 1.2;
-}
-</style>
-
-<!-- About Photographer Section -->
-<section class="section" id="about">
+<!-- Apple Bento Grid Showcase Section -->
+<section class="section" id="pro-features">
   <div class="container">
-    <div class="photographer-profile-box" id="photographer-container">
-      <div class="photographer-avatar-frame" id="p-avatar-img" style="background-image: url('/img/photographer-1.jpg');"></div>
+    <div style="text-align:center; max-width:760px; margin:0 auto 50px auto;">
+      <p class="eyebrow">STANDAR PRO SINEMATIK</p>
+      <h2 class="text-gradient-titanium" style="margin-top:12px;">Keunggulan Dirancang untuk Jemaah</h2>
+      <p class="subheading" style="margin:14px auto 0;">Kombinasi teknologi kamera tercanggih, penguasaan lokasi suci, dan etika syar'i ramah keluarga.</p>
+    </div>
+
+    <div class="bento-grid">
+      <!-- Bento Card 1 (Large 8-col) -->
+      <div class="bento-card bento-card-8">
+        <div>
+          <div class="bento-icon">📷</div>
+          <h3>Peralatan 4K Full-Frame &amp; Drone Berlisensi</h3>
+          <p>Menggunakan kamera Sony Alpha Full-Frame lensa G-Master berketajaman tinggi serta stabilizer sinematik. Menghasilkan warna alami yang memukau di bawah cahaya matahari Madinah.</p>
+        </div>
+        <img class="bento-preview-img" src="/img/service-drone.jpg" alt="Peralatan Kamera & Drone">
+      </div>
+
+      <!-- Bento Card 2 (4-col) -->
+      <div class="bento-card bento-card-4">
+        <div>
+          <div class="bento-icon">⚡</div>
+          <h3>Pengiriman Cloud 24-48 Jam</h3>
+          <p>Seluruh file foto mentah (RAW) beresolusi penuh beserta foto hasil color grading profesional langsung dibagikan melalui link Google Drive privat yang aman.</p>
+        </div>
+        <div style="margin-top:28px; padding:20px; background:rgba(255,255,255,0.04); border-radius:var(--apple-radius-md); border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:0.82rem; color:var(--apple-gold); font-weight:700;">CLOUD SYNC ACTIVE</div>
+          <div style="font-size:0.9rem; color:#FFF; margin-top:4px;">Akses Instan dari Ponsel &amp; Laptop Anda</div>
+        </div>
+      </div>
+
+      <!-- Bento Card 3 (6-col) -->
+      <div class="bento-card bento-card-6">
+        <div>
+          <div class="bento-icon">🕌</div>
+          <h3>Fotografer Mukim Fasih Bahasa Indonesia</h3>
+          <p>Fotografer muslim yang tinggal menetap di Madinah, memahami rute terbaik di pelataran Masjid Nabawi, Jabal Uhud, dan Masjid Quba, serta ramah memandu pose lansia &amp; anak-anak.</p>
+        </div>
+        <img class="bento-preview-img" src="/img/service-umrah.jpg" alt="Fotografer Mukim Madinah">
+      </div>
+
+      <!-- Bento Card 4 (6-col) -->
+      <div class="bento-card bento-card-6">
+        <div>
+          <div class="bento-icon">🔒</div>
+          <h3>Privasi &amp; Etika Syar'i Terjaga</h3>
+          <p>Dokumentasi foto keluarga, pasangan, dan mahram dilakukan dengan sopan santun islami. Kami menghormati sepenuhnya hak privasi setiap jemaah tanpa mempublikasikan foto tanpa izin.</p>
+        </div>
+        <img class="bento-preview-img" src="/img/service-couple.jpg" alt="Privasi & Etika Syar'i">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Apple Specs Service Lineup Section -->
+<section class="section" id="services" style="background:var(--apple-surface); border-top:1px solid var(--apple-border); border-bottom:1px solid var(--apple-border);">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px; margin-bottom:40px;">
       <div>
-        <p class="eyebrow" style="color:var(--gold);" data-i18n="nav_about">TENTANG FOTOGRAFER</p>
-        <h2 id="p-display-name" style="margin-top:8px; font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.2rem);">UMROH LENS Photography Studio</h2>
-        <p id="p-display-bio" style="margin-top:16px; color:var(--charcoal-soft); font-size:0.98rem; line-height:1.7;">
-          Fotografer profesional berbasis di Madinah Al-Munawwarah, berpengalaman mengabadikan momen sakral jemaah Umrah, pasangan, dan keluarga Indonesia di sekitar Masjid Nabawi dan situs bersejarah Kota Madinah. Mengutamakan pendekatan natural, ramah, dan memandu setiap sudut pose terbaik.
+        <p class="eyebrow">PILIHAN LAYANAN</p>
+        <h2 class="text-gradient-titanium" style="margin-top:12px;">Paket Dokumentasi Populer</h2>
+      </div>
+      <a class="btn-apple btn-apple-secondary" href="/services.html">Bandingkan Semua Paket ›</a>
+    </div>
+
+    <div class="services-apple-grid" id="services-grid">
+      <!-- Populated dynamically via JS from /api/services -->
+      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-secondary);">Memuat katalog layanan...</div>
+    </div>
+  </div>
+</section>
+
+<!-- Photographer Pro Profile Section -->
+<section class="section" id="about">
+  <div class="container" style="max-width:980px;">
+    <div style="background:var(--apple-card); border:1px solid var(--apple-border); border-radius:var(--apple-radius-lg); padding:48px; display:grid; grid-template-columns:300px 1fr; gap:44px; align-items:center;">
+      <div id="p-avatar-img" style="width:100%; height:340px; border-radius:var(--apple-radius-md); background-size:cover; background-position:center; background-image:url('/img/photographer-1.jpg'); border:1px solid rgba(255,255,255,0.1);"></div>
+      <div>
+        <p class="eyebrow">LEAD PHOTOGRAPHER</p>
+        <h3 id="p-display-name" style="font-size:2rem; margin:10px 0 14px 0;">UMROH LENS</h3>
+        <p id="p-display-bio" style="color:var(--text-secondary); font-size:1.02rem; line-height:1.6; margin-bottom:28px;">
+          Fotografer profesional berlisensi berbasis di Madinah Al-Munawwarah. Berpengalaman mendokumentasikan ribuan jemaah Umrah &amp; Haji dari Indonesia, Malaysia, dan internasional dengan sentuhan estetika editorial dan sinematik.
         </p>
-        
-        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;">
-          <span class="cred-badge">🌟 5+ Tahun di Madinah</span>
-          <span class="cred-badge">📸 1.000+ Sesi Terlaksana</span>
-          <span class="cred-badge">🇮🇩 Bahasa Indonesia Ramah</span>
-          <span class="cred-badge">⚡ 24-48 Jam Pengiriman File</span>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <a class="btn-apple btn-apple-primary" href="/booking.html">Booking Sesi Bersama Fotografer →</a>
+          <a class="btn-apple btn-apple-secondary" href="https://instagram.com/umrohlens" target="_blank" rel="noopener">Instagram (@umrohlens)</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<hr class="hairline">
+<!-- Apple-Style FAQ Accordion Section -->
+<section class="section" id="faq" style="background:var(--apple-surface); border-top:1px solid var(--apple-border);">
+  <div class="container" style="max-width:860px;">
+    <div style="text-align:center; margin-bottom:40px;">
+      <p class="eyebrow">PERTANYAAN UMUM</p>
+      <h2 class="text-gradient-titanium" style="margin-top:12px;">Jawaban Seputar Reservasi</h2>
+    </div>
 
-<!-- Services Section -->
-<section class="section">
-  <div class="container">
-    <p class="eyebrow" data-i18n="nav_services">Pilihan Layanan</p>
-    <h2 style="margin-top:14px; margin-bottom:44px;" data-i18n="sec_services_title">Koleksi Layanan Foto &amp; Sinematik</h2>
-  </div>
-  <div class="container">
-    <div class="grid-3" id="services-grid"></div>
-  </div>
-  <div class="container" style="margin-top:36px; text-align:center;">
-    <a class="btn btn-ghost" href="/services.html">Lihat Semua Layanan &amp; Paket Detail →</a>
-  </div>
-</section>
+    <div class="faq-apple-list">
+      <details class="faq-apple-item" open>
+        <summary class="faq-apple-summary">Apakah fotografer bisa memandu pose dan lokasi terbaik?</summary>
+        <div class="faq-apple-content">
+          Tentu saja! Fotografer kami adalah mukim Madinah yang sangat mengenal sudut-sudut terbaik dan waktu pencahayaan golden hour terindah di sekitar Masjid Nabawi, Quba, dan Jabal Uhud. Anda hanya perlu menikmati momen ibadah Anda.
+        </div>
+      </details>
 
-<hr class="hairline">
+      <details class="faq-apple-item">
+        <summary class="faq-apple-summary">Berapa deposit yang diperlukan untuk mengunci jadwal?</summary>
+        <div class="faq-apple-content">
+          Deposit sebesar 30% dari total paket yang dipilih melalui transfer Bank BCA / BSI (Rupiah) atau Al Rajhi Bank (SAR). Sisa pembayaran diselesaikan saat hari pemotretan di Madinah.
+        </div>
+      </details>
 
-<section class="section" style="background:var(--ivory);">
-  <div class="container">
-    <p class="eyebrow" data-i18n="why_choose_title">KEUNGGULAN KAMI</p>
-    <h2 style="margin-top:14px; margin-bottom:44px;" data-i18n="why_choose_sub">Abadikan Perjalanan Suci Anda dengan Standar VVIP</h2>
-    <div class="grid-3" style="gap:24px;">
-      <div style="background:#fff; padding:32px 24px; border:1px solid var(--line); border-radius:4px;">
-        <div style="font-size:2rem; margin-bottom:12px;">📸</div>
-        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Fotografer Bahasa Indonesia</h3>
-        <p style="color:var(--charcoal-soft); font-size:0.9rem; line-height:1.6;">Tim fotografer muslim profesional yang ramah keluarga &amp; lansia, siap memandu sudut pose terbaik di sekitar Masjid Nabawi.</p>
-      </div>
-      <div style="background:#fff; padding:32px 24px; border:1px solid var(--line); border-radius:4px;">
-        <div style="font-size:2rem; margin-bottom:12px;">🎬</div>
-        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Cinematic Reels &amp; Drone 4K</h3>
-        <p style="color:var(--charcoal-soft); font-size:0.9rem; line-height:1.6;">Video sinematik 60s siap tayang di Instagram &amp; TikTok dengan color grading islami serta sudut pemandangan udara yang memukau.</p>
-      </div>
-      <div style="background:#fff; padding:32px 24px; border:1px solid var(--line); border-radius:4px;">
-        <div style="font-size:2rem; margin-bottom:12px;">⚡</div>
-        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Fast Google Drive Delivery</h3>
-        <p style="color:var(--charcoal-soft); font-size:0.9rem; line-height:1.6;">Semua file foto original (RAW) plus foto editan high-resolution dikirim via tautan Google Drive privat dalam 24-48 jam.</p>
-      </div>
+      <details class="faq-apple-item">
+        <summary class="faq-apple-summary">Berapa lama proses pengiriman file foto?</summary>
+        <div class="faq-apple-content">
+          Seluruh file foto original (RAW) dan foto yang telah diedit/color-graded akan dikirimkan via link privat Google Drive dalam waktu 24 hingga maksimal 48 jam setelah sesi selesai.
+        </div>
+      </details>
+
+      <details class="faq-apple-item">
+        <summary class="faq-apple-summary">Apakah jadwal bisa diubah jika agenda ibadah berubah?</summary>
+        <div class="faq-apple-content">
+          Bisa! Anda dapat mengajukan permohonan reschedule secara instan langsung dari menu "Cek Reservasi" menggunakan Kode Booking Anda tanpa biaya tambahan (selama slot baru tersedia).
+        </div>
+      </details>
     </div>
   </div>
 </section>
 
-<hr class="hairline">
-
-<section class="section" id="faq">
-  <div class="container" style="max-width:760px;">
-    <p class="eyebrow">FAQ</p>
-    <h2 style="margin-top:14px; margin-bottom:36px;">Pertanyaan Umum Jemaah</h2>
-    <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
-      <h3 style="font-size:1.05rem;">Apakah fotografer bisa memandu pose dan lokasi terbaik?</h3>
-      <p style="color:var(--charcoal-soft); margin-top:8px;">Tentu! Fotografer kami sangat mengenal sudut-sudut terbaik dan waktu pencahayaan golden hour terindah di sekitar Masjid Nabawi, Quba, dan Uhud.</p>
-    </div>
-    <div class="faq-item" style="padding:20px 0; border-bottom:1px solid var(--line);">
-      <h3 style="font-size:1.05rem;">Berapa deposit yang diperlukan untuk konfirmasi jadwal?</h3>
-      <p style="color:var(--charcoal-soft); margin-top:8px;">Deposit sebesar 30% via transfer Bank BSI / BCA (Rupiah) atau Al Rajhi (SAR). Sisa pembayaran diselesaikan saat sesi di Madinah.</p>
-    </div>
-    <div class="faq-item" style="padding:20px 0;">
-      <h3 style="font-size:1.05rem;">Apakah jadwal sesi foto bisa diubah (reschedule)?</h3>
-      <p style="color:var(--charcoal-soft); margin-top:8px;">Bisa. Anda dapat mengajukan permohonan reschedule langsung dari halaman Cek Reservasi Saya secara mudah dan cepat.</p>
-    </div>
-  </div>
-</section>
-
-<footer class="footer">
+<!-- Minimalist Apple Footer -->
+<footer class="footer-apple">
   <div class="container">
-    <div>
-      <h3 style="font-family:var(--font-display); font-size:1.2rem;">UMROH LENS Madinah</h3>
-      <p style="opacity:0.7; margin-top:10px; max-width:280px; font-size:0.9rem;">Jasa dokumentasi foto &amp; video sinematik profesional di Madinah Al-Munawwarah.</p>
-    </div>
-    <div class="footer-cols">
-      <div class="footer-col">
-        <a href="/portfolio.html">Portofolio</a>
-        <a href="/services.html">Layanan &amp; Paket</a>
+    <div class="footer-apple-grid">
+      <div class="footer-apple-col">
+        <div class="nav-mark" style="margin-bottom:14px;">
+          <div class="nav-mark-dot"></div>
+          UMROH LENS
+        </div>
+        <p style="color:var(--text-secondary); max-width:320px; font-size:0.9rem; line-height:1.5;">
+          Platform reservasi fotografer profesional terpercaya di Madinah Al-Munawwarah. Mengabadikan setiap detik suci perjalanan ibadah Anda.
+        </p>
+      </div>
+
+      <div class="footer-apple-col">
+        <h4>Eksplorasi</h4>
+        <a href="/portfolio.html">Portofolio 4K</a>
+        <a href="/services.html">Daftar Paket &amp; Harga</a>
         <a href="/booking.html">Pesan Sesi Foto</a>
-        <a href="https://instagram.com/umrohlens" target="_blank" rel="noopener" style="color:#E1306C; font-weight:500;">📸 Instagram (@umrohlens)</a>
-      </div>
-      <div class="footer-col">
         <a href="/my-booking.html">Cek Reservasi Saya</a>
-        <a href="#about">Tentang Kami</a>
-        <a href="#faq">FAQ</a>
-        <a href="/admin/login.html" style="color:var(--gold); font-weight:500;">🔑 Portal Admin</a>
+      </div>
+
+      <div class="footer-apple-col">
+        <h4>Lokasi</h4>
+        <a href="/booking.html">Masjid Nabawi Area</a>
+        <a href="/booking.html">Masjid Quba</a>
+        <a href="/booking.html">Jabal Uhud Heritage</a>
+        <a href="/booking.html">Pintu Raudhah</a>
+      </div>
+
+      <div class="footer-apple-col">
+        <h4>Kontak &amp; Admin</h4>
+        <a href="https://instagram.com/umrohlens" target="_blank" rel="noopener">Instagram (@umrohlens)</a>
+        <a href="https://wa.me/6282175272547" target="_blank" rel="noopener">WhatsApp Resmi</a>
+        <a href="/admin/login.html" style="color:var(--apple-gold);">🔑 Login Admin</a>
       </div>
     </div>
-  </div>
-  <div class="container footer-bottom">
-    <span>© 2026 UMROH LENS, Madinah</span>
-    <div style="display:flex; gap:16px; align-items:center;">
-      <a href="https://instagram.com/umrohlens" target="_blank" rel="noopener" style="color:inherit; opacity:0.7; text-decoration:none; font-size:0.8rem;">📸 Instagram</a>
-      <a href="/admin/login.html" style="color:inherit; opacity:0.6; text-decoration:none; font-size:0.75rem;">🔒 Login Admin</a>
-      <span>Asia/Riyadh</span>
+
+    <div class="footer-apple-bottom">
+      <span>© 2026 UMROH LENS. All rights reserved. Madinah Al-Munawwarah.</span>
+      <div style="display:flex; gap:20px;">
+        <span>Asia/Riyadh (GMT+3)</span>
+        <a href="/admin/login.html" style="color:var(--text-tertiary);">Admin Portal</a>
+      </div>
     </div>
   </div>
 </footer>
 
-<script src="/js/social-widget.js"></script>
+<!-- Floating Mobile Action Bar -->
+<div class="mobile-action-bar">
+  <a class="btn-apple btn-apple-secondary" href="https://wa.me/6282175272547" target="_blank" style="flex:1;">
+    💬 WhatsApp
+  </a>
+  <a class="btn-apple btn-apple-primary" href="/booking.html" style="flex:1.4;">
+    Pesan Sesi →
+  </a>
+</div>
+
+<!-- Floating WhatsApp Widget for Desktop -->
+<a class="wa-float" href="https://wa.me/6282175272547" target="_blank" rel="noopener">
+  <span class="wa-float-icon">💬</span>
+  <span>Chat Admin WhatsApp</span>
+</a>
 
 <script>
-// Load photographer details
+// 1. Fetch Lead Photographer from Supabase
 fetch('/api/photographers')
   .then(r => r.json())
   .then(list => {
@@ -287,42 +299,58 @@ fetch('/api/photographers')
   })
   .catch(() => {});
 
-// Load live portfolio marquee strip
+// 2. Fetch Live Portfolio for Animated Stream
 fetch('/api/portfolio')
   .then(r => r.json())
   .then(items => {
     const track = document.getElementById('home-marquee-track');
     if (!items || items.length === 0 || !track) return;
-    const loopItems = [...items, ...items];
-    track.innerHTML = loopItems.map(p => `
-      <div class="h-marquee-card" onclick="window.location.href='/portfolio.html'">
+    const loop = [...items, ...items];
+    track.innerHTML = loop.map(p => `
+      <div class="marquee-card" onclick="window.location.href='/portfolio.html'">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
-        <div class="h-marquee-overlay">
-          <span class="h-marquee-tag">${p.category || 'Madinah'}</span>
-          <h4 class="h-marquee-title">${p.title}</h4>
+        <div class="marquee-card-label">
+          <span>${p.title || 'Madinah Moment'}</span>
         </div>
       </div>
     `).join('');
   })
   .catch(() => {});
 
-// Load services cards with photos
+// 3. Fetch Services Lineup Cards
 fetch('/api/services')
   .then(r => r.json())
   .then(services => {
     const grid = document.getElementById('services-grid');
-    grid.innerHTML = services.slice(0,6).map(s => `
-      <a class="service-card" href="/booking.html?service=${s.slug}" style="display:block; text-decoration:none; color:inherit;">
-        <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; height:200px; border-radius:4px; margin-bottom:14px;"></div>
-        <h3 style="font-family:var(--font-display); font-size:1.25rem;">${s.name}</h3>
-        <p style="color:var(--charcoal-soft); font-size:0.9rem; margin-top:8px; line-height:1.5;">${s.description}</p>
-        <div class="service-meta" style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:10px;">
-          <span style="font-size:0.8rem; color:var(--charcoal-soft);">${s.duration_minutes} min</span>
-          <span class="service-price" style="font-weight:600; color:var(--gold);">Mulai ${s.currency} ${s.starting_price}</span>
+    if (!services || services.length === 0 || !grid) return;
+    grid.innerHTML = services.slice(0, 6).map(s => `
+      <div class="service-apple-card">
+        <div class="service-apple-thumb">
+          <img src="${s.cover_image || '/img/service-golden-hour.jpg'}" alt="${s.name}" loading="lazy">
         </div>
-      </a>
+        <div class="service-apple-body">
+          <span class="eyebrow" style="font-size:0.75rem;">${s.slug.toUpperCase()}</span>
+          <h3 style="margin-top:6px; font-size:1.35rem;">${s.name}</h3>
+          <div class="service-apple-price">
+            ${s.currency} ${s.starting_price} <span>/ sesi</span>
+          </div>
+          <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.5; margin-bottom:20px; flex-grow:1;">
+            ${s.description}
+          </p>
+          <ul class="service-specs-list">
+            <li>Durasi Sesi: <strong>${s.duration_minutes} Menit</strong></li>
+            <li>${s.edited_photos || 10} Foto Edit High-Res + RAW Files</li>
+            <li>Pengiriman Cloud 24-48 Jam</li>
+          </ul>
+          <a class="btn-apple btn-apple-primary" href="/booking.html?service=${s.slug}" style="width:100%;">
+            Pilih Layanan Ini →
+          </a>
+        </div>
+      </div>
     `).join('');
-  });
+  })
+  .catch(() => {});
 </script>
+
 </body>
 </html>
