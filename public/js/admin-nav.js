@@ -93,6 +93,7 @@ function renderAdminNav(active) {
     ['Bookings', '/admin/bookings.html', 'bookings'],
     ['Availability', '/admin/availability.html', 'availability'],
     ['Services & Pricing', '/admin/services.html', 'services'],
+    ['Locations & Spots', '/admin/locations.html', 'locations'],
     ['Portfolio & Photos', '/admin/portfolio.html', 'portfolio'],
   ];
 

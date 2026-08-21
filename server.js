@@ -45,6 +45,7 @@ app.get('/admin/bookings', adminAuth, (req, res) => res.sendFile(path.join(__dir
 app.get('/admin/calendar', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'calendar.html')));
 app.get('/admin/portfolio', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'portfolio.html')));
 app.get('/admin/services', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
+app.get('/admin/locations', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'locations.html')));
 app.get('/admin/availability', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
 
 app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));

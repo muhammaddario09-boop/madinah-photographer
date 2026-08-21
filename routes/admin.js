@@ -537,7 +537,7 @@ router.post('/locations', async (req, res) => {
   }
 });
 
-router.put('/locations/:id', async (req, res) => {
+const handleLocationUpdate = async (req, res) => {
   try {
     const { name, description, travel_buffer_minutes } = req.body;
     await updateLocationInSupabase(req.params.id, {
@@ -554,7 +554,10 @@ router.put('/locations/:id', async (req, res) => {
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
-});
+};
+
+router.put('/locations/:id', handleLocationUpdate);
+router.patch('/locations/:id', handleLocationUpdate);
 
 router.delete('/locations/:id', async (req, res) => {
   try {

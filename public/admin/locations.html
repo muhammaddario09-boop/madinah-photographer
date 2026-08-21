@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locations & Spots — UMROH LENS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+<style>
+  .location-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    padding: 24px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(28, 24, 20, 0.04);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .location-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 8px 24px rgba(184, 144, 69, 0.12);
+  }
+  .loc-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--gold);
+    background: var(--ivory);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .loc-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--charcoal);
+    margin-bottom: 6px;
+  }
+  .loc-desc {
+    font-size: 0.9rem;
+    color: var(--charcoal-soft);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .loc-meta {
+    font-size: 0.82rem;
+    color: var(--charcoal-soft);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .form-box {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 32px;
+    box-shadow: 0 6px 20px rgba(28, 24, 20, 0.04);
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--charcoal);
+    color: #FFFFFF;
+    padding: 14px 24px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    display: none;
+    z-index: 99999;
+    border-left: 4px solid var(--gold);
+  }
+  @media (max-width: 768px) {
+    .location-card { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="admin">
+<script src="/js/admin-nav.js"></script>
+<script>renderAdminNav('locations');</script>
+
+<div id="toast" class="toast">Data berhasil disimpan!</div>
+
+<script>
+function showToast(msg = 'Data berhasil disimpan ke Supabase!') {
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+
+const main = document.getElementById('admin-main');
+main.innerHTML = `
+  <div class="admin-header">
+    <div>
+      <h1 style="font-family:var(--font-display); font-size:1.8rem; margin-bottom:4px;">Spot Lokasi Pemotretan (Madinah)</h1>
+      <p style="color:var(--charcoal-soft); font-size:0.9rem;">Kelola spot foto ikonik, deskripsi angle terbaik, dan waktu jeda antar lokasi (Tersinkronisasi Real-time ke Supabase).</p>
+    </div>
+    <button class="btn btn-primary" onclick="toggleAddForm()" id="toggle-add-btn">+ Tambah Spot Lokasi</button>
+  </div>
+
+  <!-- Form Tambah/Edit Lokasi -->
+  <div class="form-box" id="add-location-form" style="display:none;">
+    <h3 style="font-family:var(--font-display); font-size:1.25rem; margin-bottom:18px;" id="form-title">Tambah Spot Lokasi Baru</h3>
+    <input type="hidden" id="loc-id">
+    
+    <div class="form-grid">
+      <div class="field">
+        <label>Nama Spot / Lokasi *</label>
+        <input type="text" id="loc-name" placeholder="Contoh: Kubah Hijau (Green Dome) Viewpoint">
+      </div>
+      <div class="field">
+        <label>Jeda Waktu Perjalanan (Menit)</label>
+        <input type="number" id="loc-buffer" value="15" min="0" step="5">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Deskripsi & Karakteristik Spot</label>
+      <textarea id="loc-desc" placeholder="Spot foto terbaik saat Shubuh & Dhuha, latar belakang payung terbuka dan kubah hijau Nabawi..."></textarea>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:14px;">
+      <button class="btn btn-ghost" onclick="toggleAddForm()">Batal</button>
+      <button class="btn btn-primary" onclick="saveLocation()" id="save-btn">Simpan ke Supabase</button>
+    </div>
+  </div>
+
+  <!-- Daftar Lokasi Container -->
+  <div id="locations-container">
+    <div style="text-align:center; padding:40px; color:var(--charcoal-soft);">Memuat daftar spot lokasi dari Supabase...</div>
+  </div>
+`;
+
+let allLocations = [];
+
+async function loadLocations() {
+  try {
+    const res = await adminFetch('/api/admin/locations');
+    allLocations = await res.json();
+    renderLocationsList();
+  } catch (err) {
+    document.getElementById('locations-container').innerHTML = `<p style="color:var(--status-booked); text-align:center;">Gagal memuat lokasi: ${err.message}</p>`;
+  }
+}
+
+function renderLocationsList() {
+  const container = document.getElementById('locations-container');
+  if (!allLocations || allLocations.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:var(--charcoal-soft); padding:40px 0;">Belum ada spot lokasi. Silakan tambah spot baru.</p>';
+    return;
+  }
+
+  container.innerHTML = allLocations.map(loc => `
+    <div class="location-card" id="loc-card-${loc.id}">
+      <div>
+        <span class="loc-badge">📍 Spot ID: #${loc.id}</span>
+        <h3 class="loc-title">${loc.name}</h3>
+        <p class="loc-desc">${loc.description || 'Spot dokumentasi profesional di area Madinah Al-Munawwarah.'}</p>
+        <div class="loc-meta">
+          <span>⏱️ Buffer Antar Sesi: <strong>${loc.travel_buffer_minutes || 15} Menit</strong></span>
+          <span>🟢 Status: <strong>${loc.active !== 0 ? 'Aktif' : 'Non-Aktif'}</strong></span>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+        <button class="btn btn-ghost" style="font-size:0.8rem; padding:8px 16px;" onclick="editLocation(${loc.id})">✏️ Edit</button>
+        <button class="btn btn-ghost" style="font-size:0.8rem; padding:8px 16px; color:#C82333; border-color:#F5C6CB;" onclick="deleteLocation(${loc.id}, '${loc.name.replace(/'/g, "\\'")}')">🗑️ Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleAddForm() {
+  const form = document.getElementById('add-location-form');
+  const isHidden = form.style.display === 'none';
+  form.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    document.getElementById('form-title').innerText = 'Tambah Spot Lokasi Baru';
+    document.getElementById('loc-id').value = '';
+    document.getElementById('loc-name').value = '';
+    document.getElementById('loc-buffer').value = '15';
+    document.getElementById('loc-desc').value = '';
+    document.getElementById('loc-name').focus();
+  }
+}
+
+function editLocation(id) {
+  const loc = allLocations.find(l => l.id === id);
+  if (!loc) return;
+  document.getElementById('add-location-form').style.display = 'block';
+  document.getElementById('form-title').innerText = `Edit Spot: ${loc.name}`;
+  document.getElementById('loc-id').value = loc.id;
+  document.getElementById('loc-name').value = loc.name || '';
+  document.getElementById('loc-buffer').value = loc.travel_buffer_minutes || 15;
+  document.getElementById('loc-desc').value = loc.description || '';
+  window.scrollTo({ top: 120, behavior: 'smooth' });
+}
+
+async function saveLocation() {
+  const id = document.getElementById('loc-id').value;
+  const name = document.getElementById('loc-name').value.trim();
+  const travel_buffer_minutes = Number(document.getElementById('loc-buffer').value) || 15;
+  const description = document.getElementById('loc-desc').value.trim();
+
+  if (!name) {
+    alert('Nama spot lokasi wajib diisi.');
+    return;
+  }
+
+  const saveBtn = document.getElementById('save-btn');
+  saveBtn.disabled = true;
+  saveBtn.innerText = 'Menyimpan...';
+
+  try {
+    const url = id ? `/api/admin/locations/${id}` : '/api/admin/locations';
+    const method = id ? 'PUT' : 'POST';
+
+    const res = await adminFetch(url, {
+      method,
+      body: JSON.stringify({ name, description, travel_buffer_minutes })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Gagal menyimpan lokasi');
+    }
+
+    showToast(id ? 'Spot lokasi berhasil diperbarui!' : 'Spot lokasi baru berhasil ditambahkan!');
+    document.getElementById('add-location-form').style.display = 'none';
+    await loadLocations();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerText = 'Simpan ke Supabase';
+  }
+}
+
+async function deleteLocation(id, name) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus spot lokasi "${name}" dari Supabase?`)) return;
+
+  try {
+    const res = await adminFetch(`/api/admin/locations/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Gagal menghapus');
+    showToast(`Spot "${name}" berhasil dihapus.`);
+    await loadLocations();
+  } catch (e) {
+    alert('Error saat menghapus: ' + e.message);
+  }
+}
+
+loadLocations();
+</script>
+</body>
+</html>
