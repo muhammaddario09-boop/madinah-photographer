@@ -242,8 +242,8 @@ router.post('/bookings', async (req, res) => {
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
-    // Record to Supabase PostgreSQL & persistent store non-blockingly
-    recordBookingToSupabase(
+    // Record to Supabase PostgreSQL & persistent store before closing response
+    await recordBookingToSupabase(
       {
         booking_code: result.bookingCode,
         photographer_id: photographerId,
