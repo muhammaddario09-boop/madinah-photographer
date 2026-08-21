@@ -6,7 +6,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node scripts/verify-production.js",
+    "verify": "node scripts/verify-production.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

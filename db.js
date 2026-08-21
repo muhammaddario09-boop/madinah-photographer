@@ -2,20 +2,22 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
 
-// Determine database path based on environment
-const isVercel = process.env.VERCEL === '1';
+// Determine database path based on environment (Vercel has read-only root, /tmp is writable)
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Use persistent path on Vercel, otherwise use env or default
-const dbPath = isVercel
-  ? process.env.DB_PATH || path.join(process.cwd(), 'data', 'database.sqlite')
-  : process.env.DB_PATH || path.join(__dirname, 'data.sqlite');
+let dbPath;
+if (isVercel) {
+  dbPath = process.env.DB_PATH || path.join('/tmp', 'madinah_cache.sqlite');
+} else {
+  dbPath = process.env.DB_PATH || path.join(__dirname, 'data.sqlite');
+}
 
 let db;
 try {
   db = new Database(dbPath, { timeout: 10000 });
 } catch (err) {
-  // Fallback to memory if file path fails (e.g., certain test environments)
+  // Fallback to in-memory mode if file initialization fails
   db = new Database(':memory:', { timeout: 10000 });
 }
 
@@ -32,14 +34,6 @@ if (fs.existsSync(schemaPath)) {
 try {
   db.exec(`ALTER TABLE payments ADD COLUMN proof_url TEXT;`);
 } catch (e) {}
-
-// Ensure data directory exists (Vercel specific)
-if (isVercel) {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
 
 // Ensure Admin User credentials
 const { hashPassword } = require('./lib/auth');
