@@ -377,8 +377,12 @@ router.post('/bookings/:code/reschedule', (req, res) => {
     const service = db.prepare(`SELECT * FROM services WHERE id=?`).get(booking.service_id);
 
     // Generate WhatsApp Notification Template for Reschedule
-    const waSetting = db.prepare(`SELECT value FROM settings WHERE key='admin_whatsapp'`).get();
-    const waNumber = (waSetting ? waSetting.value : '+966501234567').replace(/[^0-9]/g, '');
+    let s = await fetchSettingsFromSupabase();
+    if (!s) {
+      const waSetting = db.prepare(`SELECT value FROM settings WHERE key='admin_whatsapp'`).get();
+      s = { admin_whatsapp: waSetting ? waSetting.value : '+6282175272547' };
+    }
+    const waNumber = (s.admin_whatsapp || '+6282175272547').replace(/[^0-9]/g, '');
 
     const waText = [
       `Assalamu'alaikum UMROH LENS,`,
