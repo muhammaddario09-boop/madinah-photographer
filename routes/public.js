@@ -268,7 +268,8 @@ router.post('/bookings', async (req, res) => {
         email: b.clientEmail,
         phone: b.clientPhone,
         country: b.clientCountry || 'Indonesia'
-      }
+      },
+      b.paymentProof || null
     ).catch(e => console.error('Supabase booking sync error:', e.message));
 
     recordBookingToCloud({
