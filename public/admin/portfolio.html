@@ -175,26 +175,37 @@ async function loadPortfolio() {
           <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px;">
             <div class="form-row">
               <label>Title / Caption</label>
-              <input type="text" id="new-title" placeholder="e.g. Peaceful Morning at Prophet's Mosque">
+              <input type="text" id="new-title" placeholder="e.g. Sunset Prayer at Prophet's Mosque">
             </div>
             <div class="form-row">
               <label>Category</label>
-              <select id="new-cat" style="width:100%; padding:9px; border:1px solid var(--line); background:#fff;">
-                <option value="Portrait">Portrait</option>
+              <select id="new-cat" style="width:100%; padding:9px; border:1px solid var(--line); background:#fff; border-radius:4px;">
+                <option value="Masjid Nabawi">Masjid Nabawi</option>
                 <option value="Couple">Couple</option>
+                <option value="Portrait">Portrait</option>
                 <option value="Family">Family</option>
-                <option value="Umrah">Umrah Memory</option>
-                <option value="Golden Hour">Golden Hour</option>
-                <option value="Nabawi">Masjid Nabawi Area</option>
-                <option value="Quba">Quba</option>
-                <option value="Heritage">Heritage & Old City</option>
+                <option value="Umrah">Umrah</option>
+                <option value="Uhud & Quba">Uhud & Quba</option>
+                <option value="Cinematic Reels">Cinematic Reels</option>
+                <option value="Drone">Drone</option>
               </select>
             </div>
           </div>
 
-          <div style="display:flex; align-items:center; justify-content: space-between; margin-top:14px; flex-wrap:wrap; gap:12px;">
-            <label style="font-size:0.85rem; display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" id="new-featured" checked> Mark as Featured on Homepage
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:12px;">
+            <div class="form-row">
+              <label>Shooting Location Spot</label>
+              <input type="text" id="new-loc" placeholder="e.g. Masjid Nabawi Courtyard / Jabal Uhud">
+            </div>
+            <div class="form-row">
+              <label>Short Description (Optional)</label>
+              <input type="text" id="new-desc" placeholder="e.g. Peaceful pilgrimage moment during golden hour.">
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content: space-between; margin-top:16px; flex-wrap:wrap; gap:12px;">
+            <label style="font-size:0.85rem; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="new-featured" checked> Mark as Featured on Homepage & Marquee
             </label>
             <button type="submit" id="upload-btn" class="btn btn-primary" style="padding:10px 24px; font-size:0.84rem;">Upload & Publish Photo</button>
           </div>
@@ -258,6 +269,8 @@ async function loadPortfolio() {
 
       const title = document.getElementById('new-title').value.trim();
       const category = document.getElementById('new-cat').value;
+      const location = (document.getElementById('new-loc')?.value || 'Masjid Nabawi Area').trim();
+      const description = (document.getElementById('new-desc')?.value || '').trim();
       const featured = document.getElementById('new-featured').checked;
 
       try {
@@ -265,8 +278,10 @@ async function loadPortfolio() {
           method: 'POST',
           body: JSON.stringify({
             image_url: selectedFileDataUrl,
-            title,
+            title: title || 'Madinah Sacred Moment',
             category,
+            location,
+            description,
             featured
           })
         });

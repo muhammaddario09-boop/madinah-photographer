@@ -220,15 +220,15 @@ INSERT OR IGNORE INTO availability_rules (id, photographer_id, day_of_week, is_o
   (6, 1, 5, 0, '05:30', '22:30'),
   (7, 1, 6, 0, '05:30', '22:30');
 
--- Default Locations
+-- Default Locations (Real Madinah & Holy Places)
 INSERT OR IGNORE INTO locations (id, name, description, travel_buffer_minutes) VALUES
-  (1, 'jabal uhud', 'The Prophet''s Mosque and surrounding plazas.', 15),
-  (2, 'Quba Area', 'The first mosque built in Islam.', 30),
-  (3, 'Uhud Area', 'The historic mountain and battlefield site.', 30),
-  (4, 'Al Madinah Heritage Area', 'Old-city streets and heritage architecture.', 20),
-  (5, 'Hotel', 'In-hotel or hotel-lobby session.', 10),
-  (6, 'Private Location', 'A location you specify.', 30),
-  (7, 'Bir Ali & Qiblatain Area', 'Historic miqat and two-qibla heritage mosque.', 25),
+  (1, 'Masjid Nabawi Area', 'The Prophet''s Mosque courtyard, white marble plazas, and iconic green dome vista.', 15),
+  (2, 'Quba Area', 'The first mosque built in Islam and surrounding date palm groves.', 30),
+  (3, 'Jabal Uhud Area', 'The historic mountain, Archers Hill (Jabal Rumat), and martyrs sanctuary.', 30),
+  (4, 'Al Madinah Heritage Area', 'Old-city alleyways, traditional stone architecture, and cultural heritage corridors.', 20),
+  (5, 'Hotel Area', 'In-hotel lobby or suite photography session around Markaziah.', 10),
+  (6, 'Private Location', 'Custom pilgrimage or family spot specified by client.', 30),
+  (7, 'Bir Ali & Qiblatain Area', 'Historic miqat sanctuary and historic Two-Qibla Mosque.', 25),
   (8, 'AlUla Heritage Expedition', 'Exclusive desert rock heritage expedition in Hegra & Elephant Rock.', 60),
   (9, 'Makkah Al-Mukarramah (Special Request)', 'Private pilgrimage documentation in Holy Makkah.', 60);
 
