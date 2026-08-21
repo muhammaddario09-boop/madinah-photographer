@@ -366,7 +366,7 @@ router.get('/bookings/:code', (req, res) => {
   }
 });
 
-router.post('/bookings/:code/reschedule', (req, res) => {
+router.post('/bookings/:code/reschedule', async (req, res) => {
   try {
     const booking = db.prepare(`SELECT * FROM bookings WHERE booking_code=?`).get(req.params.code);
     if (!booking) return res.status(404).json({ error: 'Booking not found.' });
