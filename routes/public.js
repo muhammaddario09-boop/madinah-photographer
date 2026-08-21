@@ -5,7 +5,7 @@ const { getAvailableSlots } = require('../lib/availabilityEngine');
 const { createBooking, reschedule } = require('../lib/bookingEngine');
 const { renderConfirmation, queueNotification } = require('../lib/notificationEngine');
 const { recordBookingToCloud } = require('../lib/cloudStore');
-const { recordBookingToSupabase } = require('../lib/supabase');
+const { recordBookingToSupabase, fetchPortfolioFromSupabase } = require('../lib/supabase');
 
 function bufferMinutes(db) {
   const row = db.prepare(`SELECT value FROM settings WHERE key='buffer_minutes'`).get();
@@ -386,8 +386,12 @@ router.post('/bookings/:code/reschedule', (req, res) => {
   }
 });
 
-router.get('/portfolio', (req, res) => {
+router.get('/portfolio', async (req, res) => {
   try {
+    const supaPhotos = await fetchPortfolioFromSupabase();
+    if (supaPhotos !== null) {
+      return res.json(supaPhotos);
+    }
     res.json(db.prepare(`SELECT * FROM portfolio WHERE active=1 ORDER BY featured DESC, sort_order`).all());
   } catch(err) {
     console.error('GET /portfolio error:', err.message);

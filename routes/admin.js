@@ -5,6 +5,7 @@ const { setStatus } = require('../lib/bookingEngine');
 const { todayRiyadhISODate } = require('../lib/timezone');
 const { verifyPassword, hashPassword, generateToken, verifyToken } = require('../lib/auth');
 const {
+  fetchPortfolioFromSupabase,
   recordPortfolioToSupabase,
   deletePortfolioFromSupabase,
   fetchBookingsFromSupabase,
@@ -463,8 +464,12 @@ router.delete('/locations/:id', (req, res) => {
 });
 
 // --- Portfolio & Gallery Manager ---
-router.get('/portfolio', (req, res) => {
+router.get('/portfolio', async (req, res) => {
   try {
+    const supaPhotos = await fetchPortfolioFromSupabase();
+    if (supaPhotos !== null) {
+      return res.json(supaPhotos);
+    }
     const items = db.prepare(`SELECT * FROM portfolio ORDER BY sort_order, id DESC`).all();
     res.json(items || []);
   } catch (err) {
@@ -475,29 +480,29 @@ router.get('/portfolio', (req, res) => {
 router.post('/portfolio', async (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
   if (!image_url) return res.status(400).json({ error: 'Image URL is required.' });
+  await recordPortfolioToSupabase(req.body).catch(() => {});
   const info = db.prepare(
     `INSERT INTO portfolio (image_url, title, category, description, location, featured, sort_order)
      VALUES (?,?,?,?,?,?,?)`
   );
   info.run(image_url, title || '', category || 'Portrait', description || '', location || 'Madinah', featured ? 1 : 0, Number(sort_order) || 0);
-  recordPortfolioToSupabase(req.body).catch(() => {});
   await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 router.put('/portfolio/:id', async (req, res) => {
   const { image_url, title, category, description, location, featured, sort_order } = req.body;
+  await recordPortfolioToSupabase({ ...req.body, id: req.params.id }).catch(() => {});
   db.prepare(
     `UPDATE portfolio SET image_url=?, title=?, category=?, description=?, location=?, featured=?, sort_order=? WHERE id=?`
   ).run(image_url, title, category, description, location, featured ? 1 : 0, Number(sort_order) || 0, req.params.id);
-  recordPortfolioToSupabase({ ...req.body, id: req.params.id }).catch(() => {});
   await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 router.delete('/portfolio/:id', async (req, res) => {
+  await deletePortfolioFromSupabase(req.params.id).catch(() => {});
   db.prepare(`DELETE FROM portfolio WHERE id=?`).run(req.params.id);
-  deletePortfolioFromSupabase(req.params.id).catch(() => {});
   await recordPortfolioToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
