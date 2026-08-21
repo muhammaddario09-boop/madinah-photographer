@@ -88,7 +88,9 @@ fetch('/api/services')
       const pkgs = s.packages || [];
       return `
         <div class="service-row">
-          <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
+          <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');">
+  <!-- Catatan: Gambar placeholder. Ganti dengan foto real sesi foto di Madinah di unggah CMS. -->
+</div>
           <div>
             <div class="eyebrow" style="color:var(--gold); margin-bottom:6px;">UMROH LENS MADINAH</div>
             <h2 style="font-size:1.75rem; font-family:var(--font-display);">${s.name}</h2>

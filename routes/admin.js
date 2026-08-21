@@ -179,12 +179,38 @@ router.post('/bookings/:id/status', (req, res) => {
   try {
     let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
-    const updated = setStatus(db, booking.id, req.body.status, 'admin', req.body.note || '');
+
+    const { status, payment_status, note } = req.body || {};
+
+    // Handle booking status change (via state machine) or payment_status update independently
+    let newBookingStatus = booking.status;
+    let newPaymentStatus = booking.payment_status;
+
+    if (status) {
+      // If status provided, use setStatus for booking state machine (admin has full authority)
+      const validStatuses = ['PENDING', 'AWAITING_PAYMENT', 'CONFIRMED', 'RESCHEDULE_REQUESTED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
+      if (validStatuses.includes(status)) {
+        newBookingStatus = status;
+      }
+      // Also allow admin to set payment_status directly
+      if (['UNPAID', 'DEPOSIT_PAID', 'PAID', 'REFUNDED'].includes(status)) {
+        newPaymentStatus = status;
+      }
+    }
+    // Allow payment_status update independently (without changing booking status)
+    if (payment_status && ['UNPAID', 'DEPOSIT_PAID', 'PAID', 'REFUNDED'].includes(payment_status)) {
+      newPaymentStatus = payment_status;
+    }
+
+    db.prepare(`UPDATE bookings SET status = ?, payment_status = ?, updated_at = datetime('now') WHERE id = ?`).run(
+      newBookingStatus, newPaymentStatus, booking.id
+    );
+
     const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(booking.id);
     if (b) {
       recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status }).catch(() => {});
     }
-    res.json({ ok: true, from: updated.status, to: req.body.status });
+    res.json({ ok: true, from: booking.status, to: payment_status || status || booking.payment_status, booking_id: booking.id });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });
   }

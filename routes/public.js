@@ -197,12 +197,14 @@ router.post('/bookings', async (req, res) => {
           `INSERT INTO payments (booking_id, amount, currency, method, type, status, reference, proof_url)
            VALUES (?, ?, ?, 'BANK_TRANSFER', 'DEPOSIT', 'PENDING', ?, ?)`
         ).run(result.id, depositAmount, pkg.currency || 'SAR', 'Screenshot Transfer', b.paymentProof);
-
-        db.prepare(`UPDATE bookings SET payment_status = 'DEPOSIT_PAID' WHERE id = ?`).run(result.id);
       } catch(payErr) {
         console.error('Payment record notice:', payErr.message);
       }
     }
+
+    // Always set initial payment status based on proof presence
+    const payStatus = b.paymentProof ? 'DEPOSIT_PAID' : 'UNPAID';
+    db.prepare(`UPDATE bookings SET payment_status = ? WHERE id = ?`).run(payStatus, result.id);
 
     const location = b.locationId ? db.prepare(`SELECT * FROM locations WHERE id=?`).get(b.locationId) : null;
     const photographer = (photographerId ? db.prepare(`SELECT * FROM photographers WHERE id=?`).get(photographerId) : null) || { name: 'UMROH LENS' };

@@ -10,15 +10,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.get('/apple-touch-icon*.png', (req, res) => res.status(204).end());
 
+// Admin authentication middleware
+const adminAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization || req.headers['x-admin-token'] || req.query.token;
+  let token = null;
+
+  if (authHeader) {
+    if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7).trim();
+    } else {
+      token = String(authHeader).trim();
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required. Please login.' });
+  }
+
+  // Verify token using the auth module
+  const { verifyToken } = require('./lib/auth');
+  const payload = verifyToken(token);
+  if (!payload || payload.role !== 'ADMIN') {
+    return res.status(401).json({ error: 'Invalid or expired session. Please login again.' });
+  }
+
+  next();
+};
+
 // Clean URL routes for Admin and Public
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
 app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
-app.get('/admin/bookings', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'bookings.html')));
-app.get('/admin/calendar', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'calendar.html')));
-app.get('/admin/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'portfolio.html')));
-app.get('/admin/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
-app.get('/admin/availability', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
+app.get('/admin', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
+app.get('/admin/bookings', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'bookings.html')));
+app.get('/admin/calendar', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'calendar.html')));
+app.get('/admin/portfolio', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'portfolio.html')));
+app.get('/admin/services', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
+app.get('/admin/availability', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
 
 app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));
 app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'portfolio.html')));

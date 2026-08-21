@@ -275,63 +275,75 @@ function renderPayment() {
   const rate = info.bankIDR?.rate || 4200;
   const depositIDR = (deposit * rate).toLocaleString('id-ID');
 
+  const paymentProof = state.paymentProof || '';
+  const depositPaid = state.result?.payment_status === 'DEPOSIT_PAID' || false;
+  const fullPaid = state.result?.payment_status === 'PAID' || false;
+
   return `
     <div class="step-label">Step 6 — Payment & Verification</div>
-    <h2 style="margin-bottom:24px;">Review &amp; Transfer Deposit</h2>
+    <h2 style="margin-bottom:24px;">Review & Transfer Deposit</h2>
     
     <div class="summary-line"><span>Service</span><span>${state.service.name}</span></div>
     <div class="summary-line"><span>Package</span><span>${p.name} (${p.duration_minutes} min)</span></div>
-    <div class="summary-line"><span>Date &amp; Time</span><span>${state.date} at ${state.time}</span></div>
+    <div class="summary-line"><span>Date & Time</span><span>${state.date} at ${state.time}</span></div>
     <div class="summary-line"><span>Total Investment</span><span>${p.currency} ${p.price}</span></div>
     <div class="summary-line" style="font-weight:600; color:var(--charcoal); background:rgba(212,175,55,0.08); padding:12px 10px;">
       <span>Deposit Due Now (${p.deposit_percentage}%)</span>
       <span style="font-size:1.15rem; color:#8A5A1E;">${p.currency} ${deposit} <span style="font-size:0.85rem; font-weight:normal;">(~Rp ${depositIDR})</span></span>
     </div>
 
-    <h3 style="font-family:var(--font-display); font-size:1.15rem; margin:28px 0 12px;">Bank Transfer Details</h3>
-    <p style="font-size:0.84rem; color:var(--charcoal-soft); margin-bottom:16px;">Silakan transfer uang muka (deposit) ke salah satu rekening resmi di bawah ini:</p>
+    ${depositPaid || fullPaid ? `
+      <div style="margin-top:24px; padding-top:24px; border-top:1px solid var(--line);">
+        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:8px;">Status Pembayaran</h3>
+        ${depositPaid ? `<p style="color:var(--charcoal-soft);">✅ Deposit sudah dibayarkan (DEPOSIT_PAID)</p>` : ''}
+        ${fullPaid ? `<p style="color:var(--charcoal-soft);">✅ Pembayaran lengkap terverifikasi (PAID)</p>` : ''}
+      </div>
+    ` : `
+      <h3 style="font-family:var(--font-display); font-size:1.15rem; margin:28px 0 12px;">Bank Transfer Details</h3>
+      <p style="font-size:0.84rem; color:var(--charcoal-soft); margin-bottom:16px;">Silakan transfer uang muka (deposit) ke salah satu rekening resmi di bawah ini:</p>
 
-    <!-- Bank Accounts Grid -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:28px;">
-      <!-- Saudi Bank Account -->
-      <div style="background:#fff; border:1px solid var(--line); border-left:4px solid var(--gold); padding:16px; border-radius:4px;">
-        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇸🇦 Saudi Arabia / SAR (Al Rajhi)</div>
-        <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankSAR?.name || 'Al Rajhi Bank'}</strong>
-        <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
-          <span>${info.bankSAR?.account || 'SA8480000123456789012345'}</span>
-          <button type="button" onclick="copyText('${info.bankSAR?.account || 'SA8480000123456789012345'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:var(--gold-soft);">📋 Copy</button>
+      <!-- Bank Accounts Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:28px;">
+        <!-- Saudi Bank Account -->
+        <div style="background:#fff; border:1px solid var(--line); border-left:4px solid var(--gold); padding:16px; border-radius:4px;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇸🇦 Saudi Arabia / SAR (Al Rajhi)</div>
+          <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankSAR?.name || 'Al Rajhi Bank'}</strong>
+          <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
+            <span>${info.bankSAR?.account || 'SA8480000123456789012345'}</span>
+            <button type="button" onclick="copyText('${info.bankSAR?.account || 'SA8480000123456789012345'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:var(--gold-soft);">📋 Copy</button>
+          </div>
+          <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankSAR?.holder || 'Al-Madani Photography'}</div>
         </div>
-        <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankSAR?.holder || 'Al-Madani Photography'}</div>
-      </div>
 
-      <!-- Indonesian Bank Account -->
-      <div style="background:#fff; border:1px solid var(--line); border-left:4px solid #3E5B2A; padding:16px; border-radius:4px;">
-        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇮🇩 Indonesia / Rupiah (BSI / BCA)</div>
-        <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankIDR?.name || 'Bank Syariah Indonesia (BSI) / BCA'}</strong>
-        <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
-          <span>${info.bankIDR?.account || '7123456789 (BSI)'}</span>
-          <button type="button" onclick="copyText('${info.bankIDR?.account || '7123456789'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:#3E5B2A;">📋 Copy</button>
+        <!-- Indonesian Bank Account -->
+        <div style="background:#fff; border:1px solid var(--line); border-left:4px solid #3E5B2A; padding:16px; border-radius:4px;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇮🇩 Indonesia / Rupiah (BSI / BCA)</div>
+          <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankIDR?.name || 'Bank Syariah Indonesia (BSI) / BCA'}</strong>
+          <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
+            <span>${info.bankIDR?.account || '7123456789 (BSI)'}</span>
+            <button type="button" onclick="copyText('${info.bankIDR?.account || '7123456789'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:#3E5B2A;">📋 Copy</button>
+          </div>
+          <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankIDR?.holder || 'Al-Madani Photography'}</div>
         </div>
-        <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankIDR?.holder || 'Al-Madani Photography'}</div>
       </div>
-    </div>
 
-    <!-- Upload Screenshot Transfer Proof -->
-    <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Upload Bukti Transfer (Screenshot)</h3>
-    <div style="border:2px dashed rgba(212,175,55,0.4); background:#fff; padding:20px; text-align:center; border-radius:6px; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('proof-file-input').click()">
-      <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
-      <div style="font-size:1.8rem; margin-bottom:4px;">📸</div>
-      <strong style="display:block; font-size:0.92rem; color:var(--charcoal);">Klik untuk memilih screenshot / bukti transfer dari HP/Laptop</strong>
-      <span style="font-size:0.78rem; color:var(--charcoal-soft);">Format JPG, PNG, atau WEBP</span>
-      <div>
-        <img id="proof-preview" src="${state.paymentProof || ''}" style="max-height:160px; max-width:100%; border-radius:4px; margin-top:10px; display:${state.paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
+      <!-- Upload Screenshot Transfer Proof -->
+      <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Upload Bukti Transfer (Screenshot)</h3>
+      <div style="border:2px dashed rgba(212,175,55,0.4); background:#fff; padding:20px; text-align:center; border-radius:6px; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('proof-file-input').click()">
+        <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
+        <div style="font-size:1.8rem; margin-bottom:4px;">📸</div>
+        <strong style="display:block; font-size:0.92rem; color:var(--charcoal);">Klik untuk memilih screenshot / bukti transfer dari HP/Laptop</strong>
+        <span style="font-size:0.78rem; color:var(--charcoal-soft);">Format JPG, PNG, atau WEBP</span>
+        <div>
+          <img id="proof-preview" src="${paymentProof}" style="max-height:160px; max-width:100%; border-radius:4px; margin-top:10px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
+        </div>
       </div>
-    </div>
 
-    <div class="actions-row">
-      <button class="btn btn-ghost" id="back">Back</button>
-      <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:600;">Confirm Booking &amp; Continue →</button>
-    </div>
+      <div class="actions-row">
+        <button class="btn btn-ghost" id="back">Back</button>
+        <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:600;">Confirm Booking & Continue →</button>
+      </div>
+    `}
   `;
 }
 
