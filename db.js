@@ -2,51 +2,44 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
 
-const DB_PATH = process.env.DB_PATH || (process.env.VERCEL ? ':memory:' : path.join(__dirname, 'data.sqlite'));
+// Determine database path based on environment
+const isVercel = process.env.VERCEL === '1';
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Use persistent path on Vercel, otherwise use env or default
+const dbPath = isVercel
+  ? process.env.DB_PATH || path.join(process.cwd(), 'data', 'database.sqlite')
+  : process.env.DB_PATH || path.join(__dirname, 'data.sqlite');
 
 let db;
 try {
-  db = new Database(DB_PATH, { timeout: 10000 });
+  db = new Database(dbPath, { timeout: 10000 });
 } catch (err) {
+  // Fallback to memory if file path fails (e.g., certain test environments)
   db = new Database(':memory:', { timeout: 10000 });
 }
 
 // Execute pure SQL Schema directly from db/schema.sql
-const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
-db.exec(schema);
+const schemaPath = path.join(__dirname, 'db', 'schema.sql');
+if (fs.existsSync(schemaPath)) {
+  const schema = fs.readFileSync(schemaPath, 'utf8');
+  db.exec(schema);
+} else {
+  console.error('Schema file not found at:', schemaPath);
+}
 
 // Migration: add proof_url column if not present
 try {
   db.exec(`ALTER TABLE payments ADD COLUMN proof_url TEXT;`);
 } catch (e) {}
 
-// Synchronously restore state on boot (100% crash-free, 0ms startup time)
-function loadPersistedState() {
-  try {
-    const jsonPath = path.join(__dirname, 'data', 'cloud_bookings.json');
-    if (fs.existsSync(jsonPath)) {
-      const parsed = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-      if (parsed.settings && typeof parsed.settings === 'object') {
-        const upsert = db.prepare(`INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value`);
-        for (const [k, v] of Object.entries(parsed.settings)) {
-          if (v !== undefined && v !== null) upsert.run(k, String(v));
-        }
-      }
-      if (Array.isArray(parsed.portfolio) && parsed.portfolio.length > 0) {
-        db.prepare(`DELETE FROM portfolio`).run();
-        const insertP = db.prepare(`INSERT INTO portfolio (image_url, title, category, description, location, featured, sort_order, active) VALUES (?,?,?,?,?,?,?,1)`);
-        for (const p of parsed.portfolio) {
-          if (p.image_url) {
-            insertP.run(p.image_url, p.title || '', p.category || 'Portrait', p.description || '', p.location || 'Madinah', p.featured ? 1 : 0, p.sort_order || 0);
-          }
-        }
-      }
-    }
-  } catch (e) {
-    console.error('loadPersistedState error:', e.message);
+// Ensure data directory exists (Vercel specific)
+if (isVercel) {
+  const dataDir = path.join(process.cwd(), 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
   }
 }
-loadPersistedState();
 
 // Ensure Admin User credentials
 const { hashPassword } = require('./lib/auth');
