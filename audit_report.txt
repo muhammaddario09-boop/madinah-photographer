@@ -1,0 +1,103 @@
+
+  #  /Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node[33812]: void node::RemoveEnvironmentCleanupHook(Isolate *, CleanupHook, void *) at ../src/api/hooks.cc:142
+  #  Assertion failed: (env) != nullptr
+
+----- Native stack trace -----
+
+ 1: 0x104795594 node::Assert(node::AssertionInfo const&) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 2: 0x10697c318 node::RemoveEnvironmentCleanupHook(v8::Isolate*, void (*)(void*), void*) (.cold.1) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 3: 0x10467f200 node::AddEnvironmentCleanupHookInternal(v8::Isolate*, void (*)(void*, void (*)(void*), void*), void*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 4: 0x120829c40 Statement::~Statement() [/Users/muhammaddariovarselprayuda/Desktop/madinah-photographer/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3/build/Release/better_sqlite3.node]
+ 5: 0x120829cac Statement::~Statement() [/Users/muhammaddariovarselprayuda/Desktop/madinah-photographer/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3/build/Release/better_sqlite3.node]
+ 6: 0x104bf9b44 v8::internal::GlobalHandles::InvokeFirstPassWeakCallbacks() [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 7: 0x104c70f40 v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 8: 0x104c8380c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags)::$_1::operator()() const [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 9: 0x104c83350 void heap::base::Stack::SetMarkerAndCallbackImpl<v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags)::$_1>(heap::base::Stack*, void*, void const*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+10: 0x105637be0 PushAllRegistersAndIterateStack [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+11: 0x104c6d1b8 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+12: 0x104c61ec4 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+13: 0x104c435a4 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+14: 0x1050d2d9c v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+15: 0x10572a234 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+16: 0x1056c2870 Builtins_ArraySingleArgumentConstructor_HoleySmi_DisableAllocationSites [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+17: 0x10568d550 Builtins_InterpreterPushArgsThenFastConstructFunction [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+18: 0x10581d628 Builtins_ConstructHandler [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+19: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+20: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+21: 0x10568d400 Builtins_InterpreterPushArgsThenFastConstructFunction [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+22: 0x10581d628 Builtins_ConstructHandler [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+23: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+24: 0x10568d400 Builtins_InterpreterPushArgsThenFastConstructFunction [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+25: 0x10581d628 Builtins_ConstructHandler [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+26: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+27: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+28: 0x10568d400 Builtins_InterpreterPushArgsThenFastConstructFunction [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+29: 0x10581d628 Builtins_ConstructHandler [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+30: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+31: 0x10568d400 Builtins_InterpreterPushArgsThenFastConstructFunction [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+32: 0x10581d628 Builtins_ConstructHandler [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+33: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+34: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+35: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+36: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+37: 0x10579f3dc Builtins_PromiseConstructor [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+38: 0x10568d550 Builtins_InterpreterPushArgsThenFastConstructFunction [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+39: 0x10581d628 Builtins_ConstructHandler [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+40: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+41: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+42: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+43: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+44: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+45: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+46: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+47: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+48: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+49: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+50: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+51: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+52: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+53: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+54: 0x12b6c48ec 
+55: 0x12b6c52ac 
+56: 0x12b6c3e00 
+57: 0x12b6897ec 
+58: 0x12b64b75c 
+59: 0x12b68713c 
+60: 0x12b68731c 
+61: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+62: 0x12b6c48ec 
+63: 0x12b6c52ac 
+64: 0x12b6c3e00 
+65: 0x12b6897ec 
+66: 0x12b64b75c 
+67: 0x12b68713c 
+68: 0x12b68731c 
+69: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+70: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+71: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+72: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+73: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+74: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+75: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+76: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+77: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+78: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+79: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+80: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+81: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+82: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+83: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+84: 0x10568cbec Builtins_InterpreterEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+85: 0x10568a8cc Builtins_JSEntryTrampoline [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+86: 0x10568a570 Builtins_JSEntry [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+87: 0x104bb36d8 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+88: 0x104bb303c v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+89: 0x104a279c0 v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+90: 0x104765610 node::builtins::BuiltinLoader::CompileAndCall(v8::Local<v8::Context>, char const*, node::Realm*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+91: 0x104849f94 node::Realm::ExecuteBootstrapper(char const*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+92: 0x10473eda4 node::StartExecution(node::Environment*, char const*) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+93: 0x10473ecf8 node::StartExecution(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfoWithModule const&)>) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+94: 0x1046798a0 node::LoadEnvironment(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfoWithModule const&)>, std::__1::function<void (node::Environment*, v8::Local<v8::Value>, v8::Local<v8::Value>)>) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+95: 0x1047f0774 node::NodeMainInstance::Run() [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+96: 0x1047427e0 node::Start(int, char**) [/Users/muhammaddariovarselprayuda/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+97: 0x18f587e00 start [/usr/lib/dyld]
