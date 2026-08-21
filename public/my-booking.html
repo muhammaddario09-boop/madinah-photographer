@@ -26,8 +26,11 @@
       <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
       <a href="/services.html" data-i18n="nav_services">Services</a>
       <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
+      <a href="/gallery.html">Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:8px;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <script src="/js/currency.js"></script>
+      <script>document.write(CurrencyEngine.renderSwitcher());</script>
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
       <a class="nav-cta" href="/">Home</a>
@@ -85,6 +88,14 @@ async function lookup(code) {
           <div>
             <span class="status-badge status-${b.status}">${sInfo.label}</span>
             <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-top:10px;">${b.booking_code}</h2>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/invoice.html?code=${b.booking_code}" target="_blank" class="btn btn-ghost" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+              <span>🧾 Cetak Invoice / PDF</span>
+            </a>
+            <a href="/gallery.html?code=${b.booking_code}" class="btn btn-primary" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+              <span>📸 Buka Galeri Foto</span>
+            </a>
           </div>
         </div>
         ${sInfo.desc ? `<p style="font-size:0.86rem; color:var(--charcoal-soft); margin-bottom:20px; padding:10px 14px; background:var(--ivory); border-radius:4px;">ℹ️ ${sInfo.desc}</p>` : ''}

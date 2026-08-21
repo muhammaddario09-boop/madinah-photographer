@@ -19,8 +19,11 @@
       <a href="#about" data-i18n="nav_about">About</a>
       <a href="#faq" data-i18n="nav_faq">FAQ</a>
       <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
+      <a href="/gallery.html">Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:12px;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <script src="/js/currency.js"></script>
+      <script>document.write(CurrencyEngine.renderSwitcher());</script>
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
       <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
@@ -142,6 +145,63 @@
   </div>
 </section>
 
+<!-- Verified Jemaah Testimonials Showcase -->
+<section class="section" style="background:#FFFFFF;">
+  <div class="container">
+    <p class="eyebrow">TESTIMONI JEMAAH RESMI</p>
+    <h2 style="margin-top:12px; margin-bottom:40px;">Kisah & Pengalaman Berkesan di Tanah Suci</h2>
+    <div class="grid-3">
+      <div style="background:var(--ivory); padding:32px; border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="color:var(--gold); font-size:1.2rem; margin-bottom:12px;">★★★★★</div>
+          <p style="color:var(--charcoal); font-size:0.95rem; line-height:1.65; font-style:italic; margin-bottom:20px;">
+            "MasyaAllah, fotografernya sangat sabar mengarahkan orang tua kami yang sudah sepuh saat sesi di Nabawi. Hasil fotonya sangat jernih dan pencahayaannya magis saat Shubuh!"
+          </p>
+        </div>
+        <div style="border-top:1px solid var(--line); padding-top:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="font-size:0.9rem; color:var(--charcoal);">Hj. Ratna & Keluarga</strong>
+            <div style="font-size:0.78rem; color:var(--charcoal-soft);">Jakarta Selatan • Family Session</div>
+          </div>
+          <span style="font-size:1.4rem;">🇮🇩</span>
+        </div>
+      </div>
+
+      <div style="background:var(--ivory); padding:32px; border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="color:var(--gold); font-size:1.2rem; margin-bottom:12px;">★★★★★</div>
+          <p style="color:var(--charcoal); font-size:0.95rem; line-height:1.65; font-style:italic; margin-bottom:20px;">
+            "Pelayanan sangat profesional dan tepat waktu. File RAW dikirim cepat dan foto editan terlihat sangat natural & elegan tanpa berlebihan. Recommended banget!"
+          </p>
+        </div>
+        <div style="border-top:1px solid var(--line); padding-top:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="font-size:0.9rem; color:var(--charcoal);">dr. Dimas & Istri</strong>
+            <div style="font-size:0.78rem; color:var(--charcoal-soft);">Surabaya • Couple Session</div>
+          </div>
+          <span style="font-size:1.4rem;">🇮🇩</span>
+        </div>
+      </div>
+
+      <div style="background:var(--ivory); padding:32px; border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="color:var(--gold); font-size:1.2rem; margin-bottom:12px;">★★★★★</div>
+          <p style="color:var(--charcoal); font-size:0.95rem; line-height:1.65; font-style:italic; margin-bottom:20px;">
+            "Video reels dan footage drone yang dibuat tim UMROH LENS sangat menyentuh hati sanubari keluarga di rumah. Sangat kami rekomendasikan untuk jemaah travel!"
+          </p>
+        </div>
+        <div style="border-top:1px solid var(--line); padding-top:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="font-size:0.9rem; color:var(--charcoal);">Ust. Hanif Al-Habsyi</strong>
+            <div style="font-size:0.78rem; color:var(--charcoal-soft);">Bandung • Private Tour & Video</div>
+          </div>
+          <span style="font-size:1.4rem;">🇮🇩</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <hr class="hairline">
 
 <!-- FAQ Section -->
@@ -245,7 +305,7 @@ fetch('/api/services')
         <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px; line-height:1.55; margin-bottom:16px;">${s.description}</p>
         <div class="service-meta">
           <span>${s.duration_minutes} Menit</span>
-          <span class="service-price">Mulai ${s.currency} ${s.starting_price}</span>
+          <span class="service-price">Mulai ${window.CurrencyEngine ? CurrencyEngine.format(s.starting_price) : s.currency + ' ' + s.starting_price}</span>
         </div>
       </a>
     `).join('');

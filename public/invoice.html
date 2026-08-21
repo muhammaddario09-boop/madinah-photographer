@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Official Booking Invoice — UMROH LENS Madinah</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body {
+    background: #F4EFE6;
+    color: #1C1814;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    margin: 0;
+    padding: 40px 20px 80px;
+  }
+  .invoice-paper {
+    max-width: 820px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border: 1px solid rgba(184, 144, 69, 0.25);
+    border-radius: 12px;
+    padding: 48px;
+    box-shadow: 0 16px 48px rgba(28, 24, 20, 0.08);
+    position: relative;
+  }
+  .invoice-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #B89045, #D4AF37, #E5C378, #B89045);
+    border-radius: 12px 12px 0 0;
+  }
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    margin-bottom: 32px;
+  }
+  .invoice-brand {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--charcoal);
+  }
+  .invoice-brand span {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 2px;
+  }
+  .invoice-title {
+    text-align: right;
+  }
+  .invoice-title h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.7rem;
+    margin: 0 0 4px;
+    color: var(--charcoal);
+  }
+  .invoice-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #EBF5EC;
+    color: #155724;
+    border: 1px solid #C3E6CB;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+  .info-block h4 {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .info-block p {
+    margin: 0 0 4px;
+    font-size: 0.92rem;
+    color: var(--charcoal);
+  }
+  .table-box {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0 24px;
+  }
+  .table-box th {
+    background: var(--ivory);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--charcoal-soft);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .table-box td {
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.92rem;
+  }
+  .summary-box {
+    margin-left: auto;
+    width: 320px;
+    border: 1px solid var(--line);
+    background: var(--ivory);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-top: 20px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.88rem;
+  }
+  .summary-row.total {
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+    margin-top: 6px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--charcoal);
+  }
+  .stamp-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 28px;
+    margin-top: 40px;
+  }
+  .official-seal {
+    border: 2px dashed var(--gold);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(184, 144, 69, 0.04);
+  }
+  .no-print {
+    max-width: 820px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  @media print {
+    body { background: #FFFFFF; padding: 0; }
+    .invoice-paper { box-shadow: none; border: none; padding: 20px; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <a href="/my-booking.html" class="btn btn-ghost">← Kembali ke Cek Reservasi</a>
+  <button onclick="window.print()" class="btn btn-primary" style="display:flex; align-items:center; gap:8px;">
+    <span>🖨️ Cetak / Simpan PDF</span>
+  </button>
+</div>
+
+<div class="invoice-paper" id="invoice-content">
+  <div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">
+    Memuat data kuitansi resmi...
+  </div>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const code = urlParams.get('code') || '';
+
+async function loadInvoice() {
+  const container = document.getElementById('invoice-content');
+  if (!code) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:40px;">
+        <h2 style="color:var(--status-booked);">Kode Booking Tidak Ditemukan</h2>
+        <p style="color:var(--charcoal-soft); margin-top:8px;">Silakan akses invoice melalui halaman <a href="/my-booking.html" style="color:var(--gold);">Cek Reservasi</a>.</p>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/bookings/${encodeURIComponent(code)}`);
+    if (!res.ok) throw new Error('Data reservasi tidak ditemukan.');
+    const data = await res.json();
+    const b = data.booking;
+    const s = data.service;
+    const p = data.package;
+    const loc = data.location;
+    const photo = data.photographer;
+
+    const deposit = Number(b.deposit_amount) || 0;
+    const total = Number(b.total_price) || 0;
+    const remaining = Math.max(0, total - deposit);
+    const depositIDR = (deposit * 4250).toLocaleString('id-ID');
+    const remainingIDR = (remaining * 4250).toLocaleString('id-ID');
+
+    container.innerHTML = `
+      <!-- Invoice Header -->
+      <div class="invoice-header">
+        <div>
+          <div class="invoice-brand">UMROH LENS <span>Official Photography Studio</span></div>
+          <div style="font-size:0.8rem; color:var(--charcoal-soft); margin-top:6px; line-height:1.4;">
+            Madinah Al-Munawwarah, Kingdom of Saudi Arabia<br>
+            Official WhatsApp: +62 821-7527-2547 | @umrohlens
+          </div>
+        </div>
+        <div class="invoice-title">
+          <h1>OFFICIAL INVOICE</h1>
+          <div style="font-family:monospace; font-size:0.95rem; font-weight:700; color:var(--gold); margin-bottom:6px;">
+            INV-${b.booking_code}
+          </div>
+          <span class="invoice-badge">${b.payment_status === 'DEPOSIT_PAID' || b.payment_status === 'PAID' ? '✅ Deposit Terverifikasi' : '⏳ Menunggu Verifikasi'}</span>
+        </div>
+      </div>
+
+      <!-- Client & Shoot Details -->
+      <div class="grid-2">
+        <div class="info-block">
+          <h4>DATA JEMAAH / KLIEN</h4>
+          <p><strong>${b.client_name}</strong></p>
+          <p>📞 ${b.client_phone}</p>
+          <p>✉️ ${b.client_email || '-'}</p>
+          <p>🌍 Asal: ${b.client_country || 'Indonesia'}</p>
+        </div>
+        <div class="info-block">
+          <h4>JADWAL & LOKASI PEMOTRETAN</h4>
+          <p>📅 <strong>${b.date}</strong></p>
+          <p>⏰ <strong>${b.start_time} - ${b.end_time} (Waktu Madinah)</strong></p>
+          <p>📍 Lokasi: <strong>${loc.name || 'Masjid Nabawi Area'}</strong></p>
+          <p>📸 Fotografer: ${photo.name || 'UMROH LENS OFFICIAL'}</p>
+        </div>
+      </div>
+
+      <!-- Itemized Table -->
+      <table class="table-box">
+        <thead>
+          <tr>
+            <th>Deskripsi Layanan</th>
+            <th>Durasi</th>
+            <th>Hasil Dokumentasi</th>
+            <th style="text-align:right;">Investasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>${s.name}</strong><br>
+              <span style="font-size:0.8rem; color:var(--charcoal-soft);">Paket: ${p.name || 'Signature'}</span>
+            </td>
+            <td>${p.duration_minutes || 60} Menit</td>
+            <td>${p.edited_photos || 15} Foto Edit + Semua File RAW</td>
+            <td style="text-align:right; font-weight:700; font-family:var(--font-display); font-size:1.05rem;">
+              ${b.currency || 'SAR'} ${total}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Summary Breakdown -->
+      <div class="summary-box">
+        <div class="summary-row">
+          <span>Total Biaya Paket</span>
+          <span>${b.currency} ${total}</span>
+        </div>
+        <div class="summary-row" style="color:#155724; font-weight:600;">
+          <span>Uang Muka / DP Dibayar</span>
+          <span>- ${b.currency} ${deposit} (~Rp ${depositIDR})</span>
+        </div>
+        <div class="summary-row total">
+          <span>Sisa Pelunasan di Madinah</span>
+          <span style="color:#8A5A1E;">${b.currency} ${remaining} <br><span style="font-size:0.75rem; font-weight:normal; color:var(--charcoal-soft);">(~Rp ${remainingIDR})</span></span>
+        </div>
+      </div>
+
+      <!-- Official Stamp & Notes -->
+      <div class="stamp-box">
+        <div class="official-seal">
+          <span style="font-size:2rem;">🏛️</span>
+          <div>
+            <div style="font-size:0.76rem; font-weight:700; color:var(--gold); letter-spacing:0.08em; text-transform:uppercase;">VERIFIED RESERVATION</div>
+            <div style="font-size:0.82rem; color:var(--charcoal); font-weight:600;">UMROH LENS OFFICIAL STUDIO</div>
+            <div style="font-size:0.7rem; color:var(--charcoal-soft);">Ref Code: ${b.booking_code}</div>
+          </div>
+        </div>
+        <div style="text-align:right; font-size:0.78rem; color:var(--charcoal-soft); max-width:320px; line-height:1.4;">
+          * Pelunasan sisa biaya dapat dibayarkan langsung kepada fotografer di Madinah dalam mata uang SAR / Transfer Rupiah setelah sesi foto selesai.
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<div style="text-align:center; color:var(--status-booked); padding:40px;">Gagal memuat invoice: ${err.message}</div>`;
+  }
+}
+
+loadInvoice();
+</script>
+</body>
+</html>

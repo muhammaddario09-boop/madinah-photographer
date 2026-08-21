@@ -385,9 +385,10 @@ function renderConfirmation() {
       </a>
     </div>
 
-    <div class="actions-row" style="justify-content:center; gap:14px;">
-      <a class="btn btn-ghost" href="/my-booking.html?code=${r.bookingCode}">View Booking Details</a>
-      <a class="btn btn-ghost" href="/">Return to Homepage</a>
+    <div class="actions-row" style="justify-content:center; gap:14px; flex-wrap:wrap;">
+      <a class="btn btn-primary" href="/invoice.html?code=${r.bookingCode}" target="_blank">🧾 Cetak Invoice / Kuitansi PDF</a>
+      <a class="btn btn-ghost" href="/my-booking.html?code=${r.bookingCode}">Cek Status Reservasi</a>
+      <a class="btn btn-ghost" href="/">Kembali ke Beranda</a>
     </div>
   `;
 }

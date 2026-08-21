@@ -148,8 +148,11 @@
       <a href="/#about">About</a>
       <a href="/#faq">FAQ</a>
       <a href="/my-booking.html">My Booking</a>
+      <a href="/gallery.html">Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:12px;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <script src="/js/currency.js"></script>
+      <script>document.write(CurrencyEngine.renderSwitcher());</script>
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
       <a class="nav-cta" href="/booking.html">Book a Session</a>

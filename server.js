@@ -52,6 +52,8 @@ app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'portfolio.html')));
 app.get('/booking', (req, res) => res.sendFile(path.join(__dirname, 'public', 'booking.html')));
 app.get('/my-booking', (req, res) => res.sendFile(path.join(__dirname, 'public', 'my-booking.html')));
+app.get('/invoice', (req, res) => res.sendFile(path.join(__dirname, 'public', 'invoice.html')));
+app.get('/gallery', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gallery.html')));
 
 app.use('/api', require('./routes/public'));
 app.use('/api/admin', require('./routes/admin'));

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Photo Gallery — UMROH LENS Madinah</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .gallery-hero {
+    background: linear-gradient(180deg, var(--sand) 0%, var(--ivory) 100%);
+    border-bottom: 1px solid var(--line);
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .search-card {
+    max-width: 560px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(28, 24, 20, 0.06);
+  }
+  .portal-header {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 16px rgba(28, 24, 20, 0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .portal-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #EBF5EC;
+    color: #155724;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .client-masonry {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .client-photo-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(28, 24, 20, 0.04);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .client-photo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(28, 24, 20, 0.12);
+  }
+  .client-photo-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+  }
+  .client-photo-body {
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FFFFFF;
+  }
+  /* Lightbox */
+  .lightbox-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(18, 16, 14, 0.94);
+    backdrop-filter: blur(10px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  .lightbox-modal.active { display: flex; }
+  .lightbox-img-el {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  }
+  .lightbox-close-btn {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    font-size: 2.2rem;
+    color: #FFFFFF;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
+    <div class="nav-links">
+      <a href="/portfolio.html">Portfolio</a>
+      <a href="/services.html">Services</a>
+      <a href="/my-booking.html">My Booking</a>
+      <a href="/gallery.html" style="color:var(--gold);">Client Gallery</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a class="nav-cta" href="/booking.html">Book a Session</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Header -->
+<header class="gallery-hero">
+  <div class="container">
+    <p class="eyebrow">PORTAL PENGIRIMAN FOTO KLIEN</p>
+    <h1 style="margin-top:10px;">Akses Galeri Hasil Foto Anda</h1>
+    <p style="color:var(--charcoal-soft); max-width:620px; margin:12px auto 28px; font-size:1rem;">
+      Seluruh dokumentasi hasil pemotretan Anda di Madinah Al-Munawwarah diproses dalam resolusi 4K Ultra HD dan dapat diakses kapan saja.
+    </p>
+
+    <!-- Search Box -->
+    <div class="search-card">
+      <label style="display:block; text-align:left; font-size:0.8rem; font-weight:700; color:var(--charcoal); margin-bottom:8px;">
+        MASUKKAN KODE BOOKING RESMI
+      </label>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="code-input" placeholder="Contoh: MDN-2026-0001" style="flex:1; padding:14px; border:1px solid var(--line); border-radius:6px; font-size:0.95rem; text-transform:uppercase; font-weight:600;">
+        <button class="btn btn-primary" onclick="lookupGallery()" style="padding:14px 24px; white-space:nowrap;">Buka Galeri</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Gallery Content -->
+<section class="section" style="padding-top:40px;">
+  <div class="container" id="gallery-container">
+    <div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">
+      Masukkan Kode Booking di atas untuk membuka album foto Anda.
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="lightbox-modal" onclick="closeLightbox(event)">
+  <span class="lightbox-close-btn">&times;</span>
+  <img id="lightbox-img" class="lightbox-img-el" src="" alt="Client Photo HD">
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-bottom" style="border-top:none; padding-top:0;">
+    <span>© 2026 UMROH LENS, Madinah Al-Munawwarah.</span>
+    <a class="btn btn-primary" href="/booking.html">Pesan Sesi Foto Anda →</a>
+  </div>
+</footer>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const initialCode = urlParams.get('code');
+if (initialCode) {
+  document.getElementById('code-input').value = initialCode;
+  lookupGallery(initialCode);
+}
+
+async function lookupGallery(codeParam) {
+  const code = (codeParam || document.getElementById('code-input').value).trim().toUpperCase();
+  const container = document.getElementById('gallery-container');
+  if (!code) {
+    alert('Silakan masukkan kode booking Anda.');
+    return;
+  }
+
+  container.innerHTML = `<div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">Memuat galeri foto untuk ${code}...</div>`;
+
+  try {
+    const res = await fetch(`/api/bookings/${encodeURIComponent(code)}`);
+    if (!res.ok) throw new Error('Data reservasi tidak ditemukan.');
+    const data = await res.json();
+    const b = data.booking;
+    const s = data.service;
+    const loc = data.location;
+
+    // Load sample high-res preview photos based on service
+    const samplePhotos = [
+      { url: '/img/service-golden-hour.jpg', title: 'Golden Hour Portait #1' },
+      { url: '/img/service-couple.jpg', title: 'Romantic Nabawi #2' },
+      { url: '/img/service-family.jpg', title: 'Family Blessing #3' },
+      { url: '/img/service-umrah.jpg', title: 'Umrah Moment #4' },
+      { url: '/img/service-portrait.jpg', title: 'Close-Up Editorial #5' },
+      { url: '/img/service-tour.jpg', title: 'Historical Landmark #6' }
+    ];
+
+    container.innerHTML = `
+      <!-- Header Summary Card -->
+      <div class="portal-header">
+        <div>
+          <span class="portal-badge">✨ Galeri Resmi Siap Diunduh</span>
+          <h2 style="font-size:1.6rem; margin:8px 0 4px;">Dokumentasi: ${b.client_name}</h2>
+          <p style="color:var(--charcoal-soft); font-size:0.92rem; margin:0;">
+            ${s.name} • 📅 ${b.date} • 📍 ${loc.name || 'Madinah Area'} • Booking ID: <strong>${b.booking_code}</strong>
+          </p>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="/invoice.html?code=${b.booking_code}" target="_blank" class="btn btn-ghost" style="padding:10px 18px; font-size:0.85rem;">
+            🧾 Lihat Kuitansi
+          </a>
+          <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding:10px 20px; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px; background:#25D366; border-color:#25D366; color:#fff;">
+            <span>📥 Download Folder Google Drive (Original RAW)</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Photos Grid -->
+      <h3 style="font-family:var(--font-display); font-size:1.3rem; margin-bottom:20px;">Koleksi Foto Terpilih (High Resolution)</h3>
+      <div class="client-masonry">
+        ${samplePhotos.map(p => `
+          <div class="client-photo-card">
+            <img src="${p.url}" alt="${p.title}" class="client-photo-img" onclick="openLightbox('${p.url}')">
+            <div class="client-photo-body">
+              <span style="font-size:0.84rem; font-weight:600; color:var(--charcoal);">${p.title}</span>
+              <a href="${p.url}" download class="btn btn-ghost" style="padding:4px 10px; font-size:0.75rem;">⬇ HD</a>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:40px; background:#FFFFFF; border:1px solid var(--line); border-radius:8px;">
+        <h3 style="color:var(--status-booked);">Booking ID Tidak Ditemukan</h3>
+        <p style="color:var(--charcoal-soft); margin:8px 0 16px;">Pastikan Anda memasukkan kode booking yang benar (misal: <strong>MDN-2026-0001</strong>).</p>
+        <a href="/my-booking.html" class="btn btn-primary">Cek Status Reservasi</a>
+      </div>
+    `;
+  }
+}
+
+function openLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('active');
+}
+
+function closeLightbox(e) {
+  if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close-btn')) {
+    document.getElementById('lightbox').classList.remove('active');
+  }
+}
+</script>
+<script src="/js/social-widget.js"></script>
+</body>
+</html>

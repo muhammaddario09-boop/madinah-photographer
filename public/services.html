@@ -60,8 +60,11 @@
       <a href="/#about">About</a>
       <a href="/#faq">FAQ</a>
       <a href="/my-booking.html">My Booking</a>
+      <a href="/gallery.html">Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:12px;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <script src="/js/currency.js"></script>
+      <script>document.write(CurrencyEngine.renderSwitcher());</script>
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
       <a class="nav-cta" href="/booking.html">Book a Session</a>
@@ -125,7 +128,7 @@ fetch('/api/services')
                     <div style="font-size:0.82rem; color:var(--charcoal-soft); margin:4px 0 12px 0;">${p.duration_minutes} Menit • ${p.edited_photos || 10} Foto Edit</div>
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid var(--line); padding-top:10px; margin-top:8px;">
-                    <span style="font-family:var(--font-display); font-size:1.25rem; font-weight:700; color:var(--gold);">${p.currency || 'SAR'} ${p.price}</span>
+                    <span style="font-family:var(--font-display); font-size:1.25rem; font-weight:700; color:var(--gold);">${window.CurrencyEngine ? CurrencyEngine.format(p.price) : (p.currency || 'SAR') + ' ' + p.price}</span>
                     <a class="btn btn-primary" href="/booking.html?service=${s.slug}&package=${p.id}" style="padding:6px 14px; font-size:0.75rem;">Pilih ›</a>
                   </div>
                 </div>
