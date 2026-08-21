@@ -245,6 +245,18 @@ async function runProductionTestSuite() {
       'data:image/jpeg;base64,automated_suite_proof'
     );
     assert.strictEqual(ok, true, 'recordBookingToSupabase must return true');
+
+    // Auto-cleanup test client and booking immediately so Supabase remains completely clean
+    try {
+      await supabaseFetch('clients', {
+        method: 'DELETE',
+        query: `?email=eq.suite.test.${randomNum}@madinahphoto.com`
+      });
+      await supabaseFetch('bookings', {
+        method: 'DELETE',
+        query: `?booking_code=eq.${testCode}`
+      });
+    } catch(cleanErr) {}
   });
 
   // ---------------------------------------------------------------------------
