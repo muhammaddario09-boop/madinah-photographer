@@ -4,7 +4,16 @@ const db = require('../db');
 const { setStatus } = require('../lib/bookingEngine');
 const { todayRiyadhISODate } = require('../lib/timezone');
 const { verifyPassword, hashPassword, generateToken, verifyToken } = require('../lib/auth');
-const { recordPortfolioToSupabase, deletePortfolioFromSupabase } = require('../lib/supabase');
+const {
+  recordPortfolioToSupabase,
+  deletePortfolioFromSupabase,
+  fetchBookingsFromSupabase,
+  fetchDashboardStatsFromSupabase,
+  fetchBookingDetailsFromSupabase,
+  updateBookingStatusInSupabase,
+  deleteBookingFromSupabase,
+  resetAllBookingsInSupabase
+} = require('../lib/supabase');
 
 // Public Login Route
 router.post('/login', (req, res) => {
@@ -122,8 +131,11 @@ router.post('/change-password', (req, res) => {
   res.json({ ok: true, message: 'Password successfully updated.' });
 });
 
-router.get('/dashboard', (req, res) => {
+router.get('/dashboard', async (req, res) => {
   const today = todayRiyadhISODate();
+  const supaStats = await fetchDashboardStatsFromSupabase(today);
+  if (supaStats) return res.json(supaStats);
+
   const todayShoots = db.prepare(`SELECT COUNT(*) n FROM bookings WHERE date=? AND status NOT IN ('CANCELLED','NO_SHOW')`).get(today).n;
   const upcoming = db.prepare(`SELECT COUNT(*) n FROM bookings WHERE date>? AND status IN ('CONFIRMED','PENDING','AWAITING_PAYMENT')`).get(today).n;
   const pendingPayments = db.prepare(`SELECT COUNT(*) n FROM bookings WHERE payment_status='UNPAID' AND status NOT IN ('CANCELLED')`).get().n;
@@ -141,8 +153,13 @@ const {
   recordLocationsToCloud
 } = require('../lib/cloudStore');
 
-router.get('/bookings', (req, res) => {
+router.get('/bookings', async (req, res) => {
   const { status, from, to } = req.query;
+  const supaBookings = await fetchBookingsFromSupabase({ status, from, to });
+  if (supaBookings !== null) {
+    return res.json(supaBookings);
+  }
+
   let sql = `SELECT b.*, 
              COALESCE(c.name, 'Guest') AS client_name, 
              COALESCE(c.phone, '') AS client_phone, 
@@ -167,7 +184,10 @@ router.get('/bookings', (req, res) => {
   }
 });
 
-router.get('/bookings/:id', (req, res) => {
+router.get('/bookings/:id', async (req, res) => {
+  const supaDetails = await fetchBookingDetailsFromSupabase(req.params.id);
+  if (supaDetails) return res.json(supaDetails);
+
   const booking = db.prepare(`SELECT * FROM bookings WHERE id=?`).get(req.params.id);
   if (!booking) return res.status(404).json({ error: 'Not found' });
   const client = db.prepare(`SELECT * FROM clients WHERE id=?`).get(booking.client_id);
@@ -176,49 +196,34 @@ router.get('/bookings/:id', (req, res) => {
   res.json({ booking, client, history, payments });
 });
 
-router.post('/bookings/:id/status', (req, res) => {
+router.post('/bookings/:id/status', async (req, res) => {
   try {
-    let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
-
     const { status, payment_status, note } = req.body || {};
+    await updateBookingStatusInSupabase(req.params.id, status, payment_status, note);
 
-    // Handle booking status change (via state machine) or payment_status update independently
-    let newBookingStatus = booking.status;
-    let newPaymentStatus = booking.payment_status;
+    let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
+    if (booking) {
+      let newBookingStatus = booking.status;
+      let newPaymentStatus = booking.payment_status;
+      if (status) newBookingStatus = status;
+      if (payment_status) newPaymentStatus = payment_status;
 
-    if (status) {
-      // If status provided, use setStatus for booking state machine (admin has full authority)
-      const validStatuses = ['PENDING', 'AWAITING_PAYMENT', 'CONFIRMED', 'RESCHEDULE_REQUESTED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
-      if (validStatuses.includes(status)) {
-        newBookingStatus = status;
-      }
-      // Also allow admin to set payment_status directly
-      if (['UNPAID', 'DEPOSIT_PAID', 'PAID', 'REFUNDED'].includes(status)) {
-        newPaymentStatus = status;
-      }
-    }
-    // Allow payment_status update independently (without changing booking status)
-    if (payment_status && ['UNPAID', 'DEPOSIT_PAID', 'PAID', 'REFUNDED'].includes(payment_status)) {
-      newPaymentStatus = payment_status;
+      db.prepare(`UPDATE bookings SET status = ?, payment_status = ?, updated_at = datetime('now') WHERE id = ?`).run(
+        newBookingStatus, newPaymentStatus, booking.id
+      );
+
+      recordBookingToCloud({ booking_code: booking.booking_code, status: newBookingStatus, payment_status: newPaymentStatus }).catch(() => {});
     }
 
-    db.prepare(`UPDATE bookings SET status = ?, payment_status = ?, updated_at = datetime('now') WHERE id = ?`).run(
-      newBookingStatus, newPaymentStatus, booking.id
-    );
-
-    const b = db.prepare(`SELECT booking_code, status, payment_status FROM bookings WHERE id=?`).get(booking.id);
-    if (b) {
-      recordBookingToCloud({ booking_code: b.booking_code, status: b.status, payment_status: b.payment_status }).catch(() => {});
-    }
-    res.json({ ok: true, from: booking.status, to: payment_status || status || booking.payment_status, booking_id: booking.id });
+    res.json({ ok: true, from: booking ? booking.status : null, to: payment_status || status, booking_id: req.params.id });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });
   }
 });
 
-router.delete('/bookings/:id', (req, res) => {
+router.delete('/bookings/:id', async (req, res) => {
   try {
+    await deleteBookingFromSupabase(req.params.id);
     const booking = db.prepare(`SELECT id, booking_code FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
     if (booking) {
       db.prepare(`DELETE FROM payments WHERE booking_id=?`).run(booking.id);
@@ -233,8 +238,9 @@ router.delete('/bookings/:id', (req, res) => {
   }
 });
 
-router.post('/bookings/reset-all', (req, res) => {
+router.post('/bookings/reset-all', async (req, res) => {
   try {
+    await resetAllBookingsInSupabase();
     db.prepare(`DELETE FROM payments`).run();
     db.prepare(`DELETE FROM booking_history`).run();
     db.prepare(`DELETE FROM notifications`).run();
@@ -246,8 +252,24 @@ router.post('/bookings/reset-all', (req, res) => {
   }
 });
 
-router.get('/calendar', (req, res) => {
+router.get('/calendar', async (req, res) => {
   try {
+    const supaBookings = await fetchBookingsFromSupabase();
+    if (supaBookings !== null) {
+      return res.json(supaBookings.map(b => ({
+        id: b.id,
+        booking_code: b.booking_code,
+        date: b.date,
+        start_time: b.start_time,
+        end_time: b.end_time,
+        service_name: b.service_name,
+        client_name: b.client_name,
+        client_phone: b.client_phone,
+        status: b.status,
+        payment_status: b.payment_status
+      })));
+    }
+
     const from = req.query.from || '2000-01-01';
     const to = req.query.to || '2099-12-31';
     const photographerId = req.query.photographerId;
