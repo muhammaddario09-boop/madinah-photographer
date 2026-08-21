@@ -20,6 +20,10 @@ function bufferMinutes(db) {
   return row ? Number(row.value) : 30;
 }
 
+router.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'UMROH LENS API' });
+});
+
 router.get('/services', async (req, res) => {
   try {
     const supaServices = await fetchServicesFromSupabase();
