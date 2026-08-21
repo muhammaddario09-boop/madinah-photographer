@@ -1,7 +1,7 @@
 # ==============================================================================
 # Stage 1: Build native dependencies (better-sqlite3 native bindings)
 # ==============================================================================
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN npm ci --omit=dev || npm install --omit=dev
 # ==============================================================================
 # Stage 2: Hardened, zero-vulnerability minimal production runtime
 # ==============================================================================
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
