@@ -252,18 +252,19 @@ router.post('/bookings', async (req, res) => {
     const waNumber = (waSetting ? waSetting.value : '+966501234567').replace(/[^0-9]/g, '');
 
     const waText = [
-      `Assalamu'alaikum UMROH LENS,`,
-      `Saya ingin konfirmasi reservasi sesi foto di Madinah:`,
+      `Assalamu'alaikum Admin UMROH LENS,`,
+      `Saya ingin mengajukan reservasi sesi foto di Madinah:`,
       ``,
       `📋 *Booking Code*: ${result.bookingCode}`,
-      `👤 *Nama*: ${b.clientName}`,
+      `👤 *Nama Jemaah*: ${b.clientName}`,
+      `📞 *No. WhatsApp*: ${b.clientPhone}`,
       `📸 *Layanan*: ${service.name} (${pkg.name})`,
       `📅 *Tanggal*: ${b.date}`,
-      `⏰ *Waktu*: ${b.startTime} - ${result.endTime} (Waktu Madinah)`,
-      `📍 *Lokasi*: ${location ? location.name : 'Madinah'}`,
-      `💵 *Deposit*: ${pkg.currency} ${depositAmount} (Bukti Transfer Terlampir)`,
+      `⏰ *Waktu Sesi*: ${b.startTime} - ${result.endTime} (Waktu Madinah)`,
+      `📍 *Spot Lokasi*: ${location ? location.name : 'Madinah Area'}`,
+      b.paymentProof ? `💵 *Bukti Transfer*: Terlampir di sistem` : `📄 *Status*: Mohon kirimkan Rate Card PDF & konfirmasi ketersediaan slot fotografer`,
       ``,
-      `Mohon verifikasi dan konfirmasi jadwal sesi saya. Terima kasih!`
+      `Mohon dibantu konfirmasi jadwal sesi kami. Terima kasih!`
     ].join('\n');
 
     const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
