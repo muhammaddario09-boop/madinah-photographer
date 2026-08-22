@@ -203,6 +203,42 @@ async function loadSettings() {
             <input type="text" id="bank_idr_holder" value="${data.bank_idr_holder || 'WAHYU AFRIANSYAH'}">
           </div>
         </div>
+
+        <!-- 5. Telegram Bot Real-time Alerts -->
+        <div class="settings-card" style="grid-column: 1 / -1; border-left: 4px solid #0088cc;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+            <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+              <span>✈️</span> Notifikasi Instan Telegram Bot
+            </h3>
+            <button type="button" onclick="testTelegramAlert()" class="btn" style="background:#0088cc; color:#fff; font-size:0.78rem; padding:6px 14px; border-radius:4px; border:none; cursor:pointer; font-weight:600;">
+              🧪 Test Kirim Notifikasi Telegram
+            </button>
+          </div>
+          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:0; margin-bottom:18px;">
+            Dapatkan pesan notifikasi otomatis ke Telegram Anda secara <em>real-time</em> (&lt;1 detik) setiap kali ada jemaah baru yang melakukan reservasi.
+          </p>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label>Telegram Bot Token (dari @BotFather)</label>
+              <input type="text" id="telegram_bot_token" value="${data.telegram_bot_token || ''}" placeholder="Contoh: 7123456789:AAHk...">
+              <small style="color:var(--charcoal-soft); font-size:0.75rem; display:block; margin-top:4px;">
+                Dapatkan token gratis dengan membuat bot di Telegram via <a href="https://t.me/BotFather" target="_blank" style="color:#0088cc;">@BotFather</a>.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>Telegram Chat ID (Akun Anda / Grup)</label>
+              <input type="text" id="telegram_chat_id" value="${data.telegram_chat_id || ''}" placeholder="Contoh: 123456789 atau -100123456789">
+              <small style="color:var(--charcoal-soft); font-size:0.75rem; display:block; margin-top:4px;">
+                Cek Chat ID Anda dengan mengirim pesan ke <a href="https://t.me/userinfobot" target="_blank" style="color:#0088cc;">@userinfobot</a>.
+              </small>
+            </div>
+          </div>
+          
+          <div id="telegram-test-result" style="display:none; margin-top:12px; padding:10px 14px; border-radius:4px; font-size:0.84rem;"></div>
+        </div>
+
       </div>
     `;
   } catch (err) {
@@ -215,6 +251,8 @@ async function saveAllSettings() {
     idr_sar_rate: document.getElementById('idr_sar_rate').value,
     buffer_minutes: document.getElementById('buffer_minutes').value,
     default_drive_url: document.getElementById('default_drive_url').value,
+    telegram_bot_token: document.getElementById('telegram_bot_token').value,
+    telegram_chat_id: document.getElementById('telegram_chat_id').value,
     admin_whatsapp: document.getElementById('admin_whatsapp').value,
     admin_whatsapp_2: document.getElementById('admin_whatsapp_2').value,
     instagram_handle: document.getElementById('instagram_handle').value,
@@ -244,6 +282,52 @@ async function saveAllSettings() {
     }
   } catch (e) {
     alert('Gagal menyimpan: ' + e.message);
+  }
+}
+
+async function testTelegramAlert() {
+  const bot_token = document.getElementById('telegram_bot_token').value.trim();
+  const chat_id = document.getElementById('telegram_chat_id').value.trim();
+  const resBox = document.getElementById('telegram-test-result');
+
+  if (!bot_token || !chat_id) {
+    resBox.style.display = 'block';
+    resBox.style.background = '#FFF3CD';
+    resBox.style.color = '#856404';
+    resBox.style.border = '1px solid #FFEEBA';
+    resBox.innerHTML = '⚠️ Silakan isi <strong>Telegram Bot Token</strong> dan <strong>Telegram Chat ID</strong> terlebih dahulu.';
+    return;
+  }
+
+  resBox.style.display = 'block';
+  resBox.style.background = '#E8F0FE';
+  resBox.style.color = '#1A73E8';
+  resBox.style.border = '1px solid #C2D7FA';
+  resBox.textContent = 'Mengirim pesan tes ke Telegram...';
+
+  try {
+    const res = await adminFetch('/api/admin/test-telegram', {
+      method: 'POST',
+      body: JSON.stringify({ bot_token, chat_id })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      resBox.style.background = '#DCE8D0';
+      resBox.style.color = '#2E5B1A';
+      resBox.style.border = '1px solid #C0D8AC';
+      resBox.innerHTML = '✅ <strong>Berhasil!</strong> Pesan tes telah masuk ke Telegram Anda. Jangan lupa klik <strong>"💾 Simpan Perubahan"</strong> di atas.';
+    } else {
+      resBox.style.background = '#F8D7DA';
+      resBox.style.color = '#721C24';
+      resBox.style.border = '1px solid #F5C6CB';
+      resBox.innerHTML = '❌ <strong>Gagal:</strong> ' + (data.error || 'Periksa kembali Bot Token dan Chat ID Anda.');
+    }
+  } catch (err) {
+    resBox.style.background = '#F8D7DA';
+    resBox.style.color = '#721C24';
+    resBox.style.border = '1px solid #F5C6CB';
+    resBox.innerHTML = '❌ Terjadi kesalahan: ' + err.message;
   }
 }
 

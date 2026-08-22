@@ -349,6 +349,27 @@ router.post('/bookings', async (req, res) => {
       created_at: new Date().toISOString()
     }).catch(() => {});
 
+    // Dispatch Instant Telegram Alert to Admin
+    const { sendNewBookingTelegramAlert } = require('../lib/telegram');
+    sendNewBookingTelegramAlert({
+      bookingCode: result.bookingCode,
+      clientName: b.clientName,
+      clientPhone: b.clientPhone,
+      clientCountry: b.clientCountry || 'Indonesia',
+      serviceName: service.name,
+      packageName: pkg.name,
+      date: b.date,
+      startTime: b.startTime,
+      endTime: result.endTime,
+      locationName: location ? location.name : 'Madinah Area',
+      occasion: b.occasion || 'Umrah',
+      numberOfPeople: b.numberOfPeople || 1,
+      depositAmount,
+      totalPrice: pkg.price,
+      currency: pkg.currency || 'SAR',
+      hasProof: !!b.paymentProof
+    }, db).catch(err => console.error('Telegram dispatch notice:', err.message));
+
     // Webhook Notification Dispatcher (WhatsApp Gateway / Telegram / Slack)
     const webhookUrl = process.env.WHATSAPP_WEBHOOK_URL || process.env.NOTIFICATION_WEBHOOK_URL;
     if (webhookUrl) {

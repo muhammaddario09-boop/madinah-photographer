@@ -664,4 +664,30 @@ router.put('/settings', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Test Telegram Notification
+router.post('/test-telegram', async (req, res) => {
+  try {
+    const { sendTelegramMessage } = require('../lib/telegram');
+    const { bot_token, chat_id } = req.body || {};
+    const testMessage = [
+      `🎉 <b>TES KONEKSI TELEGRAM BOT — UMROH LENS</b> 🇸🇦`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `✅ Selamat! Bot Telegram Anda telah <b>berhasil terhubung</b> dengan sistem website UMROH LENS Madinah.`,
+      ``,
+      `⏰ Waktu Uji Coba: <b>${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Riyadh' })} (Waktu Madinah)</b>`,
+      `📢 Setiap ada jemaah yang melakukan booking di website, Anda akan langsung menerima notifikasi instan di chat ini!`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `🌐 Panel Admin: <a href="https://madinah-photographer.vercel.app/admin/bookings.html">madinah-photographer.vercel.app</a>`
+    ].join('\n');
+
+    const result = await sendTelegramMessage(testMessage, db, bot_token, chat_id);
+    if (!result.ok) {
+      return res.status(400).json({ error: result.error });
+    }
+    res.json({ ok: true, message: 'Notifikasi uji coba berhasil dikirim ke Telegram Anda!' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;
