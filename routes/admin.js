@@ -239,6 +239,25 @@ router.post('/bookings/:id/status', async (req, res) => {
   }
 });
 
+router.post('/bookings/:id/drive', async (req, res) => {
+  try {
+    const { drive_url } = req.body || {};
+    const cleanUrl = String(drive_url || '').trim();
+
+    let booking = db.prepare(`SELECT * FROM bookings WHERE id=? OR booking_code=?`).get(req.params.id, req.params.id);
+    if (booking) {
+      db.prepare(`UPDATE bookings SET drive_url = ?, updated_at = datetime('now') WHERE id = ?`).run(
+        cleanUrl || null, booking.id
+      );
+      recordBookingToCloud({ booking_code: booking.booking_code, drive_url: cleanUrl || null }).catch(() => {});
+    }
+
+    res.json({ ok: true, drive_url: cleanUrl, booking_id: req.params.id });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.delete('/bookings/:id', async (req, res) => {
   try {
     await deleteBookingFromSupabase(req.params.id);

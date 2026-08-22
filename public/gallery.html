@@ -218,11 +218,11 @@ async function lookupGallery(codeParam) {
             ${s.name} • 📅 ${b.date} • 📍 ${loc.name || 'Madinah Area'} • Booking ID: <strong>${b.booking_code}</strong>
           </p>
         </div>
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
           <a href="/invoice.html?code=${b.booking_code}" target="_blank" class="btn btn-ghost" style="padding:10px 18px; font-size:0.85rem;">
             🧾 Lihat Kuitansi
           </a>
-          <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding:10px 20px; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px; background:#25D366; border-color:#25D366; color:#fff;">
+          <a href="${b.drive_url || 'https://drive.google.com'}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding:10px 20px; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px; background:#25D366; border-color:#25D366; color:#fff; text-decoration:none; border-radius:4px; font-weight:600;">
             <span>📥 Download Folder Google Drive (Original RAW)</span>
           </a>
         </div>

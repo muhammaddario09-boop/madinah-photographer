@@ -35,6 +35,11 @@ try {
   db.exec(`ALTER TABLE payments ADD COLUMN proof_url TEXT;`);
 } catch (e) {}
 
+// Migration: add drive_url column to bookings if not present
+try {
+  db.exec(`ALTER TABLE bookings ADD COLUMN drive_url TEXT;`);
+} catch (e) {}
+
 // Ensure Admin User credentials
 const { hashPassword } = require('./lib/auth');
 const { ensureAdminUserInSupabase } = require('./lib/supabase');

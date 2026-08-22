@@ -128,6 +128,14 @@ async function loadSettings() {
           </div>
 
           <div class="form-group">
+            <label>Default Google Drive Master Folder URL</label>
+            <input type="url" id="default_drive_url" value="${data.default_drive_url || 'https://drive.google.com'}" placeholder="https://drive.google.com/drive/folders/...">
+            <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
+              Link folder Google Drive umum jika klien belum memiliki link folder khusus.
+            </small>
+          </div>
+
+          <div class="form-group">
             <label>Instagram Handle Studio</label>
             <input type="text" id="instagram_handle" value="${data.instagram_handle || '@umrohlens'}">
           </div>
@@ -206,6 +214,7 @@ async function saveAllSettings() {
   const payload = {
     idr_sar_rate: document.getElementById('idr_sar_rate').value,
     buffer_minutes: document.getElementById('buffer_minutes').value,
+    default_drive_url: document.getElementById('default_drive_url').value,
     admin_whatsapp: document.getElementById('admin_whatsapp').value,
     admin_whatsapp_2: document.getElementById('admin_whatsapp_2').value,
     instagram_handle: document.getElementById('instagram_handle').value,
