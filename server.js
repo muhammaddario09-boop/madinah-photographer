@@ -40,14 +40,14 @@ const adminAuth = (req, res, next) => {
 // Clean URL routes for Admin and Public
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
 app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
-app.get('/admin', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
-app.get('/admin/bookings', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'bookings.html')));
-app.get('/admin/calendar', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'calendar.html')));
-app.get('/admin/portfolio', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'portfolio.html')));
-app.get('/admin/services', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
-app.get('/admin/locations', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'locations.html')));
-app.get('/admin/availability', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
-app.get('/admin/settings', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'settings.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
+app.get('/admin/bookings', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'bookings.html')));
+app.get('/admin/calendar', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'calendar.html')));
+app.get('/admin/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'portfolio.html')));
+app.get('/admin/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
+app.get('/admin/locations', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'locations.html')));
+app.get('/admin/availability', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
+app.get('/admin/settings', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'settings.html')));
 
 app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));
 app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'portfolio.html')));

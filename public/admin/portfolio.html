@@ -164,13 +164,13 @@ async function loadPortfolio() {
         <h2 style="font-family:var(--font-display); font-size:1.2rem; margin-bottom:14px;">Upload New Photo from Device</h2>
         <form id="add-photo-form">
           
-          <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('file-picker').click()">
+          <label class="upload-dropzone" id="dropzone" for="file-picker" style="display:block; cursor:pointer;">
             <input type="file" id="file-picker" accept="image/*" style="display:none;">
             <div style="font-size: 2rem; margin-bottom: 6px;">📁</div>
-            <strong style="font-size: 0.95rem; display:block; color:var(--charcoal);">Click to select a photo file or Drag & Drop here</strong>
+            <strong style="font-size: 0.95rem; display:block; color:var(--charcoal);">Click to select a photo file or Drag &amp; Drop here</strong>
             <span style="font-size:0.8rem; color:var(--charcoal-soft);">Supports JPG, PNG, WEBP from your phone or computer</span>
             <div><img id="img-preview" class="preview-box"></div>
-          </div>
+          </label>
 
           <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px;">
             <div class="form-row">

@@ -12,6 +12,7 @@ const {
   fetchDashboardStatsFromSupabase,
   fetchBookingDetailsFromSupabase,
   updateBookingStatusInSupabase,
+  updateBookingDriveUrlInSupabase,
   deleteBookingFromSupabase,
   resetAllBookingsInSupabase,
   fetchServicesFromSupabase,
@@ -251,6 +252,8 @@ router.post('/bookings/:id/drive', async (req, res) => {
       );
       recordBookingToCloud({ booking_code: booking.booking_code, drive_url: cleanUrl || null }).catch(() => {});
     }
+
+    await updateBookingDriveUrlInSupabase(req.params.id, cleanUrl).catch(() => {});
 
     res.json({ ok: true, drive_url: cleanUrl, booking_id: req.params.id });
   } catch (e) {

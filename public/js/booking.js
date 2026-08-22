@@ -311,13 +311,18 @@ function renderPayment() {
       <label style="display:block; font-size:0.8rem; font-weight:700; color:var(--charcoal-soft); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">
         Unggah Bukti Transfer Uang Muka (Opsional / Jika Sudah Ada)
       </label>
-      <div style="border:1px dashed var(--line); background:#fff; padding:16px; text-align:center; border-radius:6px; cursor:pointer;" onclick="document.getElementById('proof-file-input').click()">
+      <label for="proof-file-input" style="display:block; border:2px dashed var(--gold-soft); background:#fff; padding:20px; text-align:center; border-radius:8px; cursor:pointer; transition:background 0.2s;">
         <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
-        <span style="font-size:0.88rem; color:var(--charcoal-soft);">Klik di sini jika Anda sudah memiliki bukti transfer deposit</span>
+        <div style="font-size:1.4rem; margin-bottom:4px;">📎</div>
+        <div style="font-size:0.9rem; font-weight:600; color:var(--charcoal);">Pilih Foto / Screenshot Bukti Transfer dari Perangkat</div>
+        <div style="font-size:0.78rem; color:var(--charcoal-soft); margin-top:2px;">Format JPG, PNG, atau WEBP (Maks 10MB)</div>
         <div>
-          <img id="proof-preview" src="${paymentProof}" style="max-height:140px; max-width:100%; border-radius:4px; margin-top:8px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
+          <img id="proof-preview" src="${paymentProof}" style="max-height:140px; max-width:100%; border-radius:4px; margin-top:12px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
         </div>
-      </div>
+      </label>
+      <small style="display:block; color:var(--charcoal-soft); font-size:0.76rem; margin-top:6px;">
+        💡 <em>Catatan: Anda juga bisa langsung melampirkan foto screenshot transfer saat chat di WhatsApp setelah ini.</em>
+      </small>
     </div>
 
     <div class="actions-row">
@@ -346,6 +351,15 @@ function renderConfirmation() {
       <div style="display:inline-block; background:#DCE8D0; color:#3E5B2A; font-size:0.76rem; font-weight:600; padding:4px 14px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;">Booking Received</div>
       <h1 style="font-size:2.4rem; margin-top:4px; color:var(--charcoal);">${r.bookingCode}</h1>
       <p style="color:var(--charcoal-soft); font-size:0.95rem; margin-top:8px;">Terima kasih ${state.client.name || ''}, reservasi sesi foto Anda telah terdata di sistem kami.</p>
+    </div>
+
+    <div style="text-align:center; margin:32px 0;">
+      <a class="btn" href="${waUrl}" target="_blank" style="background:#25D366; color:#121210; font-weight:700; padding:14px 28px; font-size:1rem; border-radius:4px; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+        <span style="font-size:1.2rem;">📱</span> Buka WhatsApp &amp; Kirim Bukti
+      </a>
+      <p style="font-size:0.8rem; color:var(--charcoal-soft); margin-top:8px;">
+        💡 Silakan lampirkan / kirimkan foto screenshot bukti transfer di dalam obrolan WhatsApp tersebut.
+      </p>
     </div>
 
     <div class="manifest" style="margin-bottom:32px;">
