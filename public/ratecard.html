@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Official Rate Card & Price List 2026 — UMROH LENS Madinah</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
   body {
@@ -12,10 +12,10 @@
     color: #1C1814;
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
-    padding: 40px 20px 80px;
+    padding: 30px 20px 80px;
   }
   .ratecard-paper {
-    max-width: 860px;
+    max-width: 880px;
     margin: 0 auto;
     background: #FFFFFF;
     border: 1px solid rgba(184, 144, 69, 0.25);
@@ -23,6 +23,12 @@
     padding: 48px;
     box-shadow: 0 16px 48px rgba(28, 24, 20, 0.08);
     position: relative;
+    transition: all 0.3s ease;
+  }
+  .ratecard-paper.rtl {
+    direction: rtl;
+    text-align: right;
+    font-family: 'Amiri', 'Plus Jakarta Sans', serif;
   }
   .ratecard-paper::before {
     content: '';
@@ -37,8 +43,8 @@
   .rc-header {
     text-align: center;
     border-bottom: 1px solid var(--line);
-    padding-bottom: 32px;
-    margin-bottom: 36px;
+    padding-bottom: 30px;
+    margin-bottom: 32px;
   }
   .rc-brand {
     font-family: 'Fraunces', Georgia, serif;
@@ -57,11 +63,11 @@
     margin-top: 4px;
   }
   .rc-category {
-    margin-bottom: 36px;
+    margin-bottom: 34px;
   }
   .rc-cat-title {
     font-family: 'Fraunces', Georgia, serif;
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     color: var(--charcoal);
     border-bottom: 2px solid var(--gold);
     display: inline-block;
@@ -84,11 +90,14 @@
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
   }
+  .ratecard-paper.rtl .pkg-table th {
+    text-align: right;
+  }
   .pkg-table td {
     padding: 14px;
     border-bottom: 1px solid var(--line);
     font-size: 0.9rem;
-    vertical-align: top;
+    vertical-align: middle;
   }
   .pkg-badge {
     display: inline-block;
@@ -104,14 +113,14 @@
     background: var(--ivory);
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 32px;
+    padding: 22px 24px;
+    margin-bottom: 30px;
   }
   .benefit-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 14px;
+    gap: 12px;
+    margin-top: 12px;
   }
   .benefit-item {
     font-size: 0.88rem;
@@ -121,114 +130,138 @@
     color: var(--charcoal);
   }
   .no-print {
-    max-width: 860px;
-    margin: 0 auto 20px;
+    max-width: 880px;
+    margin: 0 auto 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
   }
+  .lang-switcher-bar {
+    display: flex;
+    gap: 6px;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    padding: 4px 6px;
+  }
+  .lang-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--charcoal-soft);
+    transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: var(--charcoal);
+    color: #FFFFFF;
+  }
   @media print {
     body { background: #FFFFFF; padding: 0; }
-    .ratecard-paper { box-shadow: none; border: none; padding: 20px; max-width: 100%; }
+    .ratecard-paper { box-shadow: none; border: none; padding: 10px; max-width: 100%; }
     .no-print { display: none; }
+  }
+  @media (max-width: 768px) {
+    .ratecard-paper { padding: 24px 18px; }
+    .benefit-grid { grid-template-columns: 1fr; }
+    .pkg-table th, .pkg-table td { padding: 10px 8px; font-size: 0.82rem; }
   }
 </style>
 </head>
 <body>
 
 <div class="no-print">
-  <div style="display:flex; gap:10px;">
-    <a href="/services.html" class="btn btn-ghost">← Kembali ke Layanan</a>
-    <a href="/" class="btn btn-ghost">Beranda</a>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <a href="/services.html" class="btn btn-ghost" style="padding:8px 14px; font-size:0.82rem;">← Layanan</a>
+    <a href="/" class="btn btn-ghost" style="padding:8px 14px; font-size:0.82rem;">Beranda</a>
+    
+    <!-- Multi-Language Switcher (ID / EN / AR) -->
+    <div class="lang-switcher-bar">
+      <button class="lang-btn active" onclick="setLanguage('id', this)">🇮🇩 ID</button>
+      <button class="lang-btn" onclick="setLanguage('en', this)">🇬🇧 EN</button>
+      <button class="lang-btn" onclick="setLanguage('ar', this)">🇸🇦 العربية</button>
+    </div>
   </div>
-  <div style="display:flex; gap:10px;">
-    <button onclick="window.print()" class="btn btn-primary" style="display:flex; align-items:center; gap:8px;">
+
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <button onclick="window.print()" class="btn btn-primary" style="display:flex; align-items:center; gap:8px; padding:9px 18px; font-size:0.84rem;">
       <span>🖨️ Cetak / Simpan PDF</span>
     </button>
-    <a href="https://wa.me/6282175272547?text=Halo%20Admin%20UMROH%20LENS%20Madinah%2C%20saya%20sudah%20melihat%20Rate%20Card%20PDF%20dan%20ingin%20konsultasi%20paket%20sesi%20foto." target="_blank" rel="noopener" class="btn" style="background:#25D366; color:#fff; display:flex; align-items:center; gap:8px; border:none; text-decoration:none; padding:10px 18px; border-radius:4px; font-weight:600;">
+    <a id="rc-top-wa" href="https://wa.me/6282175272547?text=Halo%20Admin%20UMROH%20LENS%20Madinah%2C%20saya%20sudah%20melihat%20Rate%20Card%20PDF%20dan%20ingin%20konsultasi%20paket%20sesi%20foto." target="_blank" rel="noopener" class="btn" style="background:#25D366; color:#fff; display:flex; align-items:center; gap:8px; border:none; text-decoration:none; padding:9px 18px; border-radius:4px; font-weight:600; font-size:0.84rem;">
       <span>💬 Chat WhatsApp Admin</span>
     </a>
   </div>
 </div>
 
-<div class="ratecard-paper">
+<div class="ratecard-paper" id="rc-paper">
   <!-- Header -->
   <div class="rc-header">
     <div class="rc-brand">
       UMROH LENS
-      <span>Official Photography Rate Card &amp; Catalog • Season 2026</span>
+      <span id="t-subtitle">Official Photography Rate Card &amp; Catalog • Season 2026</span>
     </div>
-    <p style="color:var(--charcoal-soft); font-size:0.92rem; max-width:600px; margin:10px auto 0; line-height:1.5;">
+    <p id="t-desc" style="color:var(--charcoal-soft); font-size:0.92rem; max-width:620px; margin:10px auto 0; line-height:1.5;">
       Dokumentasi Profesional di Madinah Al-Munawwarah • Fotografer Mukim Berizin • Arahan Pose Ramah Keluarga &amp; Lansia • Cloud Delivery 24-48 Jam.
     </p>
   </div>
 
   <!-- Standard Inclusion Box -->
   <div class="benefit-card">
-    <h4 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin:0 0 6px; font-weight:700;">
+    <h4 id="t-inc-title" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin:0 0 6px; font-weight:700;">
       ✨ SETIAP SESI SUDAH TERMASUK (ALL INCLUSIVE):
     </h4>
-    <div class="benefit-grid">
+    <div class="benefit-grid" id="t-inc-grid">
       <div class="benefit-item">✅ 100% Seluruh File RAW Original Diberikan</div>
       <div class="benefit-item">✅ Foto High-Res Pilihan Berwarna Elegan (Color Graded)</div>
-      <div class="benefit-item">✅ Fotografer Muslim Mukim Berbahasa Indonesia</div>
+      <div class="benefit-item">✅ Fotografer Muslim Mukim Berbahasa Indonesia &amp; Arab</div>
       <div class="benefit-item">✅ Pemandu Spot Terbaik (Masjid Nabawi, Kubah Hijau, Quba)</div>
       <div class="benefit-item">✅ Pengiriman Privat Google Drive High-Speed 24-48 Jam</div>
-      <div class="benefit-item">✅ Garansi Kepuasan &amp; Bebas Reschedule Jika Sakit/Uzur</div>
+      <div class="benefit-item">✅ Garansi Kepuasan &amp; Bebas Reschedule Jika Uzur/Sakit</div>
     </div>
   </div>
 
   <!-- Catalog Section 1: Portrait & Family -->
   <div class="rc-category">
-    <div class="rc-cat-title">1. Sesi Foto Jemaah, Pasangan &amp; Keluarga</div>
+    <div class="rc-cat-title" id="t-cat1-title">1. Sesi Foto Jemaah, Pasangan &amp; Keluarga</div>
     <table class="pkg-table">
       <thead>
         <tr>
-          <th>Kategori Layanan</th>
-          <th>Rincian Paket</th>
-          <th>Durasi</th>
-          <th>Output Hasil</th>
-          <th>Konsultasi Harga</th>
+          <th id="th-srv">Kategori Layanan</th>
+          <th id="th-pkg">Rincian Paket</th>
+          <th id="th-dur">Durasi</th>
+          <th id="th-out">Output Hasil</th>
+          <th id="th-prc">Konsultasi Harga</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="tb-cat1">
         <tr>
-          <td>
-            <strong>Madinah Portrait</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Individu / Single Jemaah</span>
-          </td>
+          <td><strong>Madinah Portrait</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Individu / Single Jemaah</span></td>
           <td><span class="pkg-badge">Standard / Signature</span></td>
           <td>45 - 60 Menit</td>
           <td>15 Foto Edit + Semua RAW</td>
           <td><strong>Bespoke / Hubungi WA</strong></td>
         </tr>
         <tr>
-          <td>
-            <strong>Couple Session</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Pasangan Suami Istri / Honeymoon</span>
-          </td>
+          <td><strong>Couple Session</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Pasangan Suami Istri / Honeymoon</span></td>
           <td><span class="pkg-badge">Signature Romance</span></td>
           <td>60 - 90 Menit</td>
           <td>25 Foto Edit + Semua RAW</td>
           <td><strong>Bespoke / Hubungi WA</strong></td>
         </tr>
         <tr>
-          <td>
-            <strong>Family Session</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Keluarga Besar / Bawa Orang Tua &amp; Anak</span>
-          </td>
+          <td><strong>Family Session</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Keluarga Besar / Bawa Orang Tua &amp; Anak</span></td>
           <td><span class="pkg-badge">Family Grand Heritage</span></td>
           <td>90 - 120 Menit</td>
           <td>35 Foto Edit + Semua RAW</td>
           <td><strong>Bespoke / Hubungi WA</strong></td>
         </tr>
         <tr>
-          <td>
-            <strong>Umrah Memory Session</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Dokumentasi Khusus Ibadah &amp; Momen Syahdu</span>
-          </td>
+          <td><strong>Umrah Memory Session</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Dokumentasi Khusus Ibadah &amp; Momen Syahdu</span></td>
           <td><span class="pkg-badge">Spiritual Exclusive</span></td>
           <td>60 Menit</td>
           <td>20 Foto Edit + Semua RAW</td>
@@ -240,53 +273,41 @@
 
   <!-- Catalog Section 2: Special & Cinematic -->
   <div class="rc-category">
-    <div class="rc-cat-title">2. Sesi Spesial, Tur Privat &amp; Video Sinematik</div>
+    <div class="rc-cat-title" id="t-cat2-title">2. Sesi Spesial, Tur Privat &amp; Video Sinematik</div>
     <table class="pkg-table">
       <thead>
         <tr>
-          <th>Kategori Layanan</th>
-          <th>Rincian Paket</th>
-          <th>Durasi</th>
-          <th>Output Hasil</th>
-          <th>Konsultasi Harga</th>
+          <th id="th-srv2">Kategori Layanan</th>
+          <th id="th-pkg2">Rincian Paket</th>
+          <th id="th-dur2">Durasi</th>
+          <th id="th-out2">Output Hasil</th>
+          <th id="th-prc2">Konsultasi Harga</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="tb-cat2">
         <tr>
-          <td>
-            <strong>Golden Hour Session</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Pencahayaan Magis Ba'da Shubuh / Ashar</span>
-          </td>
+          <td><strong>Golden Hour Session</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Pencahayaan Magis Ba'da Shubuh / Ashar</span></td>
           <td><span class="pkg-badge">Golden Magic</span></td>
           <td>60 Menit</td>
           <td>20 Foto Edit + Semua RAW</td>
           <td><strong>Bespoke / Hubungi WA</strong></td>
         </tr>
         <tr>
-          <td>
-            <strong>Private Tour + Photography</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Eksplorasi Ziarah Madinah &amp; Tempat Sejarah</span>
-          </td>
+          <td><strong>Private Tour + Photography</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Eksplorasi Ziarah Madinah &amp; Tempat Sejarah</span></td>
           <td><span class="pkg-badge">Full City Discovery</span></td>
           <td>180 Menit (Setengah Hari)</td>
           <td>50 Foto Edit + Semua RAW</td>
           <td><strong>Bespoke / Hubungi WA</strong></td>
         </tr>
         <tr>
-          <td>
-            <strong>Cinematic Video &amp; Reels</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Video Vertikal 4K Siap Tayang IG &amp; TikTok</span>
-          </td>
+          <td><strong>Cinematic Video &amp; Reels</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Video Vertikal 4K Siap Tayang IG &amp; TikTok</span></td>
           <td><span class="pkg-badge">Reels Masterpiece</span></td>
           <td>90 Menit</td>
           <td>2 Video Reels 60s + Foto</td>
           <td><strong>Bespoke / Hubungi WA</strong></td>
         </tr>
         <tr>
-          <td>
-            <strong>Drone &amp; Landmark Perspective</strong><br>
-            <span style="font-size:0.8rem; color:var(--charcoal-soft);">Sudut Udara 4K di Area Ziarah yang Diizinkan</span>
-          </td>
+          <td><strong>Drone &amp; Landmark Perspective</strong><br><span style="font-size:0.8rem; color:var(--charcoal-soft);">Sudut Udara 4K di Area Ziarah yang Diizinkan</span></td>
           <td><span class="pkg-badge">Aerial Cinematic</span></td>
           <td>60 Menit</td>
           <td>Footage Drone 4K + Foto</td>
@@ -296,14 +317,14 @@
     </table>
   </div>
 
-  <!-- Booking & Payment Guide -->
+  <!-- Booking & Payment Guide with Dynamic Supabase Info -->
   <div style="border-top:1px solid var(--line); padding-top:24px; margin-top:32px;">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;" id="rc-guide-grid">
       <div>
-        <h4 style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin:0 0 8px; font-weight:700;">
+        <h4 id="t-how-title" style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin:0 0 8px; font-weight:700;">
           CARA PEMESANAN &amp; KONSULTASI:
         </h4>
-        <ol style="font-size:0.86rem; color:var(--charcoal-soft); line-height:1.6; padding-left:18px; margin:0;">
+        <ol id="t-how-list" style="font-size:0.86rem; color:var(--charcoal-soft); line-height:1.6; padding-left:18px; margin:0;">
           <li>Hubungi Admin via WhatsApp atau isi form booking di website.</li>
           <li>Pilih layanan, tanggal sesi, dan waktu pemotretan yang diinginkan.</li>
           <li>Admin akan memberikan ketersediaan slot fotografer &amp; rincian penawaran resmi.</li>
@@ -311,16 +332,17 @@
         </ol>
       </div>
       <div>
-        <h4 style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin:0 0 8px; font-weight:700;">
+        <h4 id="t-contact-title" style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin:0 0 8px; font-weight:700;">
           KONTAK RESMI STUDIO:
         </h4>
-        <div style="font-size:0.88rem; color:var(--charcoal); line-height:1.6;">
+        <div style="font-size:0.88rem; color:var(--charcoal); line-height:1.6;" id="rc-contact-info">
           <strong>UMROH LENS Madinah</strong><br>
           📍 Madinah Al-Munawwarah, Kingdom of Saudi Arabia<br>
-          📱 WhatsApp 1: +62 821-7527-2547<br>
-          📱 WhatsApp 2: +62 812-3456-7890<br>
-          📸 Instagram: @umrohlens<br>
-          🌐 Website: madinah-photographer.vercel.app
+          📱 WhatsApp 1: <span id="dyn-wa1">+62 821-7527-2547</span><br>
+          📱 WhatsApp 2: <span id="dyn-wa2">+62 812-3456-7890</span><br>
+          🏦 Bank SAR: <span id="dyn-bank-sar">Al Rajhi Bank</span><br>
+          🏦 Bank IDR: <span id="dyn-bank-idr">BCA / Bank Syariah Indonesia</span><br>
+          📸 Instagram: @umrohlens
         </div>
       </div>
     </div>
@@ -328,7 +350,7 @@
 
   <!-- Official Seal Footer -->
   <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:24px; margin-top:28px;">
-    <div style="font-size:0.75rem; color:var(--charcoal-soft);">
+    <div style="font-size:0.75rem; color:var(--charcoal-soft);" id="t-copyright">
       © 2026 UMROH LENS. All rights reserved. Madinah Al-Munawwarah.
     </div>
     <div style="border:1px solid var(--gold); border-radius:4px; padding:4px 12px; font-size:0.72rem; color:var(--gold); font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">
@@ -337,6 +359,155 @@
   </div>
 </div>
 
+<script>
+// Dynamic Sync with Supabase /api/payment-info
+let rawWaNumber = '6282175272547';
+
+fetch('/api/payment-info')
+  .then(r => r.json())
+  .then(data => {
+    if (data.adminWhatsApp || data.whatsappNumber) {
+      const wa1 = data.adminWhatsApp || data.whatsappNumber;
+      rawWaNumber = wa1.replace(/[^0-9]/g, '');
+      const waEl1 = document.getElementById('dyn-wa1');
+      if (waEl1) waEl1.textContent = wa1;
+      const topWa = document.getElementById('rc-top-wa');
+      if (topWa) topWa.href = `https://wa.me/${rawWaNumber}?text=Halo%20Admin%20UMROH%20LENS%20Madinah%2C%20saya%20sudah%20melihat%20Rate%20Card%20PDF%20dan%20ingin%20konsultasi%20paket%20sesi%20foto.`;
+    }
+    if (data.adminWhatsApp2) {
+      const waEl2 = document.getElementById('dyn-wa2');
+      if (waEl2) waEl2.textContent = data.adminWhatsApp2;
+    }
+    if (data.bankSAR && data.bankSAR.name) {
+      const bSar = document.getElementById('dyn-bank-sar');
+      if (bSar) bSar.textContent = `${data.bankSAR.name} (${data.bankSAR.account || ''})`;
+    }
+    if (data.bankIDR && data.bankIDR.name) {
+      const bIdr = document.getElementById('dyn-bank-idr');
+      if (bIdr) bIdr.textContent = `${data.bankIDR.name} (${data.bankIDR.account || ''})`;
+    }
+  })
+  .catch(() => {});
+
+// Multi-Language Dictionary & Engine (ID / EN / AR)
+const I18N_RC = {
+  id: {
+    subtitle: 'Official Photography Rate Card & Catalog • Season 2026',
+    desc: 'Dokumentasi Profesional di Madinah Al-Munawwarah • Fotografer Mukim Berizin • Arahan Pose Ramah Keluarga & Lansia • Cloud Delivery 24-48 Jam.',
+    incTitle: '✨ SETIAP SESI SUDAH TERMASUK (ALL INCLUSIVE):',
+    incItems: [
+      '✅ 100% Seluruh File RAW Original Diberikan',
+      '✅ Foto High-Res Pilihan Berwarna Elegan (Color Graded)',
+      '✅ Fotografer Muslim Mukim Berbahasa Indonesia & Arab',
+      '✅ Pemandu Spot Terbaik (Masjid Nabawi, Kubah Hijau, Quba)',
+      '✅ Pengiriman Privat Google Drive High-Speed 24-48 Jam',
+      '✅ Garansi Kepuasan & Bebas Reschedule Jika Uzur/Sakit'
+    ],
+    cat1Title: '1. Sesi Foto Jemaah, Pasangan & Keluarga',
+    cat2Title: '2. Sesi Spesial, Tur Privat & Video Sinematik',
+    thSrv: 'Kategori Layanan', thPkg: 'Rincian Paket', thDur: 'Durasi', thOut: 'Output Hasil', thPrc: 'Konsultasi Harga',
+    howTitle: 'CARA PEMESANAN & KONSULTASI:',
+    howList: [
+      'Hubungi Admin via WhatsApp atau isi form booking di website.',
+      'Pilih layanan, tanggal sesi, dan waktu pemotretan yang diinginkan.',
+      'Admin akan memberikan ketersediaan slot fotografer & rincian penawaran resmi.',
+      'Kunci jadwal dengan uang muka deposit (Transfer BCA/Mandiri IDR atau Al Rajhi SAR).'
+    ],
+    contactTitle: 'KONTAK RESMI STUDIO:',
+    copyright: '© 2026 UMROH LENS. Hak cipta dilindungi undang-undang. Madinah Al-Munawwarah.'
+  },
+  en: {
+    subtitle: 'Official Photography Rate Card & Catalog • Season 2026',
+    desc: 'Professional Photography in Madinah Al-Munawwarah • Licensed Resident Photographers • Family & Senior-Friendly Posing • Fast Cloud Delivery 24-48h.',
+    incTitle: '✨ EVERY SESSION INCLUDES (ALL INCLUSIVE):',
+    incItems: [
+      '✅ 100% Full Original RAW Files Delivered',
+      '✅ Curated High-Res Edited Photos (Color Graded)',
+      '✅ Licensed Resident Muslim Photographer (English/Arabic/Indonesian)',
+      '✅ Guided Access to Best Holy Landmarks (Nabawi, Green Dome, Quba)',
+      '✅ Private High-Speed Google Drive Delivery in 24-48 Hours',
+      '✅ 100% Satisfaction Guarantee & Free Rescheduling if Ill/Delayed'
+    ],
+    cat1Title: '1. Pilgrim, Couple & Family Portrait Sessions',
+    cat2Title: '2. Special Sessions, Private Tours & Cinematic Reels',
+    thSrv: 'Service Category', thPkg: 'Package Tier', thDur: 'Duration', thOut: 'Deliverables', thPrc: 'Investment & Inquiries',
+    howTitle: 'BOOKING & CONSULTATION STEPS:',
+    howList: [
+      'Contact our team via WhatsApp or complete the reservation form on our website.',
+      'Select your preferred service, session date, and photoshoot time slot.',
+      'Our team will verify photographer availability and provide the official quotation.',
+      'Secure your slot with a deposit payment (Saudi SAR via Al Rajhi or Indonesian IDR).'
+    ],
+    contactTitle: 'OFFICIAL STUDIO CONTACTS:',
+    copyright: '© 2026 UMROH LENS. All rights reserved. Madinah Al-Munawwarah, Kingdom of Saudi Arabia.'
+  },
+  ar: {
+    subtitle: 'دليل الأسعار الرسمي وكتالوج التصوير الاحترافي • موسم 2026',
+    desc: 'توثيق احترافي في المدينة المنورة • مصورون مقيمون معتمدون • توجيه لطيف ومناسب للعائلات وكبار السن • تسليم سحابي خاص خلال 24-48 ساعة.',
+    incTitle: '✨ جميع الجلسات تشمل المميزات التالية (شاملة بالكامل):',
+    incItems: [
+      '✅ تسليم جميع الصور الأصلية الكاملة RAW بنسبة 100%',
+      '✅ صور معدلة عالية الدقة بألوان سينمائية فاخرة',
+      '✅ مصور مسلم مقيم بالمدينة يتحدث العربية والإنجليزية والإندونيسية',
+      '✅ إرشاد لأجمل زوايا المسجد النبوي وقباء وجبل أحد',
+      '✅ تسليم خاص وسريع عبر Google Drive خلال 24-48 ساعة',
+      '✅ ضمان الرضا التام وإمكانية إعادة الجدولة مجاناً في حال العذر'
+    ],
+    cat1Title: '١. جلسات تصوير الأفراد، الأزواج والعائلات',
+    cat2Title: '٢. الجلسات الخاصة، الجولات التوثيقية والفيديو السينمائي',
+    thSrv: 'نوع الخدمة', thPkg: 'الباقة', thDur: 'المدة', thOut: 'المخرجات', thPrc: 'الاستفسار والأسعار',
+    howTitle: 'خطوات الحجز والاستفسار:',
+    howList: [
+      'تواصل مع فريقنا عبر الواتساب أو أكمل نموذج الحجز على الموقع.',
+      'اختر الخدمة المطلوبة وتاريخ ووقت الجلسة المناسب لك.',
+      'سيقوم الفريق بتأكيد توفر المصور وتقديم عرض السعر الرسمي.',
+      'تأكيد حجز الموعد بدفع العربون (حساب الراجحي بالريال السعودي أو التحويل البنكي).'
+    ],
+    contactTitle: 'بيانات التواصل الرسمية:',
+    copyright: '© 2026 عدسة العمرة - UMROH LENS. جميع الحقوق محفوظة. المدينة المنورة، المملكة العربية السعودية.'
+  }
+};
+
+function setLanguage(lang, btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const dict = I18N_RC[lang] || I18N_RC.id;
+  const paper = document.getElementById('rc-paper');
+
+  if (lang === 'ar') {
+    paper.classList.add('rtl');
+  } else {
+    paper.classList.remove('rtl');
+  }
+
+  document.getElementById('t-subtitle').textContent = dict.subtitle;
+  document.getElementById('t-desc').textContent = dict.desc;
+  document.getElementById('t-inc-title').textContent = dict.incTitle;
+  
+  const incGrid = document.getElementById('t-inc-grid');
+  if (incGrid) {
+    incGrid.innerHTML = dict.incItems.map(it => `<div class="benefit-item">${it}</div>`).join('');
+  }
+
+  document.getElementById('t-cat1-title').textContent = dict.cat1Title;
+  document.getElementById('t-cat2-title').textContent = dict.cat2Title;
+
+  ['th-srv', 'th-srv2'].forEach(id => document.getElementById(id).textContent = dict.thSrv);
+  ['th-pkg', 'th-pkg2'].forEach(id => document.getElementById(id).textContent = dict.thPkg);
+  ['th-dur', 'th-dur2'].forEach(id => document.getElementById(id).textContent = dict.thDur);
+  ['th-out', 'th-out2'].forEach(id => document.getElementById(id).textContent = dict.thOut);
+  ['th-prc', 'th-prc2'].forEach(id => document.getElementById(id).textContent = dict.thPrc);
+
+  document.getElementById('t-how-title').textContent = dict.howTitle;
+  const howList = document.getElementById('t-how-list');
+  if (howList) {
+    howList.innerHTML = dict.howList.map(li => `<li>${li}</li>`).join('');
+  }
+  document.getElementById('t-contact-title').textContent = dict.contactTitle;
+  document.getElementById('t-copyright').textContent = dict.copyright;
+}
+</script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

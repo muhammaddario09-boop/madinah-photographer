@@ -325,6 +325,31 @@ router.post('/bookings', async (req, res) => {
       created_at: new Date().toISOString()
     }).catch(() => {});
 
+    // Webhook Notification Dispatcher (WhatsApp Gateway / Telegram / Slack)
+    const webhookUrl = process.env.WHATSAPP_WEBHOOK_URL || process.env.NOTIFICATION_WEBHOOK_URL;
+    if (webhookUrl) {
+      try {
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'NEW_BOOKING_RESERVATION',
+            booking_code: result.bookingCode,
+            client_name: b.clientName,
+            client_phone: b.clientPhone,
+            service: `${service.name} (${pkg.name})`,
+            date: b.date,
+            time: `${b.startTime} - ${result.endTime}`,
+            location: location ? location.name : 'Madinah Area',
+            has_payment_proof: !!b.paymentProof,
+            created_at: new Date().toISOString()
+          })
+        }).catch(err => console.error('Webhook notification notice:', err.message));
+      } catch(err) {
+        console.error('Webhook trigger notice:', err.message);
+      }
+    }
+
     return res.status(201).json({
       bookingCode: result.bookingCode,
       id: result.id,

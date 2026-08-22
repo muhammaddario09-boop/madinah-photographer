@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Portofolio — UMROH LENS Madinah</title>
+<title>Portofolio & Galeri — UMROH LENS Madinah</title>
+<meta name="description" content="Koleksi foto portofolio resmi UMROH LENS di Madinah Al-Munawwarah. Momen sakral jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami.">
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .portfolio-grid-warm {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 28px;
-    margin-top: 36px;
+    margin-top: 32px;
   }
   .portfolio-card-warm {
     background: #FFFFFF;
@@ -78,13 +79,13 @@
   .category-filter-bar {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    margin-top: 24px;
   }
   .filter-btn-warm {
-    padding: 9px 20px;
-    font-size: 0.84rem;
+    padding: 9px 22px;
+    font-size: 0.85rem;
     font-weight: 600;
     border-radius: 30px;
     border: 1px solid var(--line);
@@ -100,7 +101,7 @@
     box-shadow: 0 4px 14px rgba(28, 24, 20, 0.15);
   }
 
-  /* Lightbox Modal */
+  /* Lightbox Modal & Inquiry Box */
   .lightbox-modal {
     display: none;
     position: fixed;
@@ -108,31 +109,69 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(18, 16, 14, 0.92);
-    backdrop-filter: blur(10px);
+    background: rgba(18, 16, 14, 0.94);
+    backdrop-filter: blur(12px);
     z-index: 99999;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 20px;
   }
   .lightbox-modal.active { display: flex; }
+  .lightbox-content-box {
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
   .lightbox-img-el {
-    max-width: 90vw;
-    max-height: 84vh;
-    border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    width: 100%;
+    max-height: 65vh;
+    object-fit: contain;
+    background: #1C1814;
+  }
+  .lightbox-info-bar {
+    width: 100%;
+    padding: 18px 24px;
+    background: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    border-top: 1px solid var(--line);
   }
   .lightbox-close-btn {
     position: absolute;
-    top: 24px;
-    right: 32px;
-    font-size: 2.2rem;
+    top: 14px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    background: rgba(28, 24, 20, 0.7);
     color: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
     cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+  .lightbox-close-btn:hover {
+    background: #000;
   }
 
   @media (max-width: 768px) {
     .portfolio-grid-warm { grid-template-columns: 1fr; }
+    .lightbox-info-bar { flex-direction: column; align-items: flex-start; }
+    .lightbox-info-bar .btn { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -160,24 +199,26 @@
 </nav>
 
 <!-- Page Header -->
-<header class="section-tight" style="text-align:center; padding-top:60px; padding-bottom:20px;">
+<header class="section-tight" style="text-align:center; padding-top:60px; padding-bottom:10px;">
   <div class="container">
     <p class="eyebrow">GALERI DOKUMENTASI RESMI</p>
     <h1 style="margin-top:12px;">Portofolio Foto di Kota Madinah</h1>
-    <p style="color:var(--charcoal-soft); max-width:640px; margin:14px auto 0; font-size:1.05rem;">Dokumentasi nyata jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami di sudut-sudut terindah kota Nabi.</p>
+    <p style="color:var(--charcoal-soft); max-width:680px; margin:14px auto 0; font-size:1.05rem;">
+      Dokumentasi nyata jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami di sudut-sudut terindah kota Nabi.
+    </p>
   </div>
 </header>
 
 <!-- Category Filter -->
 <div class="container">
   <div class="category-filter-bar">
-    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)">Semua Foto</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Masjid Nabawi', this)">Masjid Nabawi</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)">Couple / Pasangan</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Family', this)">Keluarga</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)">Ibadah Umrah</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)">Jabal Uhud &amp; Quba</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)">4K Cinematic</button>
+    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)">✨ Semua Foto</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Nabawi', this)">🕌 Masjid Nabawi</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)">💍 Pasangan / Couple</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Family', this)">👨‍👩‍👧‍👦 Keluarga</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)">🕋 Ibadah Umrah</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)">⛰️ Jabal Uhud &amp; Quba</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)">🎬 4K Cinematic Reels</button>
   </div>
 </div>
 
@@ -185,16 +226,33 @@
 <section class="section" style="padding-top:20px;">
   <div class="container">
     <div class="portfolio-grid-warm" id="gallery-grid">
-      <!-- Populated via JS from Supabase /api/portfolio -->
       <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat galeri dari Supabase...</div>
     </div>
   </div>
 </section>
 
-<!-- Lightbox Modal -->
+<!-- Lightbox Modal with Interactive WhatsApp Inquire Button -->
 <div class="lightbox-modal" id="lightbox" onclick="closeLightbox(event)">
-  <div class="lightbox-close-btn" onclick="closeLightbox(event)">×</div>
-  <img class="lightbox-img-el" id="lightbox-img" src="" alt="Full view">
+  <div class="lightbox-content-box" onclick="event.stopPropagation()">
+    <div class="lightbox-close-btn" onclick="closeLightboxDirect()">×</div>
+    <img class="lightbox-img-el" id="lightbox-img" src="" alt="Full view">
+    <div class="lightbox-info-bar">
+      <div>
+        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--gold); font-weight:700; letter-spacing:0.08em;" id="lightbox-cat">
+          MADINAH PHOTO
+        </div>
+        <h3 style="font-size:1.15rem; margin:2px 0 4px; color:var(--charcoal);" id="lightbox-title">
+          Foto Kenangan Madinah
+        </h3>
+        <div style="font-size:0.82rem; color:var(--charcoal-soft);" id="lightbox-loc">
+          📍 Masjid Nabawi, Madinah
+        </div>
+      </div>
+      <a id="lightbox-wa-btn" href="#" target="_blank" rel="noopener" class="btn" style="background:#25D366; color:#fff; text-decoration:none; padding:10px 20px; font-size:0.86rem; border-radius:4px; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+        <span>💬 Mau Foto Seperti Ini? Tanya via WA</span>
+      </a>
+    </div>
+  </div>
 </div>
 
 <!-- Warm Luxury Editorial Footer -->
@@ -207,6 +265,17 @@
 
 <script>
 let allPhotos = [];
+let adminWa = '6282175272547';
+
+// Load payment info for dynamic WhatsApp contact
+fetch('/api/payment-info')
+  .then(r => r.json())
+  .then(info => {
+    if (info.whatsappNumber) {
+      adminWa = info.whatsappNumber.replace(/[^0-9]/g, '');
+    }
+  })
+  .catch(() => {});
 
 fetch('/api/portfolio')
   .then(r => r.json())
@@ -226,8 +295,8 @@ function renderGallery(photos) {
     return;
   }
 
-  grid.innerHTML = photos.map(p => `
-    <div class="portfolio-card-warm" onclick="openLightbox('${p.image_url}')">
+  grid.innerHTML = photos.map((p, idx) => `
+    <div class="portfolio-card-warm" onclick="openLightbox(${idx})">
       <div class="portfolio-thumb-warm" style="background-image:url('${p.image_url}');">
         <span class="portfolio-badge-warm">${p.category || 'Madinah'}</span>
       </div>
@@ -242,26 +311,48 @@ function renderGallery(photos) {
   `).join('');
 }
 
+let activeFilteredPhotos = [];
+
 function filterGallery(category, btn) {
   document.querySelectorAll('.filter-btn-warm').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
   if (category === 'ALL') {
+    activeFilteredPhotos = allPhotos;
     renderGallery(allPhotos);
   } else {
-    const filtered = allPhotos.filter(p => (p.category || '').toLowerCase().includes(category.toLowerCase()));
-    renderGallery(filtered);
+    activeFilteredPhotos = allPhotos.filter(p => 
+      (p.category || '').toLowerCase().includes(category.toLowerCase()) ||
+      (p.title || '').toLowerCase().includes(category.toLowerCase()) ||
+      (p.location || '').toLowerCase().includes(category.toLowerCase())
+    );
+    renderGallery(activeFilteredPhotos);
   }
 }
 
-function openLightbox(url) {
-  document.getElementById('lightbox-img').src = url;
+function openLightbox(idx) {
+  const list = activeFilteredPhotos.length > 0 ? activeFilteredPhotos : allPhotos;
+  const p = list[idx] || allPhotos[idx];
+  if (!p) return;
+
+  document.getElementById('lightbox-img').src = p.image_url;
+  document.getElementById('lightbox-cat').textContent = p.category || 'DOKUMENTASI MADINAH';
+  document.getElementById('lightbox-title').textContent = p.title;
+  document.getElementById('lightbox-loc').textContent = '📍 ' + (p.location || 'Masjid Nabawi, Madinah');
+
+  const waMsg = encodeURIComponent(`Assalamu'alaikum Admin UMROH LENS Madinah, saya tertarik dengan konsep foto referensi "${p.title}" (${p.location || 'Madinah'}). Boleh info ketersediaan slot fotografer & penawaran paket resminya? Terima kasih.`);
+  document.getElementById('lightbox-wa-btn').href = `https://wa.me/${adminWa}?text=${waMsg}`;
+
   document.getElementById('lightbox').classList.add('active');
 }
 
+function closeLightboxDirect() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+
 function closeLightbox(e) {
-  if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close-btn')) {
-    document.getElementById('lightbox').classList.remove('active');
+  if (e.target.id === 'lightbox') {
+    closeLightboxDirect();
   }
 }
 </script>
