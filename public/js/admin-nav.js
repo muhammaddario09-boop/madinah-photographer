@@ -95,6 +95,7 @@ function renderAdminNav(active) {
     ['Services & Pricing', '/admin/services.html', 'services'],
     ['Locations & Spots', '/admin/locations.html', 'locations'],
     ['Portfolio & Photos', '/admin/portfolio.html', 'portfolio'],
+    ['Pengaturan & Kurs', '/admin/settings.html', 'settings'],
   ];
 
   document.write(`

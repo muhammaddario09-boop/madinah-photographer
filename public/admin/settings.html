@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengaturan Kurs &amp; Studio — UMROH LENS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+<style>
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+  }
+  .settings-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(28, 24, 20, 0.04);
+  }
+  .settings-card h3 {
+    font-size: 1.15rem;
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--charcoal);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--charcoal-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--charcoal);
+    background: #FAFAF8;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: #FFFFFF;
+  }
+  .toast-alert {
+    display: none;
+    padding: 12px 18px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+  .toast-success {
+    background: #DCE8D0;
+    color: #2E5B1A;
+    border: 1px solid #C0D8AC;
+  }
+</style>
+</head>
+<body class="admin">
+<script src="/js/admin-nav.js"></script>
+<script>renderAdminNav('settings');</script>
+
+<script>
+async function loadSettings() {
+  const main = document.getElementById('admin-main');
+  main.innerHTML = `<h1 class="admin-h1">Pengaturan Kurs &amp; Studio</h1><p class="admin-sub">Memuat konfigurasi...</p>`;
+
+  try {
+    const res = await adminFetch('/api/admin/settings');
+    const data = res.ok ? await res.json() : {};
+
+    main.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h1 class="admin-h1" style="margin-bottom:4px;">Pengaturan Kurs &amp; Studio</h1>
+          <p class="admin-sub" style="margin-top:0;">Kelola nilai tukar mata uang (SAR → IDR), kontak WhatsApp, dan nomor rekening resmi studio.</p>
+        </div>
+        <button onclick="saveAllSettings()" class="btn btn-primary" style="padding:10px 24px; font-weight:600; display:flex; align-items:center; gap:8px;">
+          <span>💾 Simpan Perubahan</span>
+        </button>
+      </div>
+
+      <div id="toast" class="toast-alert toast-success">
+        ✅ Pengaturan berhasil disimpan dan disinkronkan ke Supabase!
+      </div>
+
+      <div class="settings-grid">
+        <!-- 1. Kurs & Buffer Settings -->
+        <div class="settings-card">
+          <h3>💱 Kurs Mata Uang &amp; Sesi</h3>
+          
+          <div class="form-group">
+            <label>Nilai Tukar Kurs (1 SAR = ... Rupiah IDR)</label>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:700; color:var(--gold);">1 SAR = Rp</span>
+              <input type="number" id="idr_sar_rate" value="${data.idr_sar_rate || 4200}" style="font-size:1.1rem; font-weight:700; color:var(--charcoal);">
+            </div>
+            <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
+              Digunakan saat perhitungan invoice, konversi rupiah di rate card, dan deposit.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Jeda Waktu Antar Sesi (Buffer Minutes)</label>
+            <input type="number" id="buffer_minutes" value="${data.buffer_minutes || 30}">
+            <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
+              Waktu istirahat/perjalanan fotografer sebelum sesi berikutnya (dalam menit).
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Instagram Handle Studio</label>
+            <input type="text" id="instagram_handle" value="${data.instagram_handle || '@umrohlens'}">
+          </div>
+        </div>
+
+        <!-- 2. WhatsApp Admin Contacts -->
+        <div class="settings-card">
+          <h3>📱 Kontak WhatsApp Resmi</h3>
+          
+          <div class="form-group">
+            <label>Nomor WhatsApp Utama (Admin 1)</label>
+            <input type="text" id="admin_whatsapp" value="${data.admin_whatsapp || '+6282175272547'}">
+            <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
+              Nomor yang menerima pesan booking otomatis dari website &amp; Rate Card PDF.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Nomor WhatsApp Cadangan (Admin 2)</label>
+            <input type="text" id="admin_whatsapp_2" value="${data.admin_whatsapp_2 || '+6281234567890'}">
+          </div>
+
+          <div class="form-group">
+            <label>Instagram URL</label>
+            <input type="text" id="instagram_url" value="${data.instagram_url || 'https://instagram.com/umrohlens'}">
+          </div>
+        </div>
+
+        <!-- 3. Saudi Bank Account (SAR) -->
+        <div class="settings-card">
+          <h3>🇸🇦 Rekening Bank Saudi (SAR)</h3>
+          
+          <div class="form-group">
+            <label>Nama Bank Saudi</label>
+            <input type="text" id="bank_sar_name" value="${data.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)'}">
+          </div>
+
+          <div class="form-group">
+            <label>Nomor Rekening / IBAN</label>
+            <input type="text" id="bank_sar_account" value="${data.bank_sar_account || 'SA84 8000 0123 4567 8901 2345'}">
+          </div>
+
+          <div class="form-group">
+            <label>Atas Nama (Account Holder)</label>
+            <input type="text" id="bank_sar_holder" value="${data.bank_sar_holder || 'UMROH LENS Photography Studio'}">
+          </div>
+        </div>
+
+        <!-- 4. Indonesian Bank Account (IDR) -->
+        <div class="settings-card">
+          <h3>🇮🇩 Rekening Bank Indonesia (Rupiah)</h3>
+          
+          <div class="form-group">
+            <label>Nama Bank Indonesia (BCA / BSI / Mandiri)</label>
+            <input type="text" id="bank_idr_name" value="${data.bank_idr_name || 'Bank Central Asia (BCA) / BSI'}">
+          </div>
+
+          <div class="form-group">
+            <label>Nomor Rekening</label>
+            <input type="text" id="bank_idr_account" value="${data.bank_idr_account || '5420123456 (BCA)'}">
+          </div>
+
+          <div class="form-group">
+            <label>Atas Nama (Account Holder)</label>
+            <input type="text" id="bank_idr_holder" value="${data.bank_idr_holder || 'WAHYU AFRIANSYAH'}">
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    main.innerHTML = `<div class="error-msg">Gagal memuat pengaturan: ${err.message}</div>`;
+  }
+}
+
+async function saveAllSettings() {
+  const payload = {
+    idr_sar_rate: document.getElementById('idr_sar_rate').value,
+    buffer_minutes: document.getElementById('buffer_minutes').value,
+    admin_whatsapp: document.getElementById('admin_whatsapp').value,
+    admin_whatsapp_2: document.getElementById('admin_whatsapp_2').value,
+    instagram_handle: document.getElementById('instagram_handle').value,
+    instagram_url: document.getElementById('instagram_url').value,
+    bank_sar_name: document.getElementById('bank_sar_name').value,
+    bank_sar_account: document.getElementById('bank_sar_account').value,
+    bank_sar_holder: document.getElementById('bank_sar_holder').value,
+    bank_idr_name: document.getElementById('bank_idr_name').value,
+    bank_idr_account: document.getElementById('bank_idr_account').value,
+    bank_idr_holder: document.getElementById('bank_idr_holder').value,
+  };
+
+  try {
+    const res = await adminFetch('/api/admin/settings', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    } else {
+      const err = await res.json();
+      alert('Gagal menyimpan: ' + (err.error || 'Terjadi kesalahan'));
+    }
+  } catch (e) {
+    alert('Gagal menyimpan: ' + e.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadSettings);
+</script>
+</body>
+</html>

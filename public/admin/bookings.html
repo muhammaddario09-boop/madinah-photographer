@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bookings — UMROH LENS Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Bookings &amp; Reservasi — UMROH LENS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
 </head>
@@ -13,6 +13,13 @@
 <script>renderAdminNav('bookings');</script>
 <script>
 const STATUSES = ['PENDING','AWAITING_PAYMENT','CONFIRMED','RESCHEDULE_REQUESTED','COMPLETED','CANCELLED','NO_SHOW'];
+const PAY_STATUSES = [
+  ['UNPAID', '⏳ Belum Bayar (UNPAID)'],
+  ['DEPOSIT_PAID', '✅ DP Terbayar (DEPOSIT_PAID)'],
+  ['PAID', '💰 Lunas (PAID)'],
+  ['REFUNDED', '↩️ Refund (REFUNDED)']
+];
+
 async function loadBookings(status) {
   try {
     const url = status ? `/api/admin/bookings?status=${status}` : '/api/admin/bookings';
@@ -23,68 +30,125 @@ async function loadBookings(status) {
     return [];
   }
 }
+
 async function draw(status) {
   const main = document.getElementById('admin-main');
-  main.innerHTML = `<h1 class="admin-h1">Bookings</h1><p class="admin-sub">Loading reservations...</p>`;
+  main.innerHTML = `<h1 class="admin-h1">Bookings</h1><p class="admin-sub">Memuat daftar reservasi...</p>`;
   const bookings = await loadBookings(status);
+
   main.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-      <h1 class="admin-h1" style="margin-bottom:0;">Bookings</h1>
+      <div>
+        <h1 class="admin-h1" style="margin-bottom:4px;">Kelola Bookings &amp; Pembayaran</h1>
+        <p class="admin-sub" style="margin-top:0;">${bookings.length} reservasi terdaftar di sistem</p>
+      </div>
       <button onclick="resetAllDemoBookings()" class="btn" style="background:#dc3545; color:#fff; font-size:0.75rem; padding:6px 14px; border-radius:4px; border:none; cursor:pointer; font-weight:500;">
         🧹 Reset Data Demo (Mulai dari 0)
       </button>
     </div>
-    <p class="admin-sub" style="margin-top:-6px; margin-bottom:16px;">${bookings.length} booking(s) registered</p>
-    <div class="admin-toolbar" style="margin-bottom:18px;">
+
+    <div class="admin-toolbar" style="margin-bottom:18px; display:flex; gap:12px; align-items:center;">
       <select id="status-filter">
-        <option value="">All statuses</option>
+        <option value="">Semua Status Sesi</option>
         ${STATUSES.map(s => `<option value="${s}" ${s===status?'selected':''}>${s.replace('_',' ')}</option>`).join('')}
       </select>
     </div>
+
     <table class="admin-table">
-      <thead><tr><th>Booking</th><th>Date</th><th>Client</th><th>Service</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Kode Booking</th>
+          <th>Tanggal &amp; Waktu</th>
+          <th>Data Jemaah</th>
+          <th>Layanan</th>
+          <th>Status Pembayaran</th>
+          <th>Status Sesi</th>
+          <th>Aksi Cepat</th>
+        </tr>
+      </thead>
       <tbody>
-        ${bookings.length === 0 ? '<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--charcoal-soft);">Belum ada data booking. Database bersih (0 bookings).</td></tr>' : ''}
-        ${bookings.map(b => `
-          <tr>
-            <td><strong>${b.booking_code}</strong></td>
-            <td>${b.date}<br><span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.start_time} - ${b.end_time}</span></td>
-            <td>${b.client_name}<br><span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.client_phone}</span></td>
-            <td>${b.service_name}</td>
-            <td>
-              <div>${b.currency} ${b.deposit_amount} <span style="font-size:0.72rem; color:var(--charcoal-soft);">(Deposit)</span></div>
-              ${b.proof_url ? `<button type="button" onclick="showProof('${b.booking_code}', '${encodeURIComponent(b.proof_url)}')" style="margin-top:4px; padding:3px 8px; font-size:0.7rem; background:#DCE8D0; color:#3E5B2A; border:1px solid #c0d8ac; border-radius:2px; cursor:pointer;">📸 View Proof</button>` : '<span style="font-size:0.72rem; color:var(--charcoal-soft);">No proof</span>'}
-            </td>
-            <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
-            <td style="white-space:nowrap;">
-              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                <a href="/invoice.html?code=${b.booking_code}" target="_blank" title="Cetak Kuitansi Resmi" style="background:var(--ivory); color:var(--charcoal); border:1px solid var(--line); padding:4px 8px; font-size:0.75rem; border-radius:3px; text-decoration:none;">🧾 Invoice</a>
-                <a href="/gallery.html?code=${b.booking_code}" target="_blank" title="Buka Galeri Klien" style="background:#EBF5EC; color:#155724; border:1px solid #C3E6CB; padding:4px 8px; font-size:0.75rem; border-radius:3px; text-decoration:none;">📸 Galeri</a>
-                <select data-id="${b.id}" data-current="${b.status}" class="status-select" style="font-size:0.8rem; padding:4px 6px;">
-                  <option value="">Status…</option>
-                  ${STATUSES.map(s => `<option value="${s}">${s.replace('_',' ')}</option>`).join('')}
+        ${bookings.length === 0 ? '<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--charcoal-soft);">Belum ada data booking.</td></tr>' : ''}
+        ${bookings.map(b => {
+          const payBg = b.payment_status === 'PAID' ? '#DCE8D0' : (b.payment_status === 'DEPOSIT_PAID' ? '#EBF5EC' : '#FFF3CD');
+          const payColor = b.payment_status === 'PAID' ? '#2E5B1A' : (b.payment_status === 'DEPOSIT_PAID' ? '#155724' : '#856404');
+          return `
+            <tr>
+              <td>
+                <strong style="color:var(--charcoal);">${b.booking_code}</strong>
+                ${b.created_at ? `<div style="font-size:0.72rem; color:var(--charcoal-soft);">${new Date(b.created_at).toLocaleDateString('id-ID')}</div>` : ''}
+              </td>
+              <td>
+                <strong>${b.date}</strong><br>
+                <span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.start_time} - ${b.end_time}</span>
+              </td>
+              <td>
+                <strong>${b.client_name}</strong><br>
+                <a href="https://wa.me/${(b.client_phone||'').replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--gold); font-size:0.78rem; text-decoration:none;">
+                  📱 ${b.client_phone}
+                </a>
+              </td>
+              <td>
+                <strong>${b.service_name || 'Madinah Photo'}</strong>
+                <div style="font-size:0.74rem; color:var(--charcoal-soft);">${b.package_name || ''}</div>
+              </td>
+              <td>
+                <div style="margin-bottom:4px; font-weight:600; font-size:0.85rem;">
+                  ${b.currency} ${b.deposit_amount} <span style="font-size:0.72rem; font-weight:normal; color:var(--charcoal-soft);">(DP)</span>
+                </div>
+                <select data-id="${b.id}" class="pay-status-select" style="font-size:0.74rem; padding:4px 6px; border-radius:4px; font-weight:600; background:${payBg}; color:${payColor}; border:1px solid rgba(0,0,0,0.1); cursor:pointer;">
+                  ${PAY_STATUSES.map(([pval, plabel]) => `
+                    <option value="${pval}" ${b.payment_status === pval ? 'selected' : ''}>${plabel}</option>
+                  `).join('')}
                 </select>
-                <button onclick="deleteSingleBooking('${b.id}', '${b.booking_code}')" title="Hapus Booking" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:4px 8px; font-size:0.75rem; border-radius:3px; cursor:pointer;">🗑️</button>
-              </div>
-            </td>
-          </tr>
-        `).join('')}
+                ${b.proof_url ? `
+                  <div style="margin-top:4px;">
+                    <button type="button" onclick="showProof('${b.booking_code}', '${encodeURIComponent(b.proof_url)}')" style="padding:2px 6px; font-size:0.68rem; background:#DCE8D0; color:#3E5B2A; border:1px solid #c0d8ac; border-radius:2px; cursor:pointer;">
+                      📸 Lihat Bukti Transfer
+                    </button>
+                  </div>
+                ` : ''}
+              </td>
+              <td>
+                <span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span>
+              </td>
+              <td style="white-space:nowrap;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <a href="/invoice.html?code=${b.booking_code}" target="_blank" title="Cetak Kuitansi Resmi" style="background:var(--ivory); color:var(--charcoal); border:1px solid var(--line); padding:4px 8px; font-size:0.75rem; border-radius:3px; text-decoration:none;">
+                    🧾 Invoice
+                  </a>
+                  <a href="/gallery.html?code=${b.booking_code}" target="_blank" title="Buka Galeri Klien" style="background:#EBF5EC; color:#155724; border:1px solid #C3E6CB; padding:4px 8px; font-size:0.75rem; border-radius:3px; text-decoration:none;">
+                    📸 Galeri
+                  </a>
+                  <select data-id="${b.id}" data-current="${b.status}" class="status-select" style="font-size:0.76rem; padding:4px 6px;">
+                    <option value="">Ubah Status…</option>
+                    ${STATUSES.map(s => `<option value="${s}">${s.replace('_',' ')}</option>`).join('')}
+                  </select>
+                  <button onclick="deleteSingleBooking('${b.id}', '${b.booking_code}')" title="Hapus Booking" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:4px 8px; font-size:0.75rem; border-radius:3px; cursor:pointer;">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('')}
       </tbody>
     </table>
 
     <!-- Modal for Payment Proof Preview -->
     <div id="proof-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
       <div style="background:#fff; padding:24px; border-radius:6px; max-width:500px; width:90%; max-height:85vh; overflow-y:auto; text-align:center; position:relative;">
-        <h3 id="modal-title" style="margin-bottom:14px; font-family:var(--font-display);">Payment Proof</h3>
+        <h3 id="modal-title" style="margin-bottom:14px; font-family:var(--font-display);">Bukti Pembayaran</h3>
         <img id="modal-img" style="max-width:100%; max-height:60vh; border-radius:4px; border:1px solid var(--line); object-fit:contain;">
         <div style="margin-top:16px;">
-          <button class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Close Preview</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Tutup Preview</button>
         </div>
       </div>
     </div>
   `;
 
   document.getElementById('status-filter')?.addEventListener('change', (e) => draw(e.target.value));
+
+  // Change Session Status
   document.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async (e) => {
       if (!e.target.value) return;
@@ -94,6 +158,20 @@ async function draw(status) {
       });
       const data = await res.json();
       if (!res.ok) { alert(data.error); }
+      draw(status);
+    });
+  });
+
+  // Change Payment Status (Verify Payment)
+  document.querySelectorAll('.pay-status-select').forEach(sel => {
+    sel.addEventListener('change', async (e) => {
+      const newPayStatus = e.target.value;
+      const res = await adminFetch(`/api/admin/bookings/${e.target.dataset.id}/status`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ payment_status: newPayStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || 'Gagal mengubah status pembayaran'); }
       draw(status);
     });
   });
@@ -109,35 +187,39 @@ async function deleteSingleBooking(id, code) {
       const d = await res.json();
       alert(d.error || 'Gagal menghapus booking');
     }
-  } catch (e) {
-    alert('Gagal menghapus: ' + e.message);
+  } catch (err) {
+    alert('Terjadi kesalahan: ' + err.message);
   }
 }
 
 async function resetAllDemoBookings() {
-  if (!confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA data booking demo dan memulai dari 0?\n\nSemua riwayat booking & tes akan dibersihkan.')) return;
+  const confirmed = confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA DATA BOOKING DEMO? Semua jadwal sesi dan riwayat pembayaran demo akan direset bersih.');
+  if (!confirmed) return;
+
   try {
     const res = await adminFetch('/api/admin/bookings/reset-all', { method: 'POST' });
     if (res.ok) {
-      alert('Semua data booking demo berhasil dibersihkan! Anda sekarang mulai dari 0 booking.');
+      alert('Semua data booking demo berhasil dibersihkan! Database sekarang bersih (0 bookings).');
       draw();
     } else {
       const d = await res.json();
-      alert(d.error || 'Gagal mereset booking.');
+      alert('Gagal mereset: ' + (d.error || 'Terjadi kesalahan'));
     }
-  } catch(e) {
-    alert('Gagal mereset: ' + e.message);
+  } catch (err) {
+    alert('Terjadi kesalahan: ' + err.message);
   }
 }
 
-function showProof(code, encodedUrl) {
+function showProof(code, proofUrl) {
   const modal = document.getElementById('proof-modal');
-  document.getElementById('modal-title').textContent = `Payment Proof — ${code}`;
-  document.getElementById('modal-img').src = decodeURIComponent(encodedUrl);
+  const title = document.getElementById('modal-title');
+  const img = document.getElementById('modal-img');
+  title.textContent = `Bukti Transfer Booking: ${code}`;
+  img.src = decodeURIComponent(proofUrl);
   modal.style.display = 'flex';
 }
 
-draw();
+document.addEventListener('DOMContentLoaded', () => draw());
 </script>
 </body>
 </html>

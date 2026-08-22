@@ -47,6 +47,7 @@ app.get('/admin/portfolio', adminAuth, (req, res) => res.sendFile(path.join(__di
 app.get('/admin/services', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'services.html')));
 app.get('/admin/locations', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'locations.html')));
 app.get('/admin/availability', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'availability.html')));
+app.get('/admin/settings', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'settings.html')));
 
 app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));
 app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'portfolio.html')));

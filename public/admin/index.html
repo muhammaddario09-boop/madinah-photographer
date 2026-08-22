@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Al-Madani Photography</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Admin Dashboard — UMROH LENS Madinah</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
+<style>
+  .kpi-card {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+</style>
 </head>
 <body class="admin">
 <script src="/js/admin-nav.js"></script>
@@ -15,31 +25,80 @@
 (async function () {
   const main = document.getElementById('admin-main');
   main.innerHTML = `
-    <h1 class="admin-h1">Dashboard</h1>
-    <p class="admin-sub">Today, Asia/Riyadh time.</p>
-    <div class="kpi-row" id="kpis"></div>
-    <h2 style="font-family:var(--font-display); font-size:1.2rem; margin-bottom:14px;">Today's shoots</h2>
-    <table class="admin-table" id="today-table"><tbody></tbody></table>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+      <div>
+        <h1 class="admin-h1" style="margin-bottom:4px;">Dashboard</h1>
+        <p class="admin-sub" style="margin-top:0;">Waktu Operasional: Asia/Riyadh (Madinah Al-Munawwarah)</p>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <a href="/admin/settings.html" class="btn btn-ghost" style="font-size:0.8rem; padding:8px 14px;">
+          ⚙️ Ubah Kurs &amp; Kontak Studio
+        </a>
+        <a href="/admin/bookings.html" class="btn btn-primary" style="font-size:0.8rem; padding:8px 14px;">
+          📋 Kelola Bookings
+        </a>
+      </div>
+    </div>
+
+    <div class="kpi-row" id="kpis">
+      <div style="color:var(--charcoal-soft);">Memuat data metrik...</div>
+    </div>
+
+    <h2 style="font-family:var(--font-display); font-size:1.2rem; margin-top:32px; margin-bottom:14px;">Jadwal Sesi Hari Ini (Today's Shoots)</h2>
+    <table class="admin-table" id="today-table">
+      <thead>
+        <tr>
+          <th>Jam Sesi</th>
+          <th>Layanan</th>
+          <th>Nama Jemaah</th>
+          <th>Fotografer</th>
+          <th>Status Sesi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   `;
-  const kpis = await adminFetch('/api/admin/dashboard').then(r => r.json());
-  document.getElementById('kpis').innerHTML = `
-    <div class="kpi-card"><div class="kpi-label">Today's Shoots</div><div class="kpi-value">${kpis.todayShoots}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Upcoming Bookings</div><div class="kpi-value">${kpis.upcoming}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Pending Payments</div><div class="kpi-value">${kpis.pendingPayments}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Revenue</div><div class="kpi-value">SAR ${kpis.revenue}</div></div>
-  `;
-  const today = new Date().toISOString().slice(0,10);
-  const bookings = await adminFetch(`/api/admin/bookings?from=${today}&to=${today}`).then(r => r.json());
-  const tbody = document.querySelector('#today-table tbody');
-  tbody.innerHTML = bookings.length ? bookings.map(b => `
-    <tr>
-      <td>${b.start_time} – ${b.end_time}</td>
-      <td>${b.service_name}</td>
-      <td>${b.client_name}</td>
-      <td>${b.photographer_name}</td>
-      <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
-    </tr>
-  `).join('') : `<tr><td style="color:var(--charcoal-soft);">No sessions scheduled today.</td></tr>`;
+
+  try {
+    const kpis = await adminFetch('/api/admin/dashboard').then(r => r.json());
+    document.getElementById('kpis').innerHTML = `
+      <div class="kpi-card" onclick="window.location.href='/admin/calendar.html'">
+        <div class="kpi-label">TODAY'S SHOOTS</div>
+        <div class="kpi-value">${kpis.todayShoots || 0}</div>
+        <small style="color:var(--gold); font-size:0.72rem;">Buka Kalender →</small>
+      </div>
+      <div class="kpi-card" onclick="window.location.href='/admin/bookings.html'">
+        <div class="kpi-label">UPCOMING BOOKINGS</div>
+        <div class="kpi-value">${kpis.upcoming || 0}</div>
+        <small style="color:var(--gold); font-size:0.72rem;">Lihat Semua →</small>
+      </div>
+      <div class="kpi-card" onclick="window.location.href='/admin/bookings.html'" style="${(kpis.pendingPayments || 0) > 0 ? 'border-left:4px solid #e0a800;' : ''}">
+        <div class="kpi-label">PENDING PAYMENTS</div>
+        <div class="kpi-value" style="${(kpis.pendingPayments || 0) > 0 ? 'color:#856404;' : ''}">${kpis.pendingPayments || 0}</div>
+        <small style="color:var(--gold); font-size:0.72rem;">Verifikasi Pembayaran →</small>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">REVENUE TERKUMPUL</div>
+        <div class="kpi-value">SAR ${kpis.revenue || 0}</div>
+        <small style="color:var(--charcoal-soft); font-size:0.72rem;">Total Deposit/Lunas</small>
+      </div>
+    `;
+
+    const today = new Date().toISOString().slice(0,10);
+    const bookings = await adminFetch(`/api/admin/bookings?from=${today}&to=${today}`).then(r => r.json());
+    const tbody = document.querySelector('#today-table tbody');
+    tbody.innerHTML = (Array.isArray(bookings) && bookings.length) ? bookings.map(b => `
+      <tr>
+        <td><strong>${b.start_time} – ${b.end_time}</strong></td>
+        <td>${b.service_name}</td>
+        <td>${b.client_name}</td>
+        <td>${b.photographer_name || 'UMROH LENS'}</td>
+        <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
+      </tr>
+    `).join('') : `<tr><td colspan="5" style="color:var(--charcoal-soft); padding:20px; text-align:center;">Tidak ada jadwal pemotretan hari ini.</td></tr>`;
+  } catch (err) {
+    console.error('Dashboard load error:', err);
+  }
 })();
 </script>
 </body>
