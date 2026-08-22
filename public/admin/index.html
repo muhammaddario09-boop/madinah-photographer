@@ -8,14 +8,13 @@
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
 <style>
-  .kpi-card {
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  }
+  .kpi-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.10); }
+  .quick-link { display:flex; align-items:center; gap:10px; padding:14px 16px; background:#fff; border:1px solid var(--line); border-radius:6px; text-decoration:none; color:var(--charcoal); font-size:0.88rem; font-weight:600; transition:all 0.18s; }
+  .quick-link:hover { border-color:var(--gold-soft); box-shadow:0 4px 14px rgba(0,0,0,0.07); transform:translateY(-2px); }
+  .quick-link .ql-icon { font-size:1.4rem; width:36px; text-align:center; flex-shrink:0; }
+  .quick-link small { display:block; font-weight:400; color:var(--charcoal-soft); font-size:0.76rem; margin-top:2px; }
+  .section-title { font-family:var(--font-display); font-size:1.15rem; margin:32px 0 14px; color:var(--charcoal); }
 </style>
 </head>
 <body class="admin">
@@ -24,27 +23,66 @@
 <script>
 (async function () {
   const main = document.getElementById('admin-main');
+  
+  // Get current Madinah time
+  const nowMadinah = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Riyadh', weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
   main.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:24px;">
       <div>
         <h1 class="admin-h1" style="margin-bottom:4px;">Dashboard</h1>
-        <p class="admin-sub" style="margin-top:0;">Waktu Operasional: Asia/Riyadh (Madinah Al-Munawwarah)</p>
+        <p class="admin-sub" style="margin-top:0;">🕌 Waktu Madinah: <strong>${nowMadinah}</strong></p>
       </div>
-      <div style="display:flex; gap:8px;">
-        <a href="/admin/settings.html" class="btn btn-ghost" style="font-size:0.8rem; padding:8px 14px;">
-          ⚙️ Ubah Kurs &amp; Kontak Studio
-        </a>
-        <a href="/admin/bookings.html" class="btn btn-primary" style="font-size:0.8rem; padding:8px 14px;">
-          📋 Kelola Bookings
-        </a>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="/admin/settings.html" class="btn btn-ghost" style="font-size:0.8rem; padding:8px 14px;">⚙️ Pengaturan & Kurs</a>
+        <a href="/admin/bookings.html" class="btn btn-primary" style="font-size:0.8rem; padding:8px 14px;">📋 Kelola Bookings</a>
       </div>
     </div>
 
+    <!-- KPI Cards -->
     <div class="kpi-row" id="kpis">
       <div style="color:var(--charcoal-soft);">Memuat data metrik...</div>
     </div>
 
-    <h2 style="font-family:var(--font-display); font-size:1.2rem; margin-top:32px; margin-bottom:14px;">Jadwal Sesi Hari Ini (Today's Shoots)</h2>
+    <!-- Quick Actions Grid -->
+    <p class="section-title">⚡ Aksi Cepat Admin</p>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:32px;">
+      <a href="/admin/bookings.html" class="quick-link">
+        <span class="ql-icon">📋</span>
+        <div><span>Kelola Bookings</span><small>Verifikasi pembayaran & status sesi</small></div>
+      </a>
+      <a href="/admin/calendar.html" class="quick-link">
+        <span class="ql-icon">📅</span>
+        <div><span>Kalender Sesi</span><small>Jadwal harian fotografer di Madinah</small></div>
+      </a>
+      <a href="/admin/portfolio.html" class="quick-link">
+        <span class="ql-icon">🖼️</span>
+        <div><span>Upload Portfolio</span><small>Tambah & kelola galeri foto</small></div>
+      </a>
+      <a href="/admin/availability.html" class="quick-link">
+        <span class="ql-icon">⏰</span>
+        <div><span>Ketersediaan</span><small>Atur jam operasional & libur</small></div>
+      </a>
+      <a href="/admin/services.html" class="quick-link">
+        <span class="ql-icon">📸</span>
+        <div><span>Layanan & Paket</span><small>Edit harga & detail paket</small></div>
+      </a>
+      <a href="/admin/locations.html" class="quick-link">
+        <span class="ql-icon">📍</span>
+        <div><span>Lokasi Pemotretan</span><small>Masjid Nabawi, Raudhah & lainnya</small></div>
+      </a>
+      <a href="/admin/settings.html" class="quick-link">
+        <span class="ql-icon">💱</span>
+        <div><span>Kurs & Rekening</span><small>Ubah rate SAR/IDR & nomor bank</small></div>
+      </a>
+      <a href="/ratecard.html" target="_blank" class="quick-link">
+        <span class="ql-icon">📄</span>
+        <div><span>Rate Card PDF</span><small>Buka & bagikan ke calon klien</small></div>
+      </a>
+    </div>
+
+    <!-- Today's Shoots Table -->
+    <p class="section-title">🎯 Jadwal Sesi Hari Ini</p>
     <table class="admin-table" id="today-table">
       <thead>
         <tr>
@@ -52,15 +90,33 @@
           <th>Layanan</th>
           <th>Nama Jemaah</th>
           <th>Fotografer</th>
+          <th>Pembayaran</th>
           <th>Status Sesi</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="today-tbody"><tr><td colspan="6" style="text-align:center; color:var(--charcoal-soft); padding:20px;">Memuat jadwal hari ini...</td></tr></tbody>
+    </table>
+
+    <!-- Pending Payments Table -->
+    <p class="section-title" id="pending-title" style="display:none;">⚠️ Pembayaran Menunggu Verifikasi</p>
+    <table class="admin-table" id="pending-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Kode Booking</th>
+          <th>Nama Jemaah</th>
+          <th>Layanan</th>
+          <th>Deposit</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="pending-tbody"></tbody>
     </table>
   `;
 
   try {
-    const kpis = await adminFetch('/api/admin/dashboard').then(r => r.json());
+    // Load KPIs
+    const kpisRes = await adminFetch('/api/admin/dashboard');
+    const kpis = await kpisRes.json();
     document.getElementById('kpis').innerHTML = `
       <div class="kpi-card" onclick="window.location.href='/admin/calendar.html'">
         <div class="kpi-label">TODAY'S SHOOTS</div>
@@ -84,18 +140,47 @@
       </div>
     `;
 
+    // Load today's bookings
     const today = new Date().toISOString().slice(0,10);
-    const bookings = await adminFetch(`/api/admin/bookings?from=${today}&to=${today}`).then(r => r.json());
-    const tbody = document.querySelector('#today-table tbody');
-    tbody.innerHTML = (Array.isArray(bookings) && bookings.length) ? bookings.map(b => `
-      <tr>
-        <td><strong>${b.start_time} – ${b.end_time}</strong></td>
-        <td>${b.service_name}</td>
-        <td>${b.client_name}</td>
-        <td>${b.photographer_name || 'UMROH LENS'}</td>
-        <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
-      </tr>
-    `).join('') : `<tr><td colspan="5" style="color:var(--charcoal-soft); padding:20px; text-align:center;">Tidak ada jadwal pemotretan hari ini.</td></tr>`;
+    const bookRes = await adminFetch(`/api/admin/bookings?from=${today}&to=${today}`);
+    const bookings = await bookRes.json();
+    const tbody = document.getElementById('today-tbody');
+    tbody.innerHTML = (Array.isArray(bookings) && bookings.length)
+      ? bookings.map(b => `
+        <tr>
+          <td><strong>${b.start_time} – ${b.end_time}</strong></td>
+          <td>${b.service_name}</td>
+          <td>
+            ${b.client_name}
+            ${b.client_phone ? `<br><a href="https://wa.me/${b.client_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:0.76rem; color:#25D366;">📱 ${b.client_phone}</a>` : ''}
+          </td>
+          <td>${b.photographer_name || 'UMROH LENS'}</td>
+          <td><span style="font-size:0.78rem; font-weight:600; color:${b.payment_status === 'PAID' ? '#2E5B1A' : b.payment_status === 'DEPOSIT_PAID' ? '#1a73e8' : '#856404'};">${b.payment_status?.replace('_',' ')}</span></td>
+          <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
+        </tr>
+      `).join('')
+      : `<tr><td colspan="6" style="color:var(--charcoal-soft); padding:20px; text-align:center;">Tidak ada jadwal pemotretan hari ini. Semua tenang! 🕌</td></tr>`;
+
+    // Load pending payments
+    const allRes = await adminFetch('/api/admin/bookings');
+    const allBookings = await allRes.json();
+    const pending = (Array.isArray(allBookings) ? allBookings : []).filter(b => b.payment_status === 'UNPAID' && b.status !== 'CANCELLED');
+    if (pending.length > 0) {
+      document.getElementById('pending-title').style.display = 'block';
+      document.getElementById('pending-table').style.display = 'table';
+      document.getElementById('pending-tbody').innerHTML = pending.map(b => `
+        <tr>
+          <td><a href="/admin/bookings.html" style="font-family:monospace; font-weight:600; color:var(--charcoal);">${b.booking_code}</a></td>
+          <td>${b.client_name} ${b.client_phone ? `<br><a href="https://wa.me/${b.client_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:0.76rem; color:#25D366;">📱 ${b.client_phone}</a>` : ''}</td>
+          <td>${b.service_name}</td>
+          <td style="font-weight:700; color:#856404;">${b.currency || 'SAR'} ${b.deposit_amount}</td>
+          <td>
+            <a href="/admin/bookings.html" class="btn btn-primary" style="font-size:0.76rem; padding:4px 12px;">Verifikasi →</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
   } catch (err) {
     console.error('Dashboard load error:', err);
   }

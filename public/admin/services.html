@@ -245,37 +245,17 @@ async function loadData() {
         <button class="btn btn-primary" onclick="savePhotographer()" style="padding:8px 18px; font-size:0.8rem;">Save Photographer Profile</button>
       </div>
 
-      <!-- Locations & Shooting Spots Section -->
-      <div class="service-card" style="border-left: 4px solid #3E5B2A; background:#fafcf8;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-          <div>
-            <h2 style="font-family:var(--font-display); font-size:1.3rem;">📍 Shooting Locations &amp; Spots</h2>
-            <p style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:2px;">Daftar lokasi pemotretan yang muncul saat klien melakukan booking.</p>
-          </div>
-          <button class="btn" onclick="addNewLocationPrompt()" style="background:#3E5B2A; color:#fff; padding:6px 14px; font-size:0.78rem; border-radius:3px; border:none; cursor:pointer;">➕ Tambah Lokasi Baru</button>
-        </div>
 
-        <div id="locations-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
-          ${(locations || []).map(loc => `
-            <div class="pkg-card" data-loc-id="${loc.id}" style="background:#fff; border:1px solid #d0dec4;">
-              <div class="form-row">
-                <label>Nama Tempat / Spot</label>
-                <input type="text" class="loc-name" value="${loc.name}" style="font-weight:600;">
-              </div>
-              <div class="form-row">
-                <label>Deskripsi Lokasi</label>
-                <input type="text" class="loc-desc" value="${loc.description || ''}">
-              </div>
-              <div class="form-row">
-                <label>Waktu Perjalanan / Buffer (Menit)</label>
-                <input type="number" class="loc-buffer" value="${loc.travel_buffer_minutes || 15}">
-              </div>
-              <div style="display:flex; gap:8px; margin-top:10px;">
-                <button class="btn btn-primary" onclick="saveLocation(${loc.id})" style="flex:1; padding:6px; font-size:0.75rem; background:#3E5B2A;">Simpan Lokasi</button>
-                <button onclick="deleteLocation(${loc.id}, '${loc.name}')" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:6px 10px; font-size:0.75rem; border-radius:3px; cursor:pointer;">🗑️</button>
-              </div>
-            </div>
-          `).join('')}
+      <!-- Locations: Managed in dedicated Locations & Spots page -->
+      <div class="service-card" style="border-left: 4px solid #3E5B2A; background:#fafcf8;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 style="font-family:var(--font-display); font-size:1.3rem;">📍 Lokasi & Shooting Spots</h2>
+            <p style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:4px;">Kelola daftar lokasi pemotretan (Masjid Nabawi, Kubah Hijau, Raudhah, dll.) melalui halaman khusus.</p>
+          </div>
+          <a href="/admin/locations.html" class="btn" style="background:#3E5B2A; color:#fff; padding:8px 16px; font-size:0.8rem; border-radius:3px; text-decoration:none; font-weight:600;">
+            📍 Buka Halaman Locations & Spots →
+          </a>
         </div>
       </div>
 
