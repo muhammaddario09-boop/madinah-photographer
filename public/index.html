@@ -298,17 +298,21 @@ fetch('/api/services')
   .then(services => {
     const grid = document.getElementById('services-grid');
     if (!services || services.length === 0 || !grid) return;
-    grid.innerHTML = services.slice(0,6).map(s => `
-      <a class="service-card" href="/booking.html?service=${s.slug}">
-        <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
-        <h3 style="font-size:1.25rem;">${s.name}</h3>
-        <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px; line-height:1.55; margin-bottom:16px;">${s.description}</p>
-        <div class="service-meta">
-          <span>⏱️ ${s.duration_minutes} Menit</span>
-          <span class="service-price" style="color:var(--gold); font-weight:600;">Bespoke • Pilih Jadwal →</span>
-        </div>
-      </a>
-    `).join('');
+    grid.innerHTML = services.slice(0,6).map(s => {
+      const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
+      const dur = isLong ? 120 : 90;
+      return `
+        <a class="service-card" href="/booking.html?service=${s.slug}">
+          <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
+          <h3 style="font-size:1.25rem;">${s.name}</h3>
+          <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px; line-height:1.55; margin-bottom:16px;">${s.description}</p>
+          <div class="service-meta" style="flex-wrap:wrap; gap:8px;">
+            <span>⏱️ <strong>${dur} Menit</strong> · 40 Edit + 1 Min Video</span>
+            <span class="service-price" style="color:var(--gold); font-weight:600;">Pilih Jadwal →</span>
+          </div>
+        </a>
+      `;
+    }).join('');
   });
 </script>
 <script src="/js/social-widget.js"></script>

@@ -30,8 +30,20 @@ router.get('/services', async (req, res) => {
     if (supaServices) return res.json(supaServices);
     const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order`).all();
     const full = services.map(s => {
-      const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(s.id);
-      return { ...s, packages };
+      const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
+      const standardDur = isLong ? 120 : 90;
+      const packages = [{
+        id: s.id * 10,
+        service_id: s.id,
+        name: 'Standard Bespoke Session',
+        description: `${standardDur} Menit Hunting, 40 Foto Edit + RAW + 1 Min Video`,
+        price: s.starting_price || 400,
+        currency: 'SAR',
+        duration_minutes: standardDur,
+        edited_photos: 40,
+        raw_photos_included: 1
+      }];
+      return { ...s, duration_minutes: standardDur, edited_photos: 40, packages };
     });
     res.json(full);
   } catch (err) {
@@ -50,8 +62,20 @@ router.get('/services/:slug', async (req, res) => {
     }
     const service = db.prepare(`SELECT * FROM services WHERE (slug=? OR id=? OR LOWER(slug)=LOWER(?)) AND active=1`).get(param, isNaN(param) ? -1 : Number(param), param);
     if (!service) return res.status(404).json({ error: 'Service not found' });
-    const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price`).all(service.id);
-    res.json({ ...service, packages });
+    const isLong = (service.slug || '').includes('family') || (service.slug || '').includes('tour');
+    const standardDur = isLong ? 120 : 90;
+    const packages = [{
+      id: service.id * 10,
+      service_id: service.id,
+      name: 'Standard Bespoke Session',
+      description: `${standardDur} Menit Hunting, 40 Foto Edit + RAW + 1 Min Video`,
+      price: service.starting_price || 400,
+      currency: 'SAR',
+      duration_minutes: standardDur,
+      edited_photos: 40,
+      raw_photos_included: 1
+    }];
+    res.json({ ...service, duration_minutes: standardDur, edited_photos: 40, packages });
   } catch (err) {
     console.error('GET /services/:slug error:', err.message);
     res.status(404).json({ error: 'Service not found' });

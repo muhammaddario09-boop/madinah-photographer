@@ -162,19 +162,23 @@ fetch('/api/services')
             </p>
 
             <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;">
-              ${pkgs.map(p => `
-                <div class="pkg-pill-warm">
-                  <div>
-                    <div style="font-weight:700; color:var(--charcoal); font-size:1rem;">${p.name}</div>
-                    <div style="font-size:0.8rem; color:var(--charcoal-soft); margin:4px 0 10px 0;">
-                      ⏱️ ${p.duration_minutes} Menit • 📸 ${p.edited_photos || 15} Foto Edit
+              ${(() => {
+                const isLongSession = s.slug.includes('family') || s.slug.includes('tour');
+                const duration = isLongSession ? 120 : 90;
+                return `
+                  <div class="pkg-pill-warm" style="width:100%;">
+                    <div>
+                      <div style="font-weight:700; color:var(--charcoal); font-size:1.05rem;">Standard Bespoke Session</div>
+                      <div style="font-size:0.85rem; color:var(--charcoal-soft); margin:6px 0 10px 0; line-height:1.5;">
+                        ⏱️ <strong>${duration} Menit Hunting</strong> • 📸 <strong>40 Foto Edit High-Res</strong> • 🎬 <strong>1 Menit Video Reels 4K</strong>
+                      </div>
+                    </div>
+                    <div style="border-top:1px solid var(--line); padding-top:8px; font-size:0.8rem; color:var(--gold); font-weight:700;">
+                      ✓ 100% Seluruh File RAW Original Diberikan via Google Drive
                     </div>
                   </div>
-                  <div style="border-top:1px solid var(--line); padding-top:8px; font-size:0.78rem; color:var(--gold); font-weight:600;">
-                    ✓ All RAW Photos Included
-                  </div>
-                </div>
-              `).join('')}
+                `;
+              })()}
             </div>
 
             <!-- Action Buttons -->

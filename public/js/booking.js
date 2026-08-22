@@ -88,36 +88,51 @@ function renderService() {
   return `
     <div class="step-label">Step 1 — Pilih Layanan</div>
     <h2 style="margin-bottom:24px;">Pilihan Jenis Sesi Fotografi</h2>
-    ${state.services.map(s => `
-      <div class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;">
-        <div style="width:70px; height:70px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
-        <div style="flex:1;">
-          <h3 style="font-size:1.05rem;">${s.name}</h3>
-          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">⏱️ ${s.duration_minutes} Menit · Sesi Eksklusif Madinah</p>
+    ${state.services.map(s => {
+      const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
+      const dur = isLong ? 120 : 90;
+      return `
+        <div class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;">
+          <div style="width:70px; height:70px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
+          <div style="flex:1;">
+            <h3 style="font-size:1.05rem;">${s.name}</h3>
+            <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">
+              ⏱️ ${dur} Menit · 📸 40 Foto Edit + RAW + 1 Min Video
+            </p>
+          </div>
+          <span style="font-size:1.1rem; color:var(--gold); font-weight:600;">Pilih ›</span>
         </div>
-        <span style="font-size:1.1rem; color:var(--gold); font-weight:600;">Pilih ›</span>
-      </div>
-    `).join('')}
+      `;
+    }).join('')}
   `;
 }
 
 function renderPackage() {
-  const pkgs = state.service?.packages || [];
+  const isLong = (state.service?.slug || '').includes('family') || (state.service?.slug || '').includes('tour');
+  const dur = isLong ? 120 : 90;
+  const p = (state.service?.packages && state.service.packages[0]) || { id: 1, name: 'Standard Bespoke Session', duration_minutes: dur, edited_photos: 40 };
+
   return `
-    <div class="step-label">Step 2 — Pilih Rincian Paket</div>
+    <div class="step-label">Step 2 — Konfirmasi Pilihan Paket Standar</div>
     <h2 style="margin-bottom:24px;">${state.service.name}</h2>
-    ${pkgs.map(p => `
-      <div class="option-card ${state.package?.id === p.id ? 'selected' : ''}" data-id="${p.id}" style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <h3 style="font-size:1.05rem;">${p.name}</h3>
-          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">
-            ⏱️ ${p.duration_minutes} Menit · 📸 ${p.edited_photos || 15} Foto Edit · All RAW Included
-          </p>
-        </div>
-        <span style="font-size:0.82rem; font-weight:700; color:var(--gold); background:var(--ivory); padding:4px 10px; border-radius:4px; border:1px solid var(--line);">Bespoke Tier</span>
+    
+    <div class="option-card selected" data-id="${p.id}" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+      <div>
+        <h3 style="font-size:1.1rem; color:var(--charcoal);">Standard Bespoke Session</h3>
+        <p style="color:var(--charcoal-soft); font-size:0.88rem; margin-top:6px; line-height:1.5;">
+          ⏱️ <strong>${dur} Menit Hunting</strong> • 📸 <strong>40 Pcs Foto Edit Resolusi Tinggi</strong><br>
+          🎬 <strong>1 Menit Video Reels 4K</strong> • <strong>100% Seluruh File RAW Original</strong>
+        </p>
       </div>
-    `).join('')}
-    <div class="actions-row"><button class="btn btn-ghost" id="back">Back</button><span></span></div>
+      <span style="font-size:0.85rem; font-weight:700; color:var(--gold); background:var(--ivory); padding:6px 14px; border-radius:4px; border:1px solid var(--line); white-space:nowrap;">
+        Paket Terpilih ✓
+      </span>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-ghost" id="back">Kembali</button>
+      <button class="btn btn-primary" id="next-pkg">Lanjut Pilih Tanggal &amp; Jam →</button>
+    </div>
   `;
 }
 
@@ -372,8 +387,17 @@ function bindStep(stepName) {
     }));
   }
   if (stepName === 'PACKAGE') {
+    if (!state.package && state.service?.packages) {
+      state.package = state.service.packages[0] || null;
+    }
+    document.getElementById('next-pkg')?.addEventListener('click', () => {
+      if (!state.package && state.service?.packages) {
+        state.package = state.service.packages[0] || null;
+      }
+      goto(2);
+    });
     document.querySelectorAll('.option-card').forEach(c => c.addEventListener('click', () => {
-      state.package = state.service.packages.find(p => p.id == c.dataset.id);
+      state.package = (state.service.packages && state.service.packages.find(p => p.id == c.dataset.id)) || (state.service.packages && state.service.packages[0]);
       goto(2);
     }));
   }
