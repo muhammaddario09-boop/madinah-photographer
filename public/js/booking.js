@@ -288,47 +288,124 @@ function compressReceiptImage(file) {
 function renderPayment() {
   const p = state.package;
   const paymentProof = state.paymentProof || '';
+  const pi = state.paymentInfo || {};
+  const bankSAR = pi.bankSAR || {};
+  const bankIDR = pi.bankIDR || {};
+  const depositPct = p.deposit_percentage || 30;
+  const totalSAR = p.price || 0;
+  const depositSAR = Math.round((totalSAR * depositPct) / 100);
+  const rate = bankIDR.rate || 4800;
+  const depositIDR = (depositSAR * rate).toLocaleString('id-ID');
+  const totalIDR = (totalSAR * rate).toLocaleString('id-ID');
+  const adminWA = (pi.adminWhatsApp || '+6282175272547').replace(/[^0-9]/g, '');
+  const waLink = `https://wa.me/${adminWA}`;
 
   return `
-    <div class="step-label">Step 6 — Konfirmasi Jadwal & Permintaan Penawaran</div>
-    <h2 style="margin-bottom:24px;">Ringkasan Jadwal Pemotretan</h2>
-    
+    <div class="step-label">Step 6 — Informasi Pembayaran Deposit &amp; Konfirmasi</div>
+    <h2 style="margin-bottom:20px;">Ringkasan &amp; Cara Pembayaran</h2>
+
+    <!-- Booking Summary -->
     <div class="summary-line"><span>Layanan Sesi</span><strong>${state.service.name}</strong></div>
-    <div class="summary-line"><span>Pilihan Paket</span><span>${p.name} (${p.duration_minutes} Menit)</span></div>
-    <div class="summary-line"><span>Tanggal & Waktu</span><strong>${state.date} pukul ${state.time} (Madinah)</strong></div>
+    <div class="summary-line"><span>Paket</span><span>${p.name} (${p.duration_minutes} Menit)</span></div>
+    <div class="summary-line"><span>Tanggal &amp; Waktu</span><strong>${state.date} pukul ${state.time} (Madinah)</strong></div>
     <div class="summary-line"><span>Nama Jemaah</span><span>${state.client.name || '—'}</span></div>
     <div class="summary-line"><span>Kontak WhatsApp</span><span>${state.client.phone || '—'}</span></div>
 
-    <div style="background:var(--ivory); border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:6px; padding:18px 20px; margin:24px 0;">
-      <h4 style="font-size:0.92rem; margin:0 0 6px; color:var(--charcoal); font-weight:700;">✨ Layanan Eksklusif & Konsultasi Ramah</h4>
-      <p style="font-size:0.86rem; color:var(--charcoal-soft); margin:0; line-height:1.55;">
-        Setelah mengajukan jadwal, tim admin UMROH LENS akan segera mengonfirmasi ketersediaan fotografer di Madinah dan mengirimkan <strong>Rate Card PDF Resmi</strong> via WhatsApp untuk konsultasi rincian investasi & penguncian jadwal Anda.
-      </p>
+    <!-- Pricing Box -->
+    <div style="background:linear-gradient(135deg,#2C1810,#3D2515); color:#F5EFE0; border-radius:10px; padding:20px 22px; margin:22px 0;">
+      <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; color:#C9A96E; margin-bottom:10px; font-weight:600;">💵 Investasi Sesi Foto Anda</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:0.9rem; opacity:0.85;">Total Investasi</span>
+        <span style="font-size:1.05rem; font-weight:700; color:#F0D080;">SAR ${totalSAR} <span style="font-size:0.78rem; opacity:0.7;">(≈ Rp ${totalIDR})</span></span>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.15); margin:10px 0; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.9rem; opacity:0.85;">Uang Muka / DP (${depositPct}%)</span>
+        <span style="font-size:1.35rem; font-weight:800; color:#F5C842;">SAR ${depositSAR} <span style="font-size:0.82rem; font-weight:600; opacity:0.85;">(≈ Rp ${depositIDR})</span></span>
+      </div>
+      <div style="font-size:0.76rem; color:rgba(245,239,224,0.6); margin-top:6px;">Sisa ${100-depositPct}% dibayarkan tunai saat hari sesi di Madinah</div>
     </div>
 
-    <!-- Optional Upload Transfer Proof if already communicated -->
-    <div style="margin-bottom:28px;">
+    <!-- Bank SAR -->
+    <div style="background:#fff; border:1px solid var(--line); border-left:4px solid #25D366; border-radius:8px; padding:18px 20px; margin-bottom:14px;">
+      <div style="font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#888; margin-bottom:10px;">🇸🇦 Transfer via Bank Saudi (SAR — Untuk Jemaah di Arab Saudi)</div>
+      <div style="display:grid; gap:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">Nama Bank</span>
+          <strong style="font-size:0.9rem;">${bankSAR.name || 'Al Rajhi Bank'}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">No. Rekening / IBAN</span>
+          <strong style="font-size:0.88rem; font-family:monospace; background:#f5f5f5; padding:3px 8px; border-radius:3px;">${bankSAR.account || 'SA84 8000 0123 4567 8901 2345'}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">Atas Nama</span>
+          <strong style="font-size:0.9rem;">${bankSAR.holder || 'UMROH LENS Photography'}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">Jumlah DP</span>
+          <strong style="font-size:1rem; color:#2E5B1A;">SAR ${depositSAR}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bank IDR -->
+    <div style="background:#fff; border:1px solid var(--line); border-left:4px solid #1a73e8; border-radius:8px; padding:18px 20px; margin-bottom:20px;">
+      <div style="font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#888; margin-bottom:10px;">🇮🇩 Transfer via Bank Indonesia (IDR — Untuk Jemaah dari Indonesia)</div>
+      <div style="display:grid; gap:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">Nama Bank</span>
+          <strong style="font-size:0.9rem;">${bankIDR.name || 'BCA / BSI'}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">No. Rekening</span>
+          <strong style="font-size:0.88rem; font-family:monospace; background:#f5f5f5; padding:3px 8px; border-radius:3px;">${bankIDR.account || '5420123456'}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">Atas Nama</span>
+          <strong style="font-size:0.9rem;">${bankIDR.holder || 'WAHYU AFRIANSYAH'}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; color:var(--charcoal-soft);">Jumlah DP</span>
+          <strong style="font-size:1rem; color:#1a4fa8;">Rp ${depositIDR}</strong>
+        </div>
+        <div style="font-size:0.75rem; color:var(--charcoal-soft); margin-top:4px; padding-top:8px; border-top:1px dashed var(--line);">
+          *Kurs estimasi: 1 SAR = Rp ${rate.toLocaleString('id-ID')} (kurs aktual dikonfirmasi admin via WhatsApp)
+        </div>
+      </div>
+    </div>
+
+    <!-- Steps to Pay -->
+    <div style="background:#F0F7FF; border:1px solid #C2D7FA; border-radius:8px; padding:16px 20px; margin-bottom:22px;">
+      <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#1a73e8; margin-bottom:10px;">📋 Langkah Pembayaran</div>
+      <ol style="margin:0; padding-left:18px; font-size:0.86rem; color:var(--charcoal); line-height:1.8;">
+        <li>Transfer uang muka / DP sesuai nominal di atas ke rekening yang sesuai (SAR atau IDR).</li>
+        <li>Screenshot / foto bukti transfer Anda.</li>
+        <li>Klik tombol <strong>"Kunci Jadwal &amp; Kirim ke WhatsApp"</strong> di bawah.</li>
+        <li>Lampirkan foto bukti transfer langsung di chat WhatsApp yang terbuka.</li>
+        <li>Admin akan memverifikasi dan mengonfirmasi booking Anda dalam <strong>1×24 jam</strong>.</li>
+      </ol>
+    </div>
+
+    <!-- Optional Upload -->
+    <div style="margin-bottom:24px;">
       <label style="display:block; font-size:0.8rem; font-weight:700; color:var(--charcoal-soft); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">
-        Unggah Bukti Transfer Uang Muka (Opsional / Jika Sudah Ada)
+        Unggah Bukti Transfer (Opsional — Bisa juga via WhatsApp)
       </label>
-      <label for="proof-file-input" style="display:block; border:2px dashed var(--gold-soft); background:#fff; padding:20px; text-align:center; border-radius:8px; cursor:pointer; transition:background 0.2s;">
+      <label for="proof-file-input" style="display:block; border:2px dashed var(--gold-soft); background:#fff; padding:18px; text-align:center; border-radius:8px; cursor:pointer; transition:background 0.2s;">
         <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
         <div style="font-size:1.4rem; margin-bottom:4px;">📎</div>
-        <div style="font-size:0.9rem; font-weight:600; color:var(--charcoal);">Pilih Foto / Screenshot Bukti Transfer dari Perangkat</div>
-        <div style="font-size:0.78rem; color:var(--charcoal-soft); margin-top:2px;">Format JPG, PNG, atau WEBP (Maks 10MB)</div>
+        <div style="font-size:0.88rem; font-weight:600; color:var(--charcoal);">Pilih Foto / Screenshot Bukti Transfer dari Perangkat</div>
+        <div style="font-size:0.76rem; color:var(--charcoal-soft); margin-top:2px;">JPG, PNG, WEBP · Maks 10MB</div>
         <div>
           <img id="proof-preview" src="${paymentProof}" style="max-height:140px; max-width:100%; border-radius:4px; margin-top:12px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
         </div>
       </label>
-      <small style="display:block; color:var(--charcoal-soft); font-size:0.76rem; margin-top:6px;">
-        💡 <em>Catatan: Anda juga bisa langsung melampirkan foto screenshot transfer saat chat di WhatsApp setelah ini.</em>
-      </small>
     </div>
 
     <div class="actions-row">
       <button class="btn btn-ghost" id="back">Kembali</button>
-      <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:700;">
-        Kunci Jadwal &amp; Lanjut ke WhatsApp →
+      <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:700; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.1rem;">📱</span> Kunci Jadwal &amp; Kirim ke WhatsApp →
       </button>
     </div>
   `;
