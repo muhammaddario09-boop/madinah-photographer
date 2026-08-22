@@ -54,6 +54,7 @@ app.get('/booking', (req, res) => res.sendFile(path.join(__dirname, 'public', 'b
 app.get('/my-booking', (req, res) => res.sendFile(path.join(__dirname, 'public', 'my-booking.html')));
 app.get('/invoice', (req, res) => res.sendFile(path.join(__dirname, 'public', 'invoice.html')));
 app.get('/gallery', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gallery.html')));
+app.get('/ratecard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ratecard.html')));
 
 app.use('/api', require('./routes/public'));
 app.use('/api/admin', require('./routes/admin'));

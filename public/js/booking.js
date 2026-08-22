@@ -93,9 +93,9 @@ function renderService() {
         <div style="width:70px; height:70px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
         <div style="flex:1;">
           <h3 style="font-size:1.05rem;">${s.name}</h3>
-          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">${s.duration_minutes} min · Mulai ${s.currency} ${s.starting_price}</p>
+          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">⏱️ ${s.duration_minutes} Menit · Sesi Eksklusif Madinah</p>
         </div>
-        <span style="font-size:1.2rem; color:var(--gold);">→</span>
+        <span style="font-size:1.1rem; color:var(--gold); font-weight:600;">Pilih ›</span>
       </div>
     `).join('')}
   `;
@@ -104,15 +104,17 @@ function renderService() {
 function renderPackage() {
   const pkgs = state.service?.packages || [];
   return `
-    <div class="step-label">Step 2 — Select Package</div>
+    <div class="step-label">Step 2 — Pilih Rincian Paket</div>
     <h2 style="margin-bottom:24px;">${state.service.name}</h2>
     ${pkgs.map(p => `
-      <div class="option-card ${state.package?.id === p.id ? 'selected' : ''}" data-id="${p.id}">
+      <div class="option-card ${state.package?.id === p.id ? 'selected' : ''}" data-id="${p.id}" style="display:flex; justify-content:space-between; align-items:center;">
         <div>
           <h3 style="font-size:1.05rem;">${p.name}</h3>
-          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">${p.duration_minutes} min · ${p.edited_photos} edited photos · ${p.deposit_percentage}% deposit</p>
+          <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">
+            ⏱️ ${p.duration_minutes} Menit · 📸 ${p.edited_photos || 15} Foto Edit · All RAW Included
+          </p>
         </div>
-        <span style="font-family:var(--font-display); font-size:1.15rem;">${p.currency} ${p.price}</span>
+        <span style="font-size:0.82rem; font-weight:700; color:var(--gold); background:var(--ivory); padding:4px 10px; border-radius:4px; border:1px solid var(--line);">Bespoke Tier</span>
       </div>
     `).join('')}
     <div class="actions-row"><button class="btn btn-ghost" id="back">Back</button><span></span></div>
@@ -270,80 +272,45 @@ function compressReceiptImage(file) {
 
 function renderPayment() {
   const p = state.package;
-  const deposit = Math.round(p.price * p.deposit_percentage / 100);
-  const info = state.paymentInfo || {};
-  const rate = info.bankIDR?.rate || 4200;
-  const depositIDR = (deposit * rate).toLocaleString('id-ID');
-
   const paymentProof = state.paymentProof || '';
-  const depositPaid = state.result?.payment_status === 'DEPOSIT_PAID' || false;
-  const fullPaid = state.result?.payment_status === 'PAID' || false;
 
   return `
-    <div class="step-label">Step 6 — Payment & Verification</div>
-    <h2 style="margin-bottom:24px;">Review & Transfer Deposit</h2>
+    <div class="step-label">Step 6 — Konfirmasi Jadwal & Permintaan Penawaran</div>
+    <h2 style="margin-bottom:24px;">Ringkasan Jadwal Pemotretan</h2>
     
-    <div class="summary-line"><span>Service</span><span>${state.service.name}</span></div>
-    <div class="summary-line"><span>Package</span><span>${p.name} (${p.duration_minutes} min)</span></div>
-    <div class="summary-line"><span>Date & Time</span><span>${state.date} at ${state.time}</span></div>
-    <div class="summary-line"><span>Total Investment</span><span>${p.currency} ${p.price}</span></div>
-    <div class="summary-line" style="font-weight:600; color:var(--charcoal); background:rgba(212,175,55,0.08); padding:12px 10px;">
-      <span>Deposit Due Now (${p.deposit_percentage}%)</span>
-      <span style="font-size:1.15rem; color:#8A5A1E;">${p.currency} ${deposit} <span style="font-size:0.85rem; font-weight:normal;">(~Rp ${depositIDR})</span></span>
+    <div class="summary-line"><span>Layanan Sesi</span><strong>${state.service.name}</strong></div>
+    <div class="summary-line"><span>Pilihan Paket</span><span>${p.name} (${p.duration_minutes} Menit)</span></div>
+    <div class="summary-line"><span>Tanggal & Waktu</span><strong>${state.date} pukul ${state.time} (Madinah)</strong></div>
+    <div class="summary-line"><span>Nama Jemaah</span><span>${state.client.name || '—'}</span></div>
+    <div class="summary-line"><span>Kontak WhatsApp</span><span>${state.client.phone || '—'}</span></div>
+
+    <div style="background:var(--ivory); border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:6px; padding:18px 20px; margin:24px 0;">
+      <h4 style="font-size:0.92rem; margin:0 0 6px; color:var(--charcoal); font-weight:700;">✨ Layanan Eksklusif & Konsultasi Ramah</h4>
+      <p style="font-size:0.86rem; color:var(--charcoal-soft); margin:0; line-height:1.55;">
+        Setelah mengajukan jadwal, tim admin UMROH LENS akan segera mengonfirmasi ketersediaan fotografer di Madinah dan mengirimkan <strong>Rate Card PDF Resmi</strong> via WhatsApp untuk konsultasi rincian investasi & penguncian jadwal Anda.
+      </p>
     </div>
 
-    ${depositPaid || fullPaid ? `
-      <div style="margin-top:24px; padding-top:24px; border-top:1px solid var(--line);">
-        <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:8px;">Status Pembayaran</h3>
-        ${depositPaid ? `<p style="color:var(--charcoal-soft);">✅ Deposit sudah dibayarkan (DEPOSIT_PAID)</p>` : ''}
-        ${fullPaid ? `<p style="color:var(--charcoal-soft);">✅ Pembayaran lengkap terverifikasi (PAID)</p>` : ''}
-      </div>
-    ` : `
-      <h3 style="font-family:var(--font-display); font-size:1.15rem; margin:28px 0 12px;">Bank Transfer Details</h3>
-      <p style="font-size:0.84rem; color:var(--charcoal-soft); margin-bottom:16px;">Silakan transfer uang muka (deposit) ke salah satu rekening resmi di bawah ini:</p>
-
-      <!-- Bank Accounts Grid -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:28px;">
-        <!-- Saudi Bank Account -->
-        <div style="background:#fff; border:1px solid var(--line); border-left:4px solid var(--gold); padding:16px; border-radius:4px;">
-          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇸🇦 Saudi Arabia / SAR (Al Rajhi)</div>
-          <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankSAR?.name || 'Al Rajhi Bank'}</strong>
-          <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
-            <span>${info.bankSAR?.account || 'SA8480000123456789012345'}</span>
-            <button type="button" onclick="copyText('${info.bankSAR?.account || 'SA8480000123456789012345'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:var(--gold-soft);">📋 Copy</button>
-          </div>
-          <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankSAR?.holder || 'Al-Madani Photography'}</div>
-        </div>
-
-        <!-- Indonesian Bank Account -->
-        <div style="background:#fff; border:1px solid var(--line); border-left:4px solid #3E5B2A; padding:16px; border-radius:4px;">
-          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--charcoal-soft); letter-spacing:0.05em;">🇮🇩 Indonesia / Rupiah (BSI / BCA)</div>
-          <strong style="display:block; font-size:0.95rem; margin-top:4px;">${info.bankIDR?.name || 'Bank Syariah Indonesia (BSI) / BCA'}</strong>
-          <div style="font-family:monospace; font-size:0.95rem; background:var(--ivory); padding:6px 8px; margin:8px 0; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
-            <span>${info.bankIDR?.account || '7123456789 (BSI)'}</span>
-            <button type="button" onclick="copyText('${info.bankIDR?.account || '7123456789'}', this)" style="border:none; background:transparent; cursor:pointer; font-size:0.78rem; color:#3E5B2A;">📋 Copy</button>
-          </div>
-          <div style="font-size:0.78rem; color:var(--charcoal-soft);">A/N: ${info.bankIDR?.holder || 'Al-Madani Photography'}</div>
-        </div>
-      </div>
-
-      <!-- Upload Screenshot Transfer Proof -->
-      <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-bottom:10px;">Upload Bukti Transfer (Screenshot)</h3>
-      <div style="border:2px dashed rgba(212,175,55,0.4); background:#fff; padding:20px; text-align:center; border-radius:6px; cursor:pointer; margin-bottom:20px;" onclick="document.getElementById('proof-file-input').click()">
+    <!-- Optional Upload Transfer Proof if already communicated -->
+    <div style="margin-bottom:28px;">
+      <label style="display:block; font-size:0.8rem; font-weight:700; color:var(--charcoal-soft); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">
+        Unggah Bukti Transfer Uang Muka (Opsional / Jika Sudah Ada)
+      </label>
+      <div style="border:1px dashed var(--line); background:#fff; padding:16px; text-align:center; border-radius:6px; cursor:pointer;" onclick="document.getElementById('proof-file-input').click()">
         <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
-        <div style="font-size:1.8rem; margin-bottom:4px;">📸</div>
-        <strong style="display:block; font-size:0.92rem; color:var(--charcoal);">Klik untuk memilih screenshot / bukti transfer dari HP/Laptop</strong>
-        <span style="font-size:0.78rem; color:var(--charcoal-soft);">Format JPG, PNG, atau WEBP</span>
+        <span style="font-size:0.88rem; color:var(--charcoal-soft);">Klik di sini jika Anda sudah memiliki bukti transfer deposit</span>
         <div>
-          <img id="proof-preview" src="${paymentProof}" style="max-height:160px; max-width:100%; border-radius:4px; margin-top:10px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
+          <img id="proof-preview" src="${paymentProof}" style="max-height:140px; max-width:100%; border-radius:4px; margin-top:8px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
         </div>
       </div>
+    </div>
 
-      <div class="actions-row">
-        <button class="btn btn-ghost" id="back">Back</button>
-        <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:600;">Confirm Booking & Continue →</button>
-      </div>
-    `}
+    <div class="actions-row">
+      <button class="btn btn-ghost" id="back">Kembali</button>
+      <button class="btn btn-primary" id="confirm" style="padding:14px 28px; font-weight:700;">
+        Kunci Jadwal &amp; Lanjut ke WhatsApp →
+      </button>
+    </div>
   `;
 }
 
@@ -385,8 +352,8 @@ function renderConfirmation() {
       </a>
     </div>
 
-    <div class="actions-row" style="justify-content:center; gap:14px; flex-wrap:wrap;">
-      <a class="btn btn-primary" href="/invoice.html?code=${r.bookingCode}" target="_blank">🧾 Cetak Invoice / Kuitansi PDF</a>
+    <div class="actions-row" style="justify-content:center; gap:12px; flex-wrap:wrap;">
+      <a class="btn btn-primary" href="/ratecard.html" target="_blank">📄 Buka Rate Card &amp; Pricelist PDF</a>
       <a class="btn btn-ghost" href="/my-booking.html?code=${r.bookingCode}">Cek Status Reservasi</a>
       <a class="btn btn-ghost" href="/">Kembali ke Beranda</a>
     </div>

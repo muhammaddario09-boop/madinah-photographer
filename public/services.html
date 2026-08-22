@@ -3,47 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Layanan &amp; Paket — UMROH LENS Madinah</title>
+<title>Layanan & Paket Dokumentasi — UMROH LENS Madinah</title>
+<meta name="description" content="Katalog layanan sesi foto & video profesional di Madinah Al-Munawwarah untuk jemaah Umrah, pasangan, dan keluarga. Dapatkan Rate Card resmi via WhatsApp.">
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .service-row-warm {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 36px;
     background: #FFFFFF;
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 38px;
-    margin-bottom: 28px;
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 36px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 16px rgba(28, 24, 20, 0.04);
     align-items: center;
-    box-shadow: 0 6px 20px rgba(28, 24, 20, 0.04);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
   .service-row-warm:hover {
-    border-color: var(--gold);
-    transform: translateY(-4px);
-    box-shadow: 0 14px 34px rgba(28, 24, 20, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(28, 24, 20, 0.08);
   }
   .service-thumb-warm {
-    height: 260px;
-    border-radius: 6px;
+    width: 100%;
+    height: 250px;
     background-size: cover;
     background-position: center;
+    border-radius: 6px;
     border: 1px solid var(--line);
   }
   .pkg-pill-warm {
+    flex: 1;
+    min-width: 200px;
     background: var(--ivory);
     border: 1px solid var(--line);
     border-radius: 6px;
-    padding: 18px 22px;
-    flex: 1;
-    min-width: 210px;
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
+  .ratecard-banner {
+    background: linear-gradient(135deg, var(--charcoal) 0%, #2A241E 100%);
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 24px 32px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    box-shadow: 0 8px 24px rgba(28, 24, 20, 0.15);
+  }
   @media (max-width: 860px) {
-    .service-row-warm { grid-template-columns: 1fr; padding: 24px; gap: 20px; }
+    .service-row-warm { grid-template-columns: 1fr; }
     .service-thumb-warm { height: 220px; }
   }
 </style>
@@ -57,14 +71,11 @@
     <div class="nav-links">
       <a href="/portfolio.html">Portfolio</a>
       <a href="/services.html" style="color:var(--gold);">Services</a>
-      <a href="/#about">About</a>
-      <a href="/#faq">FAQ</a>
+      <a href="/ratecard.html">Rate Card PDF</a>
       <a href="/my-booking.html">My Booking</a>
       <a href="/gallery.html">Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <script src="/js/currency.js"></script>
-      <script>document.write(CurrencyEngine.renderSwitcher());</script>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
       <a class="nav-cta" href="/booking.html">Book a Session</a>
@@ -75,15 +86,42 @@
 <!-- Page Header -->
 <header class="section-tight" style="text-align:center; padding-top:60px; padding-bottom:20px;">
   <div class="container">
-    <p class="eyebrow">PILIHAN LAYANAN &amp; PAKET</p>
+    <p class="eyebrow">PILIHAN LAYANAN &amp; SESI FOTO</p>
     <h1 style="margin-top:12px;">Daftar Sesi Foto &amp; Video Profesional</h1>
-    <p style="color:var(--charcoal-soft); max-width:650px; margin:14px auto 0; font-size:1.05rem;">Seluruh paket mencakup fotografer mukim Madinah, arahan pose ramah keluarga, pengiriman Google Drive 24-48 jam, dan file RAW original.</p>
+    <p style="color:var(--charcoal-soft); max-width:680px; margin:14px auto 0; font-size:1.05rem;">
+      Seluruh sesi dipandu oleh fotografer mukim Madinah berizin resmi, ramah keluarga &amp; lansia, mencakup seluruh file RAW original serta pengiriman Google Drive cepat 24-48 jam.
+    </p>
   </div>
 </header>
 
-<!-- Services List (Live Supabase) -->
+<!-- Services List & Rate Card Banner -->
 <section class="section" style="padding-top:20px;">
   <div class="container">
+    
+    <!-- Top Rate Card PDF & WhatsApp Banner -->
+    <div class="ratecard-banner">
+      <div>
+        <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--gold-light); font-weight:700;">
+          📄 OFFICIAL CATALOG 2026
+        </div>
+        <h3 style="color:#FFFFFF; font-size:1.35rem; margin:6px 0 4px; font-family:var(--font-display);">
+          Unduh Rate Card &amp; Pricelist PDF Lengkap
+        </h3>
+        <p style="color:rgba(255,255,255,0.8); font-size:0.88rem; margin:0;">
+          Dapatkan rincian seluruh paket, benefit lengkap, dan penawaran khusus rombongan/travel via WhatsApp.
+        </p>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="/ratecard.html" target="_blank" class="btn btn-primary" style="padding:11px 22px; font-size:0.86rem;">
+          <span>📥 Buka Rate Card PDF</span>
+        </a>
+        <a href="https://wa.me/6282175272547?text=Halo%20Admin%20UMROH%20LENS%20Madinah%2C%20saya%20ingin%20minta%20Pricelist%20dan%20Rate%20Card%20PDF%20resmi%20untuk%20sesi%20foto%20di%20Madinah." target="_blank" rel="noopener" class="btn" style="background:#25D366; color:#fff; text-decoration:none; padding:11px 22px; font-size:0.86rem; border-radius:4px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+          <span>💬 Tanya via WhatsApp</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Services Grid -->
     <div id="services-list">
       <div style="text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat daftar layanan...</div>
     </div>
@@ -110,34 +148,47 @@ fetch('/api/services')
 
     container.innerHTML = services.map(s => {
       const pkgs = s.packages || [];
+      const waMsg = encodeURIComponent(`Halo Admin UMROH LENS Madinah, saya tertarik dengan layanan "${s.name}". Boleh minta informasi harga paket dan Rate Card PDF resminya? Terima kasih.`);
+      const waLink = `https://wa.me/6282175272547?text=${waMsg}`;
+
       return `
         <div class="service-row-warm">
           <div class="service-thumb-warm" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
           <div>
             <div class="eyebrow" style="margin-bottom:6px;">UMROH LENS MADINAH</div>
-            <h2 style="font-size:1.8rem; margin-bottom:10px;">${s.name}</h2>
-            <p style="color:var(--charcoal-soft); font-size:0.95rem; line-height:1.6; max-width:660px; margin-bottom:20px;">
+            <h2 style="font-size:1.75rem; margin-bottom:8px;">${s.name}</h2>
+            <p style="color:var(--charcoal-soft); font-size:0.92rem; line-height:1.6; max-width:660px; margin-bottom:18px;">
               ${s.description}
             </p>
 
-            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:22px;">
+            <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;">
               ${pkgs.map(p => `
                 <div class="pkg-pill-warm">
                   <div>
-                    <div style="font-weight:700; color:var(--charcoal); font-size:1.05rem;">${p.name}</div>
-                    <div style="font-size:0.82rem; color:var(--charcoal-soft); margin:4px 0 12px 0;">${p.duration_minutes} Menit • ${p.edited_photos || 10} Foto Edit</div>
+                    <div style="font-weight:700; color:var(--charcoal); font-size:1rem;">${p.name}</div>
+                    <div style="font-size:0.8rem; color:var(--charcoal-soft); margin:4px 0 10px 0;">
+                      ⏱️ ${p.duration_minutes} Menit • 📸 ${p.edited_photos || 15} Foto Edit
+                    </div>
                   </div>
-                  <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid var(--line); padding-top:10px; margin-top:8px;">
-                    <span style="font-family:var(--font-display); font-size:1.25rem; font-weight:700; color:var(--gold);">${window.CurrencyEngine ? CurrencyEngine.format(p.price) : (p.currency || 'SAR') + ' ' + p.price}</span>
-                    <a class="btn btn-primary" href="/booking.html?service=${s.slug}&package=${p.id}" style="padding:6px 14px; font-size:0.75rem;">Pilih ›</a>
+                  <div style="border-top:1px solid var(--line); padding-top:8px; font-size:0.78rem; color:var(--gold); font-weight:600;">
+                    ✓ All RAW Photos Included
                   </div>
                 </div>
               `).join('')}
             </div>
 
-            <a class="btn btn-ghost" href="/booking.html?service=${s.slug}" style="padding:10px 20px; font-size:0.8rem;">
-              Lihat Ketersediaan Slot Jadwal →
-            </a>
+            <!-- Action Buttons -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <a class="btn btn-primary" href="/booking.html?service=${s.slug}" style="padding:10px 20px; font-size:0.84rem;">
+                📅 Pilih Jadwal Sesi →
+              </a>
+              <a class="btn" href="${waLink}" target="_blank" rel="noopener" style="background:#25D366; color:#fff; text-decoration:none; padding:10px 18px; font-size:0.84rem; border-radius:4px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+                <span>💬 Tanya Harga via WA</span>
+              </a>
+              <a class="btn btn-ghost" href="/ratecard.html" target="_blank" style="padding:10px 16px; font-size:0.82rem;">
+                📄 Rate Card PDF
+              </a>
+            </div>
           </div>
         </div>
       `;

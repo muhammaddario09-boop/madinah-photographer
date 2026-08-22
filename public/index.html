@@ -16,14 +16,13 @@
     <div class="nav-links">
       <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
       <a href="/services.html" data-i18n="nav_services">Services</a>
-      <a href="#about" data-i18n="nav_about">About</a>
-      <a href="#faq" data-i18n="nav_faq">FAQ</a>
+      <a href="/ratecard.html">Rate Card PDF</a>
+      <a href="/#about" data-i18n="nav_about">About</a>
+      <a href="/#faq" data-i18n="nav_faq">FAQ</a>
       <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
       <a href="/gallery.html">Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <script src="/js/currency.js"></script>
-      <script>document.write(CurrencyEngine.renderSwitcher());</script>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
       <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
@@ -41,8 +40,9 @@
     <p class="hero-sub" data-i18n="hero_sub">
       Jasa foto profesional untuk jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami di sudut-sudut terbaik kota Madinah Al-Munawwarah.
     </p>
-    <div class="hero-actions">
+    <div class="hero-actions" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
       <a class="btn btn-primary" href="/booking.html" data-i18n="hero_cta_book">Pesan Jadwal Sesi →</a>
+      <a class="btn btn-ghost" href="/ratecard.html" target="_blank">📄 Unduh Rate Card PDF</a>
       <a class="btn btn-ghost" href="/portfolio.html" data-i18n="hero_cta_view">Lihat Galeri Foto ›</a>
     </div>
 
@@ -304,8 +304,8 @@ fetch('/api/services')
         <h3 style="font-size:1.25rem;">${s.name}</h3>
         <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px; line-height:1.55; margin-bottom:16px;">${s.description}</p>
         <div class="service-meta">
-          <span>${s.duration_minutes} Menit</span>
-          <span class="service-price">Mulai ${window.CurrencyEngine ? CurrencyEngine.format(s.starting_price) : s.currency + ' ' + s.starting_price}</span>
+          <span>⏱️ ${s.duration_minutes} Menit</span>
+          <span class="service-price" style="color:var(--gold); font-weight:600;">Bespoke • Pilih Jadwal →</span>
         </div>
       </a>
     `).join('');
