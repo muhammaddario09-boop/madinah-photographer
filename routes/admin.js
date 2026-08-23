@@ -417,47 +417,64 @@ router.get('/services-full', async (req, res) => {
 });
 
 router.put('/services/:id', async (req, res) => {
-  const { name, description, cover_image, starting_price, currency, edited_photos } = req.body;
+  const { name, slug, description, cover_image, starting_price, currency, edited_photos, duration_minutes, sort_order } = req.body;
   await updateServiceInSupabase(req.params.id, {
-    name, description, cover_image,
+    name,
+    slug,
+    description,
+    cover_image,
     starting_price: Number(starting_price) || 0,
     currency: currency || 'SAR',
-    edited_photos: Number(edited_photos) || 0
+    edited_photos: Number(edited_photos) || 0,
+    duration_minutes: Number(duration_minutes) || 60,
+    sort_order: Number(sort_order) || 0
   }).catch(() => {});
   db.prepare(
-    `UPDATE services SET name=?, description=?, cover_image=?, starting_price=?, currency=?, edited_photos=? WHERE id=?`
-  ).run(name, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, req.params.id);
+    `UPDATE services SET name=?, slug=COALESCE(?, slug), description=?, cover_image=?, starting_price=?, currency=?, edited_photos=?, duration_minutes=COALESCE(?, duration_minutes), sort_order=COALESCE(?, sort_order) WHERE id=?`
+  ).run(name, slug || null, description, cover_image, Number(starting_price) || 0, currency || 'SAR', Number(edited_photos) || 0, duration_minutes ? Number(duration_minutes) : null, sort_order !== undefined ? Number(sort_order) : null, req.params.id);
   recordServicesToCloud(db).catch(() => {});
   res.json({ ok: true });
 });
 
 router.post('/services', async (req, res) => {
-  const { name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order } = req.body;
-  const created = await createServiceInSupabase({
-    name,
-    slug: slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-    description: description || '',
-    cover_image: cover_image || '/img/service-golden-hour.jpg',
-    duration_minutes: Number(duration_minutes) || 60,
-    starting_price: Number(starting_price) || 350,
-    currency: currency || 'SAR',
-    edited_photos: Number(edited_photos) || 10,
-    sort_order: Number(sort_order) || 0,
-    active: 1
-  }).catch(() => {});
+  try {
+    const { name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order } = req.body || {};
+    if (!name) return res.status(400).json({ error: 'Nama layanan wajib diisi.' });
 
-  const info = db.prepare(
-    `INSERT INTO services (name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order)
-     VALUES (?,?,?,?,?,?,?,?,?)`
-  );
-  const result = info.run(
-    name, slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-    description || '', cover_image || '/img/service-golden-hour.jpg',
-    Number(duration_minutes) || 60, Number(starting_price) || 350,
-    currency || 'SAR', Number(edited_photos) || 10, Number(sort_order) || 0
-  );
-  recordServicesToCloud(db).catch(() => {});
-  res.json({ ok: true, id: created ? created.id : result.lastInsertRowid });
+    let finalSlug = (slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-+|-+$/g, '');
+    let existing = db.prepare(`SELECT id FROM services WHERE slug=?`).get(finalSlug);
+    if (existing) {
+      finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
+    }
+
+    const created = await createServiceInSupabase({
+      name,
+      slug: finalSlug,
+      description: description || '',
+      cover_image: cover_image || '/img/service-golden-hour.jpg',
+      duration_minutes: Number(duration_minutes) || 60,
+      starting_price: Number(starting_price) || 350,
+      currency: currency || 'SAR',
+      edited_photos: Number(edited_photos) || 10,
+      sort_order: Number(sort_order) || 0,
+      active: 1
+    }).catch(() => {});
+
+    const info = db.prepare(
+      `INSERT INTO services (name, slug, description, cover_image, duration_minutes, starting_price, currency, edited_photos, sort_order)
+       VALUES (?,?,?,?,?,?,?,?,?)`
+    );
+    const result = info.run(
+      name, finalSlug,
+      description || '', cover_image || '/img/service-golden-hour.jpg',
+      Number(duration_minutes) || 60, Number(starting_price) || 350,
+      currency || 'SAR', Number(edited_photos) || 10, Number(sort_order) || 0
+    );
+    recordServicesToCloud(db).catch(() => {});
+    res.json({ ok: true, id: created ? created.id : result.lastInsertRowid });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 router.delete('/services/:id', async (req, res) => {
@@ -685,6 +702,36 @@ router.post('/test-telegram', async (req, res) => {
       return res.status(400).json({ error: result.error });
     }
     res.json({ ok: true, message: 'Notifikasi uji coba berhasil dikirim ke Telegram Anda!' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Set Telegram Interactive Bot Webhook
+router.post('/set-telegram-webhook', async (req, res) => {
+  try {
+    const { getTelegramConfig } = require('../lib/telegram');
+    const { webhook_url } = req.body || {};
+    const config = await getTelegramConfig(db);
+    const botToken = req.body?.bot_token || config.botToken;
+
+    if (!botToken) {
+      return res.status(400).json({ error: 'Bot Token belum dikonfigurasi.' });
+    }
+
+    const targetUrl = webhook_url || 'https://madinah-photographer.vercel.app/api/telegram/webhook';
+    const setRes = await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: targetUrl })
+    });
+    const data = await setRes.json();
+
+    if (!data.ok) {
+      return res.status(400).json({ error: data.description || 'Gagal mendaftarkan Webhook Telegram.' });
+    }
+
+    res.json({ ok: true, message: `Webhook bot berhasil diaktifkan ke ${targetUrl}`, result: data });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

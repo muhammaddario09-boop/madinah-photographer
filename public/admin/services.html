@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Services & Pricing — UMROH LENS Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Layanan & Paket Harga — UMROH LENS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
 <style>
   .service-card {
-    background: #fff;
+    background: #FFFFFF;
     border: 1px solid var(--line);
     padding: 24px;
     margin-bottom: 32px;
-    border-radius: 4px;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(28, 24, 20, 0.04);
   }
   .service-header {
     display: flex;
@@ -23,7 +24,7 @@
     padding-bottom: 18px;
     margin-bottom: 20px;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 20px;
   }
   .pkg-grid {
     display: grid;
@@ -35,12 +36,16 @@
     background: var(--ivory);
     border: 1px solid var(--line);
     padding: 18px;
-    border-radius: 4px;
+    border-radius: 6px;
+    position: relative;
   }
   .pkg-card h4 {
     font-size: 1.05rem;
     margin-bottom: 12px;
     color: var(--charcoal);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .form-row {
     margin-bottom: 12px;
@@ -48,12 +53,13 @@
   .form-row label {
     display: block;
     font-size: 0.74rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--charcoal-soft);
     margin-bottom: 4px;
   }
-  .form-row input, .form-row textarea {
+  .form-row input, .form-row textarea, .form-row select {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--line);
@@ -61,6 +67,12 @@
     font-size: 0.88rem;
     box-sizing: border-box;
     background: #fff;
+    border-radius: 4px;
+    color: var(--charcoal);
+  }
+  .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+    outline: none;
+    border-color: var(--gold);
   }
   .pkg-card input {
     font-size: 0.84rem;
@@ -72,12 +84,12 @@
     right: 24px;
     background: #2A4A5B;
     color: #fff;
-    padding: 12px 20px;
+    padding: 12px 22px;
     border-radius: 4px;
     font-size: 0.88rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
     display: none;
-    z-index: 9999;
+    z-index: 99999;
   }
   .file-btn {
     display: inline-block;
@@ -86,22 +98,49 @@
     background: var(--ivory);
     border: 1px solid var(--line);
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 4px;
     margin-top: 4px;
+    font-weight: 500;
+  }
+  .file-btn:hover {
+    background: #e8e2d5;
+  }
+  /* Modal Overlay */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.65);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-box {
+    background: #FFFFFF;
+    padding: 28px;
+    border-radius: 8px;
+    max-width: 580px;
+    width: 92%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
   }
 </style>
 </head>
 <body class="admin">
 <script src="/js/admin-nav.js"></script>
 <script>renderAdminNav('services');</script>
-<div id="toast" class="toast">Saved successfully!</div>
+<div id="toast" class="toast">Berhasil disimpan!</div>
 
 <script>
-function showToast(msg = 'Saved successfully!') {
+function showToast(msg = 'Perubahan berhasil disimpan!') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 2500);
+  setTimeout(() => { t.style.display = 'none'; }, 2800);
 }
 
 function compressImage(file, maxWidth = 1200, quality = 0.85) {
@@ -131,356 +170,441 @@ function compressImage(file, maxWidth = 1200, quality = 0.85) {
   });
 }
 
-async function loadData() {
+let catalogServices = [];
+
+async function loadCatalog() {
   const main = document.getElementById('admin-main');
-  main.innerHTML = `<h1 class="admin-h1">Services & Price List Manager</h1><p class="admin-sub">Loading catalog...</p>`;
+  main.innerHTML = `<h1 class="admin-h1">Katalog Layanan &amp; Paket Harga</h1><p class="admin-sub">Memuat data layanan...</p>`;
 
   try {
-    const [svcRes, photoRes, setRes, locRes] = await Promise.all([
-      adminFetch('/api/admin/services-full'),
-      adminFetch('/api/admin/photographer'),
-      adminFetch('/api/admin/settings').catch(() => null),
-      adminFetch('/api/admin/locations').catch(() => null)
-    ]);
+    const res = await adminFetch('/api/admin/services-full');
+    catalogServices = res.ok ? await res.json() : [];
 
-    const services = svcRes.ok ? await svcRes.json() : [];
-    const photographer = photoRes.ok ? await photoRes.json() : {};
-    const settings = (setRes && setRes.ok) ? await setRes.json() : {};
-    const locations = (locRes && locRes.ok) ? await locRes.json() : [];
-
-    if (!Array.isArray(services)) {
-      throw new Error('Invalid services catalog format');
+    if (!Array.isArray(catalogServices)) {
+      throw new Error('Format data layanan tidak valid.');
     }
 
     main.innerHTML = `
-      <h1 class="admin-h1">Services, Pricing & Payment Settings</h1>
-      <p class="admin-sub">Update service descriptions, package pricing, bank accounts, and WhatsApp numbers in real-time.</p>
-
-      <!-- Bank Accounts & WhatsApp Settings Card -->
-      <div class="service-card" style="border-left: 4px solid #25D366; background:#fafdfa;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h2 style="font-family:var(--font-display); font-size:1.3rem;">💳 Bank Accounts &amp; WhatsApp Settings</h2>
-          <span style="font-size:0.75rem; background:#DCE8D0; color:#3E5B2A; padding:3px 10px; border-radius:2px; font-weight:600;">ACTIVE IN BOOKING CHECKOUT</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+        <div>
+          <h1 class="admin-h1" style="margin-bottom:4px;">Katalog Layanan &amp; Paket Harga</h1>
+          <p class="admin-sub" style="margin-top:0;">Kelola jenis sesi foto, cover image, durasi hunting, dan tier paket harga.</p>
         </div>
-        
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
-          <div class="form-row">
-            <label>Admin WhatsApp 1 (Utama / CS 1)</label>
-            <input type="text" id="set-wa" value="${settings.admin_whatsapp || '+966501234567'}" placeholder="+966501234567">
-          </div>
-          <div class="form-row">
-            <label>Admin WhatsApp 2 (CS 2 / Tim Madinah)</label>
-            <input type="text" id="set-wa-2" value="${settings.admin_whatsapp_2 || '+6281234567890'}" placeholder="+6281234567890">
-          </div>
-          <div class="form-row">
-            <label>Instagram Official URL</label>
-            <input type="text" id="set-ig-url" value="${settings.instagram_url || 'https://instagram.com/umrohlens'}" placeholder="https://instagram.com/umrohlens">
-          </div>
-          <div class="form-row">
-            <label>Instagram Handle / Username</label>
-            <input type="text" id="set-ig-handle" value="${settings.instagram_handle || '@umrohlens'}" placeholder="@umrohlens">
-          </div>
-          <div class="form-row">
-            <label>SAR to IDR Exchange Rate (1 SAR = Rp)</label>
-            <input type="number" id="set-rate" value="${settings.idr_sar_rate || '4200'}" placeholder="4200">
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:8px;">
-          <div style="background:#fff; border:1px solid var(--line); padding:14px; border-radius:4px;">
-            <strong style="font-size:0.85rem; color:var(--charcoal);">🇸🇦 Saudi Bank (SAR)</strong>
-            <div class="form-row" style="margin-top:8px;">
-              <label>Bank Name</label>
-              <input type="text" id="set-sar-name" value="${settings.bank_sar_name || 'Al Rajhi Bank (Saudi Arabia)'}">
-            </div>
-            <div class="form-row">
-              <label>Account Number / IBAN</label>
-              <input type="text" id="set-sar-acc" value="${settings.bank_sar_account || 'SA84 8000 0123 4567 8901 2345'}">
-            </div>
-            <div class="form-row">
-              <label>Account Holder Name</label>
-              <input type="text" id="set-sar-holder" value="${settings.bank_sar_holder || 'UMROH LENS Photography Studio'}">
-            </div>
-          </div>
-
-          <div style="background:#fff; border:1px solid var(--line); padding:14px; border-radius:4px;">
-            <strong style="font-size:0.85rem; color:var(--charcoal);">🇮🇩 Indonesian Bank (Rupiah)</strong>
-            <div class="form-row" style="margin-top:8px;">
-              <label>Bank Name</label>
-              <input type="text" id="set-idr-name" value="${settings.bank_idr_name || 'Bank Syariah Indonesia (BSI) / BCA'}">
-            </div>
-            <div class="form-row">
-              <label>Account Number</label>
-              <input type="text" id="set-idr-acc" value="${settings.bank_idr_account || '7123456789 (BSI) / 5420123456 (BCA)'}">
-            </div>
-            <div class="form-row">
-              <label>Account Holder Name</label>
-              <input type="text" id="set-idr-holder" value="${settings.bank_idr_holder || 'UMROH LENS Photography'}">
-            </div>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" onclick="savePaymentSettings()" style="margin-top:14px; padding:9px 22px; font-size:0.82rem; background:#128C7E;">Save Bank, WhatsApp &amp; Instagram Settings</button>
+        <button onclick="openAddServiceModal()" class="btn btn-primary" style="padding:10px 20px; font-weight:600; display:flex; align-items:center; gap:6px;">
+          <span>➕ Tambah Layanan Baru</span>
+        </button>
       </div>
 
-      <!-- Photographer Profile Section -->
-      <div class="service-card" style="border-left: 4px solid var(--gold);">
-        <h2 style="font-family:var(--font-display); font-size:1.3rem; margin-bottom:14px;">Photographer Profile</h2>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
-          <div class="form-row">
-            <label>Name</label>
-            <input type="text" id="p-name" value="${photographer.name || ''}">
-          </div>
-          <div class="form-row">
-            <label>Avatar / Profile Photo</label>
-            <input type="text" id="p-avatar" value="${photographer.avatar_url || ''}">
-            <input type="file" id="p-avatar-file" accept="image/*" style="display:none;" onchange="handlePhotographerAvatar(this)">
-            <button type="button" class="file-btn" onclick="document.getElementById('p-avatar-file').click()">📁 Choose File from Device</button>
-          </div>
-        </div>
-        <div class="form-row">
-          <label>Bio / Description</label>
-          <textarea id="p-bio" rows="2">${photographer.bio || ''}</textarea>
-        </div>
-        <button class="btn btn-primary" onclick="savePhotographer()" style="padding:8px 18px; font-size:0.8rem;">Save Photographer Profile</button>
-      </div>
-
-
-      <!-- Locations: Managed in dedicated Locations & Spots page -->
-      <div class="service-card" style="border-left: 4px solid #3E5B2A; background:#fafcf8;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div>
-            <h2 style="font-family:var(--font-display); font-size:1.3rem;">📍 Lokasi & Shooting Spots</h2>
-            <p style="font-size:0.82rem; color:var(--charcoal-soft); margin-top:4px;">Kelola daftar lokasi pemotretan (Masjid Nabawi, Kubah Hijau, Raudhah, dll.) melalui halaman khusus.</p>
-          </div>
-          <a href="/admin/locations.html" class="btn" style="background:#3E5B2A; color:#fff; padding:8px 16px; font-size:0.8rem; border-radius:3px; text-decoration:none; font-weight:600;">
-            📍 Buka Halaman Locations & Spots →
-          </a>
-        </div>
-      </div>
-
-      <h2 style="font-family:var(--font-display); font-size:1.3rem; margin: 36px 0 16px 0;">Services & Packages Catalog</h2>
-      
       <div id="services-container">
-        ${services.map(s => `
+        ${catalogServices.map(s => `
           <div class="service-card" data-service-id="${s.id}">
             <div class="service-header">
               <div style="flex:1; min-width:280px;">
-                <div style="display:flex; gap:12px; align-items:center; margin-bottom:10px;">
-                  <span class="eyebrow" style="color:var(--gold);">Service ID: ${s.id}</span>
-                  <span style="font-size:0.75rem; color:var(--charcoal-soft);">/${s.slug}</span>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+                  <span class="eyebrow" style="color:var(--gold); font-weight:700;">SERVICE ID: #${s.id}</span>
+                  <span style="font-size:0.75rem; color:var(--charcoal-soft); background:#f4f4f0; padding:2px 8px; border-radius:3px;">/${s.slug}</span>
                 </div>
+                
                 <div class="form-row">
-                  <label>Service Title</label>
+                  <label>Nama Layanan Sesi</label>
                   <input type="text" class="svc-name" value="${s.name}">
                 </div>
+                
                 <div class="form-row">
-                  <label>Description</label>
+                  <label>Deskripsi Layanan</label>
                   <textarea class="svc-desc" rows="2">${s.description || ''}</textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                  <div class="form-row">
+                    <label>Durasi Standar (Menit)</label>
+                    <input type="number" class="svc-duration" value="${s.duration_minutes || 60}">
+                  </div>
+                  <div class="form-row">
+                    <label>Jumlah Foto Edit</label>
+                    <input type="number" class="svc-photos" value="${s.edited_photos || 10}">
+                  </div>
                 </div>
               </div>
 
-              <div style="width:260px;">
+              <div style="width:280px;">
                 <div class="form-row">
-                  <label>Cover Photo</label>
-                  <input type="text" class="svc-cover" value="${s.cover_image || ''}">
+                  <label>Foto Cover Layanan</label>
+                  <div style="width:100%; height:110px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; border:1px solid var(--line); margin-bottom:6px;" class="svc-preview"></div>
+                  <input type="text" class="svc-cover" value="${s.cover_image || ''}" placeholder="/img/service-..." style="font-size:0.78rem;">
                   <input type="file" class="svc-cover-file" accept="image/*" style="display:none;" onchange="handleServiceCover(this, ${s.id})">
-                  <button type="button" class="file-btn" onclick="this.previousElementSibling.click()">📁 Choose Photo from Device</button>
+                  <button type="button" class="file-btn" onclick="this.previousElementSibling.click()">📁 Ganti Foto dari Perangkat</button>
                 </div>
+
                 <div class="form-row">
-                  <label>Starting Price (${s.currency})</label>
-                  <input type="number" class="svc-start-price" value="${s.starting_price}">
+                  <label>Harga Mulai Dari (${s.currency || 'SAR'})</label>
+                  <input type="number" class="svc-start-price" value="${s.starting_price || 350}" style="font-weight:700; color:var(--charcoal);">
                 </div>
-                <button class="btn btn-ghost" onclick="saveService(${s.id})" style="width:100%; padding:8px; font-size:0.75rem; margin-top:8px;">Save Service Info</button>
+
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                  <button class="btn btn-ghost" onclick="saveService(${s.id})" style="flex:1; padding:8px; font-size:0.78rem; font-weight:600;">💾 Simpan Layanan</button>
+                  <button onclick="deleteService(${s.id}, '${s.name.replace(/'/g, "\\'")}')" title="Hapus Layanan" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:8px 12px; font-size:0.78rem; border-radius:4px; cursor:pointer;">🗑️</button>
+                </div>
               </div>
             </div>
 
-            <h3 style="font-family:var(--font-display); font-size:1.1rem; margin-top:16px;">Pricing Tiers (${s.packages.length})</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; border-top:1px dashed var(--line); padding-top:14px;">
+              <h3 style="font-family:var(--font-display); font-size:1.1rem; margin:0;">
+                Tier Paket Harga (${(s.packages || []).length})
+              </h3>
+              <button onclick="openAddPackageModal(${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="btn btn-ghost" style="padding:5px 12px; font-size:0.75rem; color:var(--gold); border-color:var(--gold);">
+                ➕ Tambah Tier Paket
+              </button>
+            </div>
+
             <div class="pkg-grid">
-              ${s.packages.map(p => `
+              ${(s.packages || []).map(p => `
                 <div class="pkg-card" data-pkg-id="${p.id}">
-                  <h4>${p.name}</h4>
+                  <h4>
+                    <span>${p.name}</span>
+                    <button onclick="deletePackage(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Hapus Paket" style="background:transparent; border:none; color:#c82333; cursor:pointer; font-size:0.85rem;">🗑️</button>
+                  </h4>
+                  
                   <div class="form-row">
-                    <label>Tier Name</label>
+                    <label>Nama Paket</label>
                     <input type="text" class="pkg-name" value="${p.name}">
                   </div>
+                  
                   <div class="form-row">
-                    <label>Price (SAR)</label>
-                    <input type="number" class="pkg-price" value="${p.price}" style="font-weight:600; color:#2A4A5B;">
+                    <label>Harga (SAR)</label>
+                    <input type="number" class="pkg-price" value="${p.price}" style="font-weight:700; color:#2A4A5B; font-size:0.95rem;">
                   </div>
+                  
                   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                     <div class="form-row">
-                      <label>Duration (Mins)</label>
-                      <input type="number" class="pkg-duration" value="${p.duration_minutes}">
+                      <label>Durasi (Mnt)</label>
+                      <input type="number" class="pkg-duration" value="${p.duration_minutes || 60}">
                     </div>
                     <div class="form-row">
-                      <label>Edited Photos</label>
-                      <input type="number" class="pkg-photos" value="${p.edited_photos}">
+                      <label>Foto Edit</label>
+                      <input type="number" class="pkg-photos" value="${p.edited_photos || 10}">
                     </div>
                   </div>
+                  
                   <div class="form-row">
-                    <label>Deposit Required (%)</label>
-                    <input type="number" class="pkg-deposit" value="${p.deposit_percentage}">
+                    <label>Deposit DP (%)</label>
+                    <input type="number" class="pkg-deposit" value="${p.deposit_percentage || 30}">
                   </div>
+                  
                   <div class="form-row">
-                    <label>Description</label>
-                    <input type="text" class="pkg-desc" value="${p.description || ''}">
+                    <label>Deskripsi / Fasilitas</label>
+                    <input type="text" class="pkg-desc" value="${p.description || ''}" placeholder="Include 40 foto edit + RAW + 1 min video">
                   </div>
-                  <button class="btn btn-primary" onclick="savePackage(${p.id})" style="width:100%; padding:7px; font-size:0.75rem; margin-top:6px;">Update Package Price</button>
+                  
+                  <button class="btn btn-primary" onclick="savePackage(${p.id})" style="width:100%; padding:7px; font-size:0.76rem; margin-top:6px;">
+                    Update Harga Paket
+                  </button>
                 </div>
-              `).join('')}
+              `).join('') || '<div style="grid-column:1/-1; color:var(--charcoal-soft); padding:12px; font-size:0.85rem;">Belum ada tier paket untuk layanan ini. Klik "➕ Tambah Tier Paket" di atas.</div>'}
             </div>
           </div>
         `).join('')}
       </div>
+
+      <!-- Modal: Tambah Layanan Baru -->
+      <div id="add-service-modal" class="modal-overlay">
+        <div class="modal-box">
+          <h3 style="margin-top:0; margin-bottom:16px; font-family:var(--font-display); font-size:1.3rem;">➕ Tambah Layanan Fotografi Baru</h3>
+          
+          <div class="form-row">
+            <label>Nama Layanan *</label>
+            <input type="text" id="new-svc-name" placeholder="Contoh: Kids &amp; Family Umrah Portrait">
+          </div>
+
+          <div class="form-row">
+            <label>Slug URL (Opsional, otomatis dari nama)</label>
+            <input type="text" id="new-svc-slug" placeholder="Contoh: kids-family-portrait">
+          </div>
+
+          <div class="form-row">
+            <label>Deskripsi Layanan</label>
+            <textarea id="new-svc-desc" rows="2" placeholder="Dokumentasi hangat &amp; penuh makna bersama keluarga di area Masjid Nabawi..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <label>Foto Cover Layanan</label>
+            <input type="text" id="new-svc-cover" value="/img/service-golden-hour.jpg" placeholder="/img/service-...">
+            <input type="file" id="new-svc-cover-file" accept="image/*" style="display:none;" onchange="handleNewServiceCover(this)">
+            <button type="button" class="file-btn" onclick="document.getElementById('new-svc-cover-file').click()">📁 Upload dari Perangkat</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-row">
+              <label>Harga Mulai (SAR)</label>
+              <input type="number" id="new-svc-price" value="400">
+            </div>
+            <div class="form-row">
+              <label>Durasi Standar (Menit)</label>
+              <input type="number" id="new-svc-dur" value="60">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-row">
+              <label>Foto Edit Dihasilkan</label>
+              <input type="number" id="new-svc-photos" value="10">
+            </div>
+            <div class="form-row">
+              <label>Urutan Tampil (Sort Order)</label>
+              <input type="number" id="new-svc-sort" value="10">
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+            <button class="btn btn-ghost" onclick="closeAddServiceModal()">Batal</button>
+            <button class="btn btn-primary" onclick="submitNewService()">Simpan Layanan Baru</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal: Tambah Paket Baru -->
+      <div id="add-pkg-modal" class="modal-overlay">
+        <div class="modal-box">
+          <h3 style="margin-top:0; margin-bottom:6px; font-family:var(--font-display); font-size:1.3rem;">➕ Tambah Tier Paket Baru</h3>
+          <p style="color:var(--charcoal-soft); font-size:0.85rem; margin-top:0; margin-bottom:16px;" id="add-pkg-subtitle"></p>
+          <input type="hidden" id="new-pkg-svcid">
+
+          <div class="form-row">
+            <label>Nama Paket / Tier *</label>
+            <input type="text" id="new-pkg-name" placeholder="Contoh: Signature / Premium / VVIP">
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-row">
+              <label>Harga (SAR) *</label>
+              <input type="number" id="new-pkg-price" value="650">
+            </div>
+            <div class="form-row">
+              <label>Durasi Sesi (Menit)</label>
+              <input type="number" id="new-pkg-dur" value="60">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-row">
+              <label>Jumlah Foto Edit</label>
+              <input type="number" id="new-pkg-photos" value="25">
+            </div>
+            <div class="form-row">
+              <label>Deposit DP Required (%)</label>
+              <input type="number" id="new-pkg-deposit" value="30">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Deskripsi / Fasilitas Paket</label>
+            <textarea id="new-pkg-desc" rows="2" placeholder="60 Menit Hunting, 25 Foto Edit + Seluruh RAW + 1 Video Reels..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+            <button class="btn btn-ghost" onclick="closeAddPackageModal()">Batal</button>
+            <button class="btn btn-primary" onclick="submitNewPackage()">Simpan Paket Baru</button>
+          </div>
+        </div>
+      </div>
     `;
   } catch (err) {
-    main.innerHTML = `<div class="alert-error" style="display:block;">Failed to load catalog: ${err.message}</div>`;
+    main.innerHTML = `<div class="alert-error" style="display:block;">Gagal memuat katalog layanan: ${err.message}</div>`;
   }
 }
 
-async function handlePhotographerAvatar(input) {
-  if (input.files && input.files[0]) {
-    const dataUrl = await compressImage(input.files[0], 600);
-    document.getElementById('p-avatar').value = dataUrl;
-    showToast('Photo selected from device!');
-  }
-}
-
+// Cover image upload handlers
 async function handleServiceCover(input, svcId) {
   if (input.files && input.files[0]) {
     const dataUrl = await compressImage(input.files[0], 1200);
     const card = document.querySelector(`.service-card[data-service-id="${svcId}"]`);
     card.querySelector('.svc-cover').value = dataUrl;
-    showToast('Photo selected from device!');
+    card.querySelector('.svc-preview').style.backgroundImage = `url('${dataUrl}')`;
+    showToast('Foto cover dipilih!');
   }
 }
 
-async function savePaymentSettings() {
-  const admin_whatsapp = document.getElementById('set-wa').value.trim();
-  const admin_whatsapp_2 = document.getElementById('set-wa-2').value.trim();
-  const instagram_url = document.getElementById('set-ig-url').value.trim();
-  const instagram_handle = document.getElementById('set-ig-handle').value.trim();
-  const idr_sar_rate = document.getElementById('set-rate').value.trim();
-  const bank_sar_name = document.getElementById('set-sar-name').value.trim();
-  const bank_sar_account = document.getElementById('set-sar-acc').value.trim();
-  const bank_sar_holder = document.getElementById('set-sar-holder').value.trim();
-  const bank_idr_name = document.getElementById('set-idr-name').value.trim();
-  const bank_idr_account = document.getElementById('set-idr-acc').value.trim();
-  const bank_idr_holder = document.getElementById('set-idr-holder').value.trim();
-
-  await adminFetch('/api/admin/settings', {
-    method: 'PUT',
-    body: JSON.stringify({
-      admin_whatsapp,
-      admin_whatsapp_2,
-      instagram_url,
-      instagram_handle,
-      idr_sar_rate,
-      bank_sar_name,
-      bank_sar_account,
-      bank_sar_holder,
-      bank_idr_name,
-      bank_idr_account,
-      bank_idr_holder
-    })
-  });
-  showToast('Bank accounts, WhatsApp, & Instagram settings updated!');
+async function handleNewServiceCover(input) {
+  if (input.files && input.files[0]) {
+    const dataUrl = await compressImage(input.files[0], 1200);
+    document.getElementById('new-svc-cover').value = dataUrl;
+    showToast('Foto cover layanan berhasil diupload!');
+  }
 }
 
-async function savePhotographer() {
-  const name = document.getElementById('p-name').value;
-  const avatar_url = document.getElementById('p-avatar').value;
-  const bio = document.getElementById('p-bio').value;
-  await adminFetch('/api/admin/photographer', {
-    method: 'PUT',
-    body: JSON.stringify({ name, avatar_url, bio })
-  });
-  showToast('Photographer profile updated!');
-}
-
+// Service Actions
 async function saveService(id) {
   const card = document.querySelector(`.service-card[data-service-id="${id}"]`);
-  const name = card.querySelector('.svc-name').value;
-  const description = card.querySelector('.svc-desc').value;
-  const cover_image = card.querySelector('.svc-cover').value;
-  const starting_price = card.querySelector('.svc-start-price').value;
+  const name = card.querySelector('.svc-name').value.trim();
+  const description = card.querySelector('.svc-desc').value.trim();
+  const duration_minutes = Number(card.querySelector('.svc-duration').value) || 60;
+  const edited_photos = Number(card.querySelector('.svc-photos').value) || 10;
+  const cover_image = card.querySelector('.svc-cover').value.trim();
+  const starting_price = Number(card.querySelector('.svc-start-price').value) || 350;
 
-  await adminFetch(`/api/admin/services/${id}`, {
+  if (!name) {
+    alert('Nama layanan wajib diisi.');
+    return;
+  }
+
+  const res = await adminFetch(`/api/admin/services/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({ name, description, cover_image, starting_price })
+    body: JSON.stringify({ name, description, duration_minutes, edited_photos, cover_image, starting_price })
   });
-  showToast('Service details updated!');
+
+  if (res.ok) {
+    showToast(`Layanan "${name}" berhasil diperbarui!`);
+  } else {
+    const err = await res.json();
+    alert('Gagal menyimpan: ' + (err.error || 'Terjadi kesalahan'));
+  }
+}
+
+function openAddServiceModal() {
+  document.getElementById('add-service-modal').style.display = 'flex';
+  document.getElementById('new-svc-name').focus();
+}
+
+function closeAddServiceModal() {
+  document.getElementById('add-service-modal').style.display = 'none';
+}
+
+async function submitNewService() {
+  const name = document.getElementById('new-svc-name').value.trim();
+  const slug = document.getElementById('new-svc-slug').value.trim();
+  const description = document.getElementById('new-svc-desc').value.trim();
+  const cover_image = document.getElementById('new-svc-cover').value.trim();
+  const starting_price = Number(document.getElementById('new-svc-price').value) || 350;
+  const duration_minutes = Number(document.getElementById('new-svc-dur').value) || 60;
+  const edited_photos = Number(document.getElementById('new-svc-photos').value) || 10;
+  const sort_order = Number(document.getElementById('new-svc-sort').value) || 0;
+
+  if (!name) {
+    alert('Nama layanan wajib diisi.');
+    return;
+  }
+
+  try {
+    const res = await adminFetch('/api/admin/services', {
+      method: 'POST',
+      body: JSON.stringify({ name, slug, description, cover_image, starting_price, duration_minutes, edited_photos, sort_order })
+    });
+
+    if (res.ok) {
+      closeAddServiceModal();
+      showToast(`Layanan "${name}" berhasil ditambahkan!`);
+      loadCatalog();
+    } else {
+      const d = await res.json();
+      alert('Gagal menambahkan layanan: ' + (d.error || 'Terjadi kesalahan'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function deleteService(id, name) {
+  if (!confirm(`Apakah Anda yakin ingin MENGHAPUS layanan "${name}" beserta seluruh paket harga di dalamnya?`)) return;
+  
+  try {
+    const res = await adminFetch(`/api/admin/services/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      showToast(`Layanan "${name}" berhasil dihapus.`);
+      loadCatalog();
+    } else {
+      const d = await res.json();
+      alert('Gagal menghapus: ' + (d.error || 'Terjadi kesalahan'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// Package Actions
+function openAddPackageModal(serviceId, serviceName) {
+  document.getElementById('new-pkg-svcid').value = serviceId;
+  document.getElementById('add-pkg-subtitle').textContent = `Layanan: ${serviceName}`;
+  document.getElementById('add-pkg-modal').style.display = 'flex';
+  document.getElementById('new-pkg-name').focus();
+}
+
+function closeAddPackageModal() {
+  document.getElementById('add-pkg-modal').style.display = 'none';
+}
+
+async function submitNewPackage() {
+  const service_id = document.getElementById('new-pkg-svcid').value;
+  const name = document.getElementById('new-pkg-name').value.trim();
+  const price = Number(document.getElementById('new-pkg-price').value) || 0;
+  const duration_minutes = Number(document.getElementById('new-pkg-dur').value) || 60;
+  const edited_photos = Number(document.getElementById('new-pkg-photos').value) || 10;
+  const deposit_percentage = Number(document.getElementById('new-pkg-deposit').value) || 30;
+  const description = document.getElementById('new-pkg-desc').value.trim();
+
+  if (!name || !price) {
+    alert('Nama paket dan harga wajib diisi.');
+    return;
+  }
+
+  try {
+    const res = await adminFetch('/api/admin/packages', {
+      method: 'POST',
+      body: JSON.stringify({ service_id, name, price, duration_minutes, edited_photos, deposit_percentage, description })
+    });
+
+    if (res.ok) {
+      closeAddPackageModal();
+      showToast(`Paket "${name}" berhasil ditambahkan!`);
+      loadCatalog();
+    } else {
+      const d = await res.json();
+      alert('Gagal menambahkan paket: ' + (d.error || 'Terjadi kesalahan'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
 }
 
 async function savePackage(id) {
   const card = document.querySelector(`.pkg-card[data-pkg-id="${id}"]`);
-  const name = card.querySelector('.pkg-name').value;
-  const price = card.querySelector('.pkg-price').value;
-  const duration_minutes = card.querySelector('.pkg-duration').value;
-  const edited_photos = card.querySelector('.pkg-photos').value;
-  const deposit_percentage = card.querySelector('.pkg-deposit').value;
-  const description = card.querySelector('.pkg-desc').value;
+  const name = card.querySelector('.pkg-name').value.trim();
+  const price = Number(card.querySelector('.pkg-price').value) || 0;
+  const duration_minutes = Number(card.querySelector('.pkg-duration').value) || 60;
+  const edited_photos = Number(card.querySelector('.pkg-photos').value) || 10;
+  const deposit_percentage = Number(card.querySelector('.pkg-deposit').value) || 30;
+  const description = card.querySelector('.pkg-desc').value.trim();
 
-  await adminFetch(`/api/admin/packages/${id}`, {
+  const res = await adminFetch(`/api/admin/packages/${id}`, {
     method: 'PUT',
     body: JSON.stringify({ name, price, duration_minutes, edited_photos, deposit_percentage, description })
   });
-  showToast(`Package "${name}" price updated to SAR ${price}!`);
-}
-
-async function saveLocation(id) {
-  const card = document.querySelector(`.pkg-card[data-loc-id="${id}"]`);
-  const name = card.querySelector('.loc-name').value.trim();
-  const description = card.querySelector('.loc-desc').value.trim();
-  const travel_buffer_minutes = card.querySelector('.loc-buffer').value.trim();
-
-  if (!name) {
-    alert('Nama lokasi tidak boleh kosong.');
-    return;
-  }
-
-  await adminFetch(`/api/admin/locations/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify({ name, description, travel_buffer_minutes })
-  });
-  showToast(`Lokasi "${name}" berhasil disimpan!`);
-}
-
-async function addNewLocationPrompt() {
-  const name = prompt('Masukkan nama lokasi / spot pemotretan baru di Madinah (contoh: Jabal Magnet, Masjid Qiblatain):');
-  if (!name || !name.trim()) return;
-
-  const description = prompt('Masukkan deskripsi singkat lokasi:', 'Spot pemotretan bersejarah di Madinah') || '';
-  const buffer = prompt('Waktu perjalanan / buffer (menit):', '20') || '20';
-
-  const res = await adminFetch('/api/admin/locations', {
-    method: 'POST',
-    body: JSON.stringify({ name: name.trim(), description: description.trim(), travel_buffer_minutes: Number(buffer) || 15 })
-  });
 
   if (res.ok) {
-    showToast(`Lokasi "${name}" berhasil ditambahkan!`);
-    loadData();
+    showToast(`Paket "${name}" berhasil diupdate!`);
   } else {
     const d = await res.json();
-    alert(d.error || 'Gagal menambahkan lokasi');
+    alert('Gagal mengupdate paket: ' + (d.error || 'Terjadi kesalahan'));
   }
 }
 
-async function deleteLocation(id, name) {
-  if (!confirm(`Apakah Anda yakin ingin menghapus lokasi "${name}"?`)) return;
-  const res = await adminFetch(`/api/admin/locations/${id}`, { method: 'DELETE' });
-  if (res.ok) {
-    showToast(`Lokasi "${name}" dihapus.`);
-    loadData();
-  } else {
-    const d = await res.json();
-    alert(d.error || 'Gagal menghapus lokasi');
+async function deletePackage(id, name) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus paket "${name}"?`)) return;
+
+  try {
+    const res = await adminFetch(`/api/admin/packages/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      showToast(`Paket "${name}" berhasil dihapus.`);
+      loadCatalog();
+    } else {
+      const d = await res.json();
+      alert('Gagal menghapus paket: ' + (d.error || 'Terjadi kesalahan'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
   }
 }
 
-loadData();
+document.addEventListener('DOMContentLoaded', loadCatalog);
 </script>
 </body>
 </html>
