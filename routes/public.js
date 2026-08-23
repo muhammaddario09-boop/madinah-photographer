@@ -556,9 +556,7 @@ router.post('/telegram/webhook', async (req, res) => {
     const { handleTelegramIncomingMessage } = require('../lib/telegram');
     const update = req.body || {};
     if (update.message) {
-      handleTelegramIncomingMessage(update.message, db).catch(err => {
-        console.error('Telegram incoming handler error:', err.message);
-      });
+      await handleTelegramIncomingMessage(update.message, db);
     }
     res.json({ ok: true });
   } catch (err) {
