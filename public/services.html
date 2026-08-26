@@ -2,9 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Layanan & Paket Dokumentasi — UMROH LENS Madinah</title>
 <meta name="description" content="Katalog layanan sesi foto & video profesional di Madinah Al-Munawwarah untuk jemaah Umrah, pasangan, dan keluarga. Dapatkan Rate Card resmi via WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .service-row-warm {
@@ -123,7 +126,7 @@
 
     <!-- Live Services Grid -->
     <div id="services-list">
-      <div style="text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat daftar layanan...</div>
+      <div style="text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat daftar layanan…</div>
     </div>
   </div>
 </section>
@@ -203,6 +206,7 @@ fetch('/api/services')
     document.getElementById('services-list').innerHTML = '<p style="color:var(--charcoal-soft); text-align:center;">Gagal memuat layanan.</p>';
   });
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

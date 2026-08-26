@@ -145,9 +145,9 @@ function renderDate() {
     <div class="step-label">Step 3 — Select Date</div>
     <h2 style="margin-bottom:24px;">Choose a date</h2>
     <div class="cal-nav">
-      <button class="btn btn-ghost" id="prev-month" style="padding:8px 14px;">←</button>
+      <button class="btn btn-ghost" id="prev-month" style="padding:8px 14px;" aria-label="Bulan sebelumnya">←</button>
       <strong style="font-family:var(--font-display); font-size:1.2rem;">${monthName} ${y}</strong>
-      <button class="btn btn-ghost" id="next-month" style="padding:8px 14px;">→</button>
+      <button class="btn btn-ghost" id="next-month" style="padding:8px 14px;" aria-label="Bulan berikutnya">→</button>
     </div>
     <div class="cal-grid" id="cal-dow">
       ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-dow">${d}</div>`).join('')}
@@ -254,7 +254,7 @@ function renderDetails() {
         ${['Editorial','Natural','Cinematic','Candid','Traditional'].map(o => `<option ${state.photoshoot.style===o?'selected':''}>${o}</option>`).join('')}
       </select>
     </div>
-    <div class="field"><label>Special Requests / Notes</label><textarea id="f-request" placeholder="Hotel pickup, specific timing, or props needed...">${state.photoshoot.request || ''}</textarea></div>
+    <div class="field"><label>Special Requests / Notes</label><textarea id="f-request" placeholder="Hotel pickup, specific timing, or props needed…">${state.photoshoot.request || ''}</textarea></div>
     <div class="actions-row"><button class="btn btn-ghost" id="back">Back</button><button class="btn btn-primary" id="next">Continue to Payment</button></div>
   `;
 }

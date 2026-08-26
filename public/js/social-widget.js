@@ -133,7 +133,7 @@
         color: #1C1814;
         background: #FFFFFF;
         border: 1px solid rgba(28, 24, 20, 0.08);
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       }
       .social-item:hover {
         transform: translateY(-2px);

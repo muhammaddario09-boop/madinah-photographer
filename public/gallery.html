@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Client Photo Gallery — UMROH LENS Madinah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -160,7 +163,7 @@
 
 <!-- Lightbox Modal -->
 <div id="lightbox" class="lightbox-modal" onclick="closeLightbox(event)">
-  <span class="lightbox-close-btn">&times;</span>
+  <button type="button" class="lightbox-close-btn" aria-label="Tutup galeri">&times;</button>
   <img id="lightbox-img" class="lightbox-img-el" src="" alt="Client Photo HD">
 </div>
 
@@ -188,7 +191,7 @@ async function lookupGallery(codeParam) {
     return;
   }
 
-  container.innerHTML = `<div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">Memuat galeri foto untuk ${code}...</div>`;
+  container.innerHTML = `<div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">Memuat galeri foto untuk ${code}…</div>`;
 
   try {
     const res = await fetch(`/api/bookings/${encodeURIComponent(code)}`);
@@ -264,6 +267,7 @@ function closeLightbox(e) {
   }
 }
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

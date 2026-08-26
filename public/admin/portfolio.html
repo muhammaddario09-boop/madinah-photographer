@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Portfolio & Photos — UMROH LENS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -62,7 +65,7 @@
     text-align: center;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     margin-bottom: 16px;
   }
   .upload-dropzone:hover, .upload-dropzone.dragover {
@@ -146,7 +149,7 @@ function compressImage(file, maxWidth = 900, quality = 0.75) {
 
 async function loadPortfolio() {
   const main = document.getElementById('admin-main');
-  main.innerHTML = `<h1 class="admin-h1">Portfolio & Photo Gallery Manager</h1><p class="admin-sub">Loading gallery...</p>`;
+  main.innerHTML = `<h1 class="admin-h1">Portfolio & Photo Gallery Manager</h1><p class="admin-sub">Loading gallery…</p>`;
 
   try {
     const res = await adminFetch('/api/admin/portfolio');
@@ -265,7 +268,7 @@ async function loadPortfolio() {
 
       const uploadBtn = document.getElementById('upload-btn');
       uploadBtn.disabled = true;
-      uploadBtn.textContent = 'Uploading...';
+      uploadBtn.textContent = 'Uploading…';
 
       const title = document.getElementById('new-title').value.trim();
       const category = document.getElementById('new-cat').value;

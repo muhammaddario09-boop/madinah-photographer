@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Pengaturan Kurs &amp; Studio — UMROH LENS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -123,7 +126,7 @@ function compressImage(file, maxWidth = 800, quality = 0.85) {
 
 async function loadSettings() {
   const main = document.getElementById('admin-main');
-  main.innerHTML = `<h1 class="admin-h1">Pengaturan Kurs &amp; Studio</h1><p class="admin-sub">Memuat konfigurasi...</p>`;
+  main.innerHTML = `<h1 class="admin-h1">Pengaturan Kurs &amp; Studio</h1><p class="admin-sub">Memuat konfigurasi…</p>`;
 
   try {
     const [setRes, photoRes] = await Promise.all([
@@ -154,7 +157,7 @@ async function loadSettings() {
           <h3>💱 Kurs Mata Uang &amp; Sesi</h3>
           
           <div class="form-group">
-            <label>Nilai Tukar Kurs (1 SAR = ... Rupiah IDR)</label>
+            <label>Nilai Tukar Kurs (1 SAR = … Rupiah IDR)</label>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-weight:700; color:var(--gold);">1 SAR = Rp</span>
               <input type="number" id="idr_sar_rate" value="${data.idr_sar_rate || 4200}" style="font-size:1.1rem; font-weight:700; color:var(--charcoal);">
@@ -174,7 +177,7 @@ async function loadSettings() {
 
           <div class="form-group">
             <label>Default Google Drive Master Folder URL</label>
-            <input type="url" id="default_drive_url" value="${data.default_drive_url || 'https://drive.google.com'}" placeholder="https://drive.google.com/drive/folders/...">
+            <input type="url" id="default_drive_url" value="${data.default_drive_url || 'https://drive.google.com'}" placeholder="https://drive.google.com/drive/folders/…">
             <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
               Link folder Google Drive umum jika klien belum memiliki link folder khusus.
             </small>
@@ -295,7 +298,7 @@ async function loadSettings() {
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
             <div class="form-group">
               <label>Telegram Bot Token (dari @BotFather)</label>
-              <input type="text" id="telegram_bot_token" value="${data.telegram_bot_token || ''}" placeholder="Contoh: 7123456789:AAHk...">
+              <input type="text" id="telegram_bot_token" value="${data.telegram_bot_token || ''}" placeholder="Contoh: 7123456789:AAHk…">
               <small style="color:var(--charcoal-soft); font-size:0.75rem; display:block; margin-top:4px;">
                 Dapatkan token gratis dengan membuat bot di Telegram via <a href="https://t.me/BotFather" target="_blank" style="color:#0088cc;">@BotFather</a>.
               </small>
@@ -399,7 +402,7 @@ async function testTelegramAlert() {
   resBox.style.background = '#E8F0FE';
   resBox.style.color = '#1A73E8';
   resBox.style.border = '1px solid #C2D7FA';
-  resBox.textContent = 'Mengirim pesan tes ke Telegram...';
+  resBox.textContent = 'Mengirim pesan tes ke Telegram…';
 
   try {
     const res = await adminFetch('/api/admin/test-telegram', {
@@ -440,7 +443,7 @@ async function activateTelegramWebhook() {
   resBox.style.background = '#E8F0FE';
   resBox.style.color = '#1A73E8';
   resBox.style.border = '1px solid #C2D7FA';
-  resBox.textContent = 'Mendaftarkan Webhook Telegram...';
+  resBox.textContent = 'Mendaftarkan Webhook Telegram…';
 
   try {
     const origin = window.location.origin;

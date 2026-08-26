@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Locations & Spots — UMROH LENS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -132,7 +135,7 @@ main.innerHTML = `
 
     <div class="field">
       <label>Deskripsi & Karakteristik Spot</label>
-      <textarea id="loc-desc" placeholder="Spot foto terbaik saat Shubuh & Dhuha, latar belakang payung terbuka dan kubah hijau Nabawi..."></textarea>
+      <textarea id="loc-desc" placeholder="Spot foto terbaik saat Shubuh & Dhuha, latar belakang payung terbuka dan kubah hijau Nabawi…"></textarea>
     </div>
 
     <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:14px;">
@@ -143,7 +146,7 @@ main.innerHTML = `
 
   <!-- Daftar Lokasi Container -->
   <div id="locations-container">
-    <div style="text-align:center; padding:40px; color:var(--charcoal-soft);">Memuat daftar spot lokasi dari Supabase...</div>
+    <div style="text-align:center; padding:40px; color:var(--charcoal-soft);">Memuat daftar spot lokasi dari Supabase…</div>
   </div>
 `;
 
@@ -224,7 +227,7 @@ async function saveLocation() {
 
   const saveBtn = document.getElementById('save-btn');
   saveBtn.disabled = true;
-  saveBtn.innerText = 'Menyimpan...';
+  saveBtn.innerText = 'Menyimpan…';
 
   try {
     const url = id ? `/api/admin/locations/${id}` : '/api/admin/locations';

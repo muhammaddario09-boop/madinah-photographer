@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>My Booking — UMROH LENS Madinah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -70,7 +73,7 @@ function getStatusInfo(status) {
 
 async function lookup(code) {
   const result = document.getElementById('result');
-  result.innerHTML = '<p style="color:var(--charcoal-soft);">Mencari data reservasi...</p>';
+  result.innerHTML = '<p style="color:var(--charcoal-soft);">Mencari data reservasi…</p>';
   try {
     const res = await fetch(`/api/bookings/${code}`);
     if (!res.ok) {
@@ -133,7 +136,7 @@ async function lookup(code) {
 
       const alertBox = document.getElementById('reschedule-alert');
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '<p style="color:var(--charcoal-soft);">Mengirim permintaan reschedule...</p>';
+      alertBox.innerHTML = '<p style="color:var(--charcoal-soft);">Mengirim permintaan reschedule…</p>';
 
       const r = await fetch(`/api/bookings/${b.booking_code}/reschedule`, {
         method: 'POST',
@@ -174,6 +177,7 @@ if (params.get('code')) {
   lookup(params.get('code'));
 }
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>
