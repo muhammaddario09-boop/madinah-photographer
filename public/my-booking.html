@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#F5F5F7">
 <title>My Booking — UMROH LENS Madinah</title>
-<meta name="theme-color" content="#F5F5F7">
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .wrap { max-width: 640px; margin: 0 auto; padding: 50px 24px 100px; }
@@ -39,9 +38,9 @@
 </nav>
 
 <div class="wrap">
-  <p class="eyebrow" data-i18n="nav_my_booking">My Booking</p>
-  <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;" data-i18n="btn_lookup">Find your reservation</h1>
-  <form id="lookup-form" class="field" style="display:flex; gap:10px;">
+  <p class="eyebrow" data-i18n="nav_my_booking" data-reveal>My Booking</p>
+  <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;" data-i18n="btn_lookup" data-reveal>Find your reservation</h1>
+  <form id="lookup-form" class="field" style="display:flex; gap:10px;" data-reveal>
     <label for="code-input" style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;">Booking ID</label>
     <input id="code-input" name="booking_code" autocomplete="off" spellcheck="false" autocapitalize="characters" placeholder="Booking ID, e.g. MDN-2026-0001">
     <button type="submit" class="btn btn-primary" id="lookup-btn" data-i18n="btn_lookup">Find</button>
@@ -181,6 +180,7 @@ if (params.get('code')) {
 }
 </script>
 <script src="/js/nav.js"></script>
+<script src="/js/motion.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

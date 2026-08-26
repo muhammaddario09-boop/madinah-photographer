@@ -31,7 +31,8 @@ router.get('/services', async (req, res) => {
     const services = db.prepare(`SELECT * FROM services WHERE active=1 ORDER BY sort_order, id`).all();
     const full = services.map(s => {
       const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price ASC`).all(s.id);
-      const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
+      const svcSlug = s.slug || '';
+      const isLong = svcSlug.includes('family') || svcSlug.includes('tour');
       const standardDur = isLong ? 120 : (s.duration_minutes || 90);
       const pkgs = packages.length > 0 ? packages : [{
         id: s.id * 10,
@@ -64,7 +65,8 @@ router.get('/services/:slug', async (req, res) => {
     const service = db.prepare(`SELECT * FROM services WHERE (slug=? OR id=? OR LOWER(slug)=LOWER(?)) AND active=1`).get(param, isNaN(param) ? -1 : Number(param), param);
     if (!service) return res.status(404).json({ error: 'Service not found' });
     const packages = db.prepare(`SELECT * FROM packages WHERE service_id=? AND active=1 ORDER BY price ASC`).all(service.id);
-    const isLong = (service.slug || '').includes('family') || (service.slug || '').includes('tour');
+    const svcSlug2 = service.slug || '';
+    const isLong = svcSlug2.includes('family') || svcSlug2.includes('tour');
     const standardDur = isLong ? 120 : (service.duration_minutes || 90);
     const pkgs = packages.length > 0 ? packages : [{
       id: service.id * 10,

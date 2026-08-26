@@ -72,16 +72,16 @@
   <div class="nav-inner">
     <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
     <div class="nav-links">
-      <a href="/portfolio.html">Portfolio</a>
-      <a href="/services.html" style="color:var(--gold);">Services</a>
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" style="color:var(--gold);" data-i18n="nav_services">Services</a>
       <a href="/ratecard.html">Rate Card PDF</a>
-      <a href="/my-booking.html">My Booking</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
       <a href="/gallery.html">Gallery</a>
     </div>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
-      <a class="nav-cta" href="/booking.html">Book a Session</a>
+      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
     </div>
   </div>
 </nav>
@@ -89,9 +89,9 @@
 <!-- Page Header -->
 <header class="section-tight" style="text-align:center; padding-top:60px; padding-bottom:20px;">
   <div class="container">
-    <p class="eyebrow">PILIHAN LAYANAN &amp; SESI FOTO</p>
-    <h1 style="margin-top:12px;">Daftar Sesi Foto &amp; Video Profesional</h1>
-    <p style="color:var(--charcoal-soft); max-width:680px; margin:14px auto 0; font-size:1.05rem;">
+    <p class="eyebrow" data-reveal>PILIHAN LAYANAN &amp; SESI FOTO</p>
+    <h1 style="margin-top:12px;" data-reveal>Daftar Sesi Foto &amp; Video Profesional</h1>
+    <p style="color:var(--charcoal-soft); max-width:680px; margin:14px auto 0; font-size:1.05rem;" data-reveal>
       Seluruh sesi dipandu oleh fotografer mukim Madinah berizin resmi, ramah keluarga &amp; lansia, mencakup seluruh file RAW original serta pengiriman Google Drive cepat 24-48 jam.
     </p>
   </div>
@@ -167,7 +167,8 @@ fetch('/api/services')
 
             <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;">
               ${(() => {
-                const isLongSession = s.slug.includes('family') || s.slug.includes('tour');
+                const svcSlug = s.slug || '';
+                const isLongSession = svcSlug.includes('family') || svcSlug.includes('tour');
                 const duration = isLongSession ? 120 : 90;
                 return `
                   <div class="pkg-pill-warm" style="width:100%;">
@@ -208,6 +209,7 @@ fetch('/api/services')
   });
 </script>
 <script src="/js/nav.js"></script>
+<script src="/js/motion.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

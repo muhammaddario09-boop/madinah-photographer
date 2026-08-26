@@ -190,18 +190,18 @@
   <div class="nav-inner">
     <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
     <div class="nav-links">
-      <a href="/portfolio.html" style="color:var(--gold);">Portfolio</a>
-      <a href="/services.html">Services</a>
+      <a href="/portfolio.html" style="color:var(--gold);" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
       <a href="/ratecard.html">Rate Card PDF</a>
-      <a href="/#about">About</a>
-      <a href="/#faq">FAQ</a>
-      <a href="/my-booking.html">My Booking</a>
+      <a href="/#about" data-i18n="nav_about">About</a>
+      <a href="/#faq" data-i18n="nav_faq">FAQ</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
       <a href="/gallery.html">Gallery</a>
     </div>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <script src="/js/i18n.js"></script>
       <script>document.write(renderLanguageSwitcher());</script>
-      <a class="nav-cta" href="/booking.html">Book a Session</a>
+      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
     </div>
   </div>
 </nav>
@@ -209,9 +209,9 @@
 <!-- Page Header -->
 <header class="section-tight" style="text-align:center; padding-top:60px; padding-bottom:10px;">
   <div class="container">
-    <p class="eyebrow">GALERI DOKUMENTASI RESMI</p>
-    <h1 style="margin-top:12px;">Portofolio Foto di Kota Madinah</h1>
-    <p style="color:var(--charcoal-soft); max-width:680px; margin:14px auto 0; font-size:1.05rem;">
+    <p class="eyebrow" data-reveal>GALERI DOKUMENTASI RESMI</p>
+    <h1 style="margin-top:12px;" data-reveal>Portofolio Foto di Kota Madinah</h1>
+    <p style="color:var(--charcoal-soft); max-width:680px; margin:14px auto 0; font-size:1.05rem;" data-reveal>
       Dokumentasi nyata jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami di sudut-sudut terindah kota Nabi.
     </p>
   </div>
@@ -432,6 +432,7 @@ document.addEventListener('keydown', (e) => {
 });
 </script>
 <script src="/js/nav.js"></script>
+<script src="/js/motion.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

@@ -136,7 +136,8 @@ function renderService() {
     <div class="step-label">Step 1 — Pilih Layanan</div>
     <h2 style="margin-bottom:24px;">Pilihan Jenis Sesi Fotografi</h2>
     ${state.services.map(s => {
-      const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
+      const slug = s.slug || '';
+      const isLong = slug.includes('family') || slug.includes('tour');
       const dur = isLong ? 120 : 90;
       return `
         <button type="button" class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;" aria-pressed="${state.service?.id === s.id}">
@@ -155,7 +156,8 @@ function renderService() {
 }
 
 function renderPackage() {
-  const isLong = (state.service?.slug || '').includes('family') || (state.service?.slug || '').includes('tour');
+  const pkgSlug = state.service?.slug || '';
+  const isLong = pkgSlug.includes('family') || pkgSlug.includes('tour');
   const dur = isLong ? 120 : 90;
   const p = (state.service?.packages && state.service.packages[0]) || { id: 1, name: 'Standard Bespoke Session', duration_minutes: dur, edited_photos: 40 };
 

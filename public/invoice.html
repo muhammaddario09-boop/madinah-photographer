@@ -221,8 +221,20 @@ async function loadInvoice() {
     const deposit = Number(b.deposit_amount) || 0;
     const total = Number(b.total_price) || 0;
     const remaining = Math.max(0, total - deposit);
-    const depositIDR = (deposit * 4250).toLocaleString('id-ID');
-    const remainingIDR = (remaining * 4250).toLocaleString('id-ID');
+
+    // Use the live bank IDR rate from /api/payment-info (same source as the
+    // booking flow) with a safe fallback — never hardcode an FX rate here.
+    let idrRate = 4800;
+    try {
+      const piRes = await fetch('/api/payment-info');
+      if (piRes.ok) {
+        const pi = await piRes.json();
+        if (pi.bankIDR && Number(pi.bankIDR.rate) > 0) idrRate = Number(pi.bankIDR.rate);
+      }
+    } catch (e) { /* keep fallback rate */ }
+
+    const depositIDR = (deposit * idrRate).toLocaleString('id-ID');
+    const remainingIDR = (remaining * idrRate).toLocaleString('id-ID');
 
     container.innerHTML = `
       <!-- Invoice Header -->

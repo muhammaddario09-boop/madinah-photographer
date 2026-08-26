@@ -303,7 +303,8 @@ fetch('/api/services')
     const grid = document.getElementById('services-grid');
     if (!services || services.length === 0 || !grid) return;
     grid.innerHTML = services.slice(0,6).map(s => {
-      const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
+      const svcSlug = s.slug || '';
+      const isLong = svcSlug.includes('family') || svcSlug.includes('tour');
       const dur = isLong ? 120 : 90;
       return `
         <a class="service-card" href="/booking.html?service=${encodeURIComponent(s.slug)}">

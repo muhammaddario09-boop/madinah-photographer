@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#F5F5F7">
 <title>Client Photo Gallery — UMROH LENS Madinah</title>
-<meta name="theme-color" content="#F5F5F7">
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .gallery-hero {
@@ -122,13 +121,15 @@
   <div class="nav-inner">
     <a class="nav-mark" href="/">UMROH LENS <span>Madinah</span></a>
     <div class="nav-links">
-      <a href="/portfolio.html">Portfolio</a>
-      <a href="/services.html">Services</a>
-      <a href="/my-booking.html">My Booking</a>
+      <a href="/portfolio.html" data-i18n="nav_portfolio">Portfolio</a>
+      <a href="/services.html" data-i18n="nav_services">Services</a>
+      <a href="/my-booking.html" data-i18n="nav_my_booking">My Booking</a>
       <a href="/gallery.html" style="color:var(--gold);">Client Gallery</a>
     </div>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <a class="nav-cta" href="/booking.html">Book a Session</a>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <script src="/js/i18n.js"></script>
+      <script>document.write(renderLanguageSwitcher());</script>
+      <a class="nav-cta" href="/booking.html" data-i18n="nav_book">Book a Session</a>
     </div>
   </div>
 </nav>
@@ -136,20 +137,20 @@
 <!-- Hero Header -->
 <header class="gallery-hero">
   <div class="container">
-    <p class="eyebrow">PORTAL PENGIRIMAN FOTO KLIEN</p>
-    <h1 style="margin-top:10px;">Akses Galeri Hasil Foto Anda</h1>
-    <p style="color:var(--charcoal-soft); max-width:620px; margin:12px auto 28px; font-size:1rem;">
+    <p class="eyebrow" data-i18n="gal_eyebrow" data-reveal>PORTAL PENGIRIMAN FOTO KLIEN</p>
+    <h1 style="margin-top:10px;" data-i18n="gal_title" data-reveal>Akses Galeri Hasil Foto Anda</h1>
+    <p style="color:var(--charcoal-soft); max-width:620px; margin:12px auto 28px; font-size:1rem;" data-i18n="gal_sub" data-reveal>
       Seluruh dokumentasi hasil pemotretan Anda di Madinah Al-Munawwarah diproses dalam resolusi 4K Ultra HD dan dapat diakses kapan saja.
     </p>
 
     <!-- Search Box -->
-    <div class="search-card">
-      <label style="display:block; text-align:left; font-size:0.8rem; font-weight:700; color:var(--charcoal); margin-bottom:8px;">
+    <div class="search-card" data-reveal>
+      <label style="display:block; text-align:left; font-size:0.8rem; font-weight:700; color:var(--charcoal); margin-bottom:8px;" data-i18n="gal_label_code">
         MASUKKAN KODE BOOKING RESMI
       </label>
       <div style="display:flex; gap:10px;">
-        <input type="text" id="code-input" placeholder="Contoh: MDN-2026-0001" style="flex:1; padding:14px; border:1px solid var(--line); border-radius:6px; font-size:0.95rem; text-transform:uppercase; font-weight:600;">
-        <button class="btn btn-primary" onclick="lookupGallery()" style="padding:14px 24px; white-space:nowrap;">Buka Galeri</button>
+        <input type="text" id="code-input" placeholder="Contoh: MDN-2026-0001" data-i18n="gal_placeholder" style="flex:1; padding:14px; border:1px solid var(--line); border-radius:6px; font-size:0.95rem; text-transform:uppercase; font-weight:600;">
+        <button class="btn btn-primary" onclick="lookupGallery()" style="padding:14px 24px; white-space:nowrap;" data-i18n="gal_btn_open">Buka Galeri</button>
       </div>
     </div>
   </div>
@@ -158,7 +159,7 @@
 <!-- Main Gallery Content -->
 <section class="section" style="padding-top:40px;">
   <div class="container" id="gallery-container" aria-live="polite">
-    <div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">
+    <div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);" data-i18n="gal_empty">
       Masukkan Kode Booking di atas untuk membuka album foto Anda.
     </div>
   </div>
@@ -255,9 +256,9 @@ async function lookupGallery(codeParam) {
   } catch (err) {
     container.innerHTML = `
       <div style="text-align:center; padding:40px; background:#FFFFFF; border:1px solid var(--line); border-radius:8px;">
-        <h3 style="color:var(--status-booked);">Booking ID Tidak Ditemukan</h3>
-        <p style="color:var(--charcoal-soft); margin:8px 0 16px;">Pastikan Anda memasukkan kode booking yang benar (misal: <strong>MDN-2026-0001</strong>).</p>
-        <a href="/my-booking.html" class="btn btn-primary">Cek Status Reservasi</a>
+        <h3 style="color:var(--status-booked);">${escapeHtml(t('gal_notfound_title', 'Booking ID Tidak Ditemukan'))}</h3>
+        <p style="color:var(--charcoal-soft); margin:8px 0 16px;">${escapeHtml(t('gal_notfound_msg', 'Pastikan Anda memasukkan kode booking yang benar (misal: MDN-2026-0001).'))}</p>
+        <a href="/my-booking.html" class="btn btn-primary">${escapeHtml(t('gal_check_status', 'Cek Status Reservasi'))}</a>
       </div>
     `;
   }
@@ -302,6 +303,7 @@ document.addEventListener('keydown', (e) => {
 });
 </script>
 <script src="/js/nav.js"></script>
+<script src="/js/motion.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>
