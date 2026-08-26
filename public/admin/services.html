@@ -139,6 +139,7 @@
 <script>renderAdminNav('services');</script>
 <div id="toast" class="toast">Berhasil disimpan!</div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 function showToast(msg = 'Perubahan berhasil disimpan!') {
   const t = document.getElementById('toast');
@@ -226,12 +227,12 @@ async function loadCatalog() {
                 
                 <div class="form-row">
                   <label>Nama Layanan Sesi</label>
-                  <input type="text" class="svc-name" value="${s.name}">
+                  <input type="text" class="svc-name" value="${escapeHtml(s.name)}">
                 </div>
                 
                 <div class="form-row">
                   <label>Deskripsi Layanan</label>
-                  <textarea class="svc-desc" rows="2">${s.description || ''}</textarea>
+                  <textarea class="svc-desc" rows="2">${escapeHtml(s.description || '')}</textarea>
                 </div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
@@ -250,7 +251,7 @@ async function loadCatalog() {
                 <div class="form-row">
                   <label>Foto Cover Layanan</label>
                   <div style="width:100%; height:110px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; border:1px solid var(--line); margin-bottom:6px;" class="svc-preview"></div>
-                  <input type="text" class="svc-cover" value="${s.cover_image || ''}" placeholder="/img/service-…" style="font-size:0.78rem;">
+                  <input type="text" class="svc-cover" value="${escapeHtml(s.cover_image || '')}" placeholder="/img/service-…" style="font-size:0.78rem;">
                   <input type="file" class="svc-cover-file" accept="image/*" style="display:none;" onchange="handleServiceCover(this, ${s.id})">
                   <button type="button" class="file-btn" onclick="this.previousElementSibling.click()">📁 Ganti Foto dari Perangkat</button>
                 </div>
@@ -262,7 +263,7 @@ async function loadCatalog() {
 
                 <div style="display:flex; gap:8px; margin-top:12px;">
                   <button class="btn btn-ghost" onclick="saveService(${s.id})" style="flex:1; padding:8px; font-size:0.78rem; font-weight:600;">💾 Simpan Layanan</button>
-                  <button onclick="deleteService(${s.id}, '${s.name.replace(/'/g, "\\'")}')" title="Hapus Layanan" aria-label="Hapus layanan ${s.name.replace(/'/g, "\\'")}" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:8px 12px; font-size:0.78rem; border-radius:4px; cursor:pointer;">🗑️</button>
+                  <button onclick="deleteService(${s.id}, ${escapeHtml(JSON.stringify(s.name))})" title="Hapus Layanan" aria-label="Hapus layanan ${escapeHtml(s.name)}" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:8px 12px; font-size:0.78rem; border-radius:4px; cursor:pointer;">🗑️</button>
                 </div>
               </div>
             </div>
@@ -271,7 +272,7 @@ async function loadCatalog() {
               <h3 style="font-family:var(--font-display); font-size:1.1rem; margin:0;">
                 Tier Paket Harga (${(s.packages || []).length})
               </h3>
-              <button onclick="openAddPackageModal(${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="btn btn-ghost" style="padding:5px 12px; font-size:0.75rem; color:var(--gold); border-color:var(--gold);">
+              <button onclick="openAddPackageModal(${s.id}, ${escapeHtml(JSON.stringify(s.name))})" class="btn btn-ghost" style="padding:5px 12px; font-size:0.75rem; color:var(--gold); border-color:var(--gold);">
                 ➕ Tambah Tier Paket
               </button>
             </div>
@@ -280,13 +281,13 @@ async function loadCatalog() {
               ${(s.packages || []).map(p => `
                 <div class="pkg-card" data-pkg-id="${p.id}">
                   <h4>
-                    <span>${p.name}</span>
-                    <button onclick="deletePackage(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Hapus Paket" aria-label="Hapus paket ${p.name.replace(/'/g, "\\'")}" style="background:transparent; border:none; color:#c82333; cursor:pointer; font-size:0.85rem;">🗑️</button>
+                    <span>${escapeHtml(p.name)}</span>
+                    <button onclick="deletePackage(${p.id}, ${escapeHtml(JSON.stringify(p.name))})" title="Hapus Paket" aria-label="Hapus paket ${escapeHtml(p.name)}" style="background:transparent; border:none; color:#c82333; cursor:pointer; font-size:0.85rem;">🗑️</button>
                   </h4>
                   
                   <div class="form-row">
                     <label>Nama Paket</label>
-                    <input type="text" class="pkg-name" value="${p.name}">
+                    <input type="text" class="pkg-name" value="${escapeHtml(p.name)}">
                   </div>
                   
                   <div class="form-row">
@@ -312,7 +313,7 @@ async function loadCatalog() {
                   
                   <div class="form-row">
                     <label>Deskripsi / Fasilitas</label>
-                    <input type="text" class="pkg-desc" value="${p.description || ''}" placeholder="Include 40 foto edit + RAW + 1 min video">
+                    <input type="text" class="pkg-desc" value="${escapeHtml(p.description || '')}" placeholder="Include 40 foto edit + RAW + 1 min video">
                   </div>
                   
                   <button class="btn btn-primary" onclick="savePackage(${p.id})" style="width:100%; padding:7px; font-size:0.76rem; margin-top:6px;">

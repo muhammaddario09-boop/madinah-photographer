@@ -164,10 +164,15 @@
 
 <script src="/js/admin-nav.js"></script>
 <script>
+  // Only allow internal admin pages — prevents open redirects
+  function safeRedirectTarget() {
+    const target = new URLSearchParams(window.location.search).get('redirect') || '/admin/index.html';
+    return /^\/admin\/[a-z0-9\-]+\.html$/i.test(target) ? target : '/admin/index.html';
+  }
+
   // If already authenticated, redirect to dashboard
   if (getAdminToken()) {
-    const params = new URLSearchParams(window.location.search);
-    window.location.href = params.get('redirect') || '/admin/index.html';
+    window.location.href = safeRedirectTarget();
   }
 
   const form = document.getElementById('login-form');
@@ -200,8 +205,7 @@
       setAdminToken(data.token, data.user);
 
       // Redirect to target destination
-      const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('redirect') || '/admin/index.html';
+      window.location.href = safeRedirectTarget();
     } catch (err) {
       errAlert.textContent = err.message;
       errAlert.style.display = 'block';

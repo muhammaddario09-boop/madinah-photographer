@@ -180,6 +180,7 @@
   </div>
 </footer>
 
+<script src="/js/escape-html.js"></script>
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const initialCode = urlParams.get('code');
@@ -196,7 +197,7 @@ async function lookupGallery(codeParam) {
     return;
   }
 
-  container.innerHTML = `<div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">Memuat galeri foto untuk ${code}…</div>`;
+  container.innerHTML = `<div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">Memuat galeri foto untuk ${escapeHtml(code)}…</div>`;
 
   try {
     const res = await fetch(`/api/bookings/${encodeURIComponent(code)}`);
@@ -205,6 +206,7 @@ async function lookupGallery(codeParam) {
     const b = data.booking;
     const s = data.service;
     const loc = data.location;
+    const safeDriveUrl = safeUrl(b.drive_url, 'https://drive.google.com');
 
     // Load sample high-res preview photos based on service
     const samplePhotos = [
@@ -221,16 +223,16 @@ async function lookupGallery(codeParam) {
       <div class="portal-header">
         <div>
           <span class="portal-badge">✨ Galeri Resmi Siap Diunduh</span>
-          <h2 style="font-size:1.6rem; margin:8px 0 4px;">Dokumentasi: ${b.client_name}</h2>
+          <h2 style="font-size:1.6rem; margin:8px 0 4px;">Dokumentasi: ${escapeHtml(b.client_name)}</h2>
           <p style="color:var(--charcoal-soft); font-size:0.92rem; margin:0;">
-            ${s.name} • 📅 ${b.date} • 📍 ${loc.name || 'Madinah Area'} • Booking ID: <strong>${b.booking_code}</strong>
+            ${escapeHtml(s.name)} • 📅 ${escapeHtml(b.date)} • 📍 ${escapeHtml(loc.name || 'Madinah Area')} • Booking ID: <strong>${escapeHtml(b.booking_code)}</strong>
           </p>
         </div>
         <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-          <a href="/invoice.html?code=${b.booking_code}" target="_blank" class="btn btn-ghost" style="padding:10px 18px; font-size:0.85rem;">
+          <a href="/invoice.html?code=${encodeURIComponent(b.booking_code)}" target="_blank" class="btn btn-ghost" style="padding:10px 18px; font-size:0.85rem;">
             🧾 Lihat Kuitansi
           </a>
-          <a href="${b.drive_url || 'https://drive.google.com'}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding:10px 20px; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px; background:#25D366; border-color:#25D366; color:#fff; text-decoration:none; border-radius:4px; font-weight:600;">
+          <a href="${safeDriveUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding:10px 20px; font-size:0.85rem; display:inline-flex; align-items:center; gap:8px; background:#25D366; border-color:#25D366; color:#fff; text-decoration:none; border-radius:4px; font-weight:600;">
             <span>📥 Download Folder Google Drive (Original RAW)</span>
           </a>
         </div>

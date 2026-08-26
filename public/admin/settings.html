@@ -96,6 +96,7 @@
 <script src="/js/admin-nav.js"></script>
 <script>renderAdminNav('settings');</script>
 
+<script src="/js/escape-html.js"></script>
 <script>
 function compressImage(file, maxWidth = 800, quality = 0.85) {
   return new Promise((resolve, reject) => {
@@ -177,7 +178,7 @@ async function loadSettings() {
 
           <div class="form-group">
             <label>Default Google Drive Master Folder URL</label>
-            <input type="url" id="default_drive_url" value="${data.default_drive_url || 'https://drive.google.com'}" placeholder="https://drive.google.com/drive/folders/…">
+            <input type="url" id="default_drive_url" value="${escapeHtml(data.default_drive_url || 'https://drive.google.com')}" placeholder="https://drive.google.com/drive/folders/…">
             <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
               Link folder Google Drive umum jika klien belum memiliki link folder khusus.
             </small>
@@ -190,7 +191,7 @@ async function loadSettings() {
           
           <div class="form-group">
             <label>Nomor WhatsApp Utama (Admin 1 / CS)</label>
-            <input type="text" id="admin_whatsapp" value="${data.admin_whatsapp || '+6282175272547'}">
+            <input type="text" id="admin_whatsapp" value="${escapeHtml(data.admin_whatsapp || '+6282175272547')}">
             <small style="color:var(--charcoal-soft); font-size:0.76rem; display:block; margin-top:4px;">
               Nomor yang menerima pesan booking otomatis dari website &amp; Rate Card.
             </small>
@@ -198,17 +199,17 @@ async function loadSettings() {
 
           <div class="form-group">
             <label>Nomor WhatsApp Cadangan (Admin 2 / Madinah)</label>
-            <input type="text" id="admin_whatsapp_2" value="${data.admin_whatsapp_2 || '+6281234567890'}">
+            <input type="text" id="admin_whatsapp_2" value="${escapeHtml(data.admin_whatsapp_2 || '+6281234567890')}">
           </div>
 
           <div class="form-group">
             <label>Instagram Official URL</label>
-            <input type="text" id="instagram_url" value="${data.instagram_url || 'https://instagram.com/umrohlens'}">
+            <input type="text" id="instagram_url" value="${escapeHtml(data.instagram_url || 'https://instagram.com/umrohlens')}">
           </div>
 
           <div class="form-group">
             <label>Instagram Handle</label>
-            <input type="text" id="instagram_handle" value="${data.instagram_handle || '@umrohlens'}">
+            <input type="text" id="instagram_handle" value="${escapeHtml(data.instagram_handle || '@umrohlens')}">
           </div>
         </div>
 
@@ -259,12 +260,12 @@ async function loadSettings() {
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
             <div class="form-group">
               <label>Nama Studio / Fotografer</label>
-              <input type="text" id="photographer_name" value="${photographer.name || data.photographer_name || 'UMROH LENS'}">
+              <input type="text" id="photographer_name" value="${escapeHtml(photographer.name || data.photographer_name || 'UMROH LENS')}">
             </div>
 
             <div class="form-group">
               <label>Foto Profil / Avatar</label>
-              <input type="text" id="photographer_avatar" value="${photographer.avatar_url || data.photographer_avatar || '/img/photographer-1.jpg'}">
+              <input type="text" id="photographer_avatar" value="${escapeHtml(photographer.avatar_url || data.photographer_avatar || '/img/photographer-1.jpg')}">
               <input type="file" id="p-avatar-file" accept="image/*" style="display:none;" onchange="handlePhotographerAvatar(this)">
               <button type="button" class="file-btn" onclick="document.getElementById('p-avatar-file').click()">📁 Upload Foto dari Perangkat</button>
             </div>
@@ -272,7 +273,7 @@ async function loadSettings() {
 
           <div class="form-group">
             <label>Bio &amp; Deskripsi Fotografer</label>
-            <textarea id="photographer_bio" rows="2">${photographer.bio || data.photographer_bio || 'Fotografer & videografer profesional berbasis di Madinah Al-Munawwarah.'}</textarea>
+            <textarea id="photographer_bio" rows="2">${escapeHtml(photographer.bio || data.photographer_bio || 'Fotografer & videografer profesional berbasis di Madinah Al-Munawwarah.')}</textarea>
           </div>
         </div>
 
@@ -298,7 +299,7 @@ async function loadSettings() {
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
             <div class="form-group">
               <label>Telegram Bot Token (dari @BotFather)</label>
-              <input type="text" id="telegram_bot_token" value="${data.telegram_bot_token || ''}" placeholder="Contoh: 7123456789:AAHk…">
+              <input type="password" id="telegram_bot_token" value="${escapeHtml(data.telegram_bot_token || '')}" placeholder="Contoh: 7123456789:AAHk…" autocomplete="new-password">
               <small style="color:var(--charcoal-soft); font-size:0.75rem; display:block; margin-top:4px;">
                 Dapatkan token gratis dengan membuat bot di Telegram via <a href="https://t.me/BotFather" target="_blank" style="color:#0088cc;">@BotFather</a>.
               </small>

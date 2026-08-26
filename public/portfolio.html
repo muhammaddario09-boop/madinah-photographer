@@ -271,6 +271,7 @@
   </div>
 </footer>
 
+<script src="/js/escape-html.js"></script>
 <script>
 let allPhotos = [];
 let adminWa = '6282175272547';
@@ -289,6 +290,18 @@ fetch('/api/portfolio')
   .then(r => r.json())
   .then(items => {
     allPhotos = items || [];
+
+    // Restore category from URL (?category=...) on first load
+    const catParam = new URLSearchParams(location.search).get('category');
+    if (catParam && catParam !== 'ALL') {
+      filterGallery(catParam, null);
+      document.querySelectorAll('.filter-btn-warm').forEach(b => {
+        const isActive = b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${catParam}'`);
+        b.classList.toggle('active', !!isActive);
+        b.setAttribute('aria-pressed', String(!!isActive));
+      });
+      return;
+    }
     renderGallery(allPhotos);
   })
   .catch(err => {
@@ -305,14 +318,14 @@ function renderGallery(photos) {
 
   grid.innerHTML = photos.map((p, idx) => `
     <div class="portfolio-card-warm" role="button" tabindex="0" data-idx="${idx}" aria-haspopup="dialog">
-      <div class="portfolio-thumb-warm" style="background-image:url('${p.image_url}');">
-        <span class="portfolio-badge-warm">${p.category || 'Madinah'}</span>
+      <div class="portfolio-thumb-warm" style="background-image:url('${escapeHtml(p.image_url)}');">
+        <span class="portfolio-badge-warm">${escapeHtml(p.category || 'Madinah')}</span>
       </div>
       <div class="portfolio-body-warm">
-        <h3>${p.title}</h3>
-        <p>${p.description || 'Dokumentasi eksklusif di sudut suci Madinah Al-Munawwarah.'}</p>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.description || 'Dokumentasi eksklusif di sudut suci Madinah Al-Munawwarah.')}</p>
         <div class="portfolio-loc-warm">
-          📍 <span>${p.location || 'Masjid Nabawi, Madinah'}</span>
+          📍 <span>${escapeHtml(p.location || 'Masjid Nabawi, Madinah')}</span>
         </div>
       </div>
     </div>
@@ -355,6 +368,14 @@ function filterGallery(category, btn) {
     );
     renderGallery(activeFilteredPhotos);
   }
+
+  // Keep filter state in the URL (shareable / refresh-safe)
+  try {
+    const u = new URL(location.href);
+    if (category === 'ALL') u.searchParams.delete('category');
+    else u.searchParams.set('category', category);
+    history.replaceState(null, '', u);
+  } catch (e) { /* ignore */ }
 }
 
 let lightboxLastFocus = null;

@@ -262,6 +262,7 @@
 </footer>
 
 
+<script src="/js/escape-html.js"></script>
 <script>
 // 1. Load photographer details
 fetch('/api/photographers')
@@ -285,10 +286,10 @@ fetch('/api/portfolio')
     const loopItems = [...items, ...items];
     track.innerHTML = loopItems.map(p => `
       <a class="h-marquee-card" href="/portfolio.html">
-        <img src="${p.image_url}" alt="${p.title}" loading="lazy">
+        <img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" loading="lazy">
         <div class="h-marquee-overlay">
-          <div class="h-marquee-tag">${p.category || 'Madinah'}</div>
-          <h4 class="h-marquee-title">${p.title}</h4>
+          <div class="h-marquee-tag">${escapeHtml(p.category || 'Madinah')}</div>
+          <h4 class="h-marquee-title">${escapeHtml(p.title)}</h4>
         </div>
       </a>
     `).join('');
@@ -305,10 +306,10 @@ fetch('/api/services')
       const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
       const dur = isLong ? 120 : 90;
       return `
-        <a class="service-card" href="/booking.html?service=${s.slug}">
-          <div class="service-thumb" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
-          <h3 style="font-size:1.25rem;">${s.name}</h3>
-          <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px; line-height:1.55; margin-bottom:16px;">${s.description}</p>
+        <a class="service-card" href="/booking.html?service=${encodeURIComponent(s.slug)}">
+          <div class="service-thumb" style="background-image:url('${escapeHtml(s.cover_image || '/img/service-golden-hour.jpg')}');"></div>
+          <h3 style="font-size:1.25rem;">${escapeHtml(s.name)}</h3>
+          <p style="color:var(--charcoal-soft); font-size:0.92rem; margin-top:8px; line-height:1.55; margin-bottom:16px;">${escapeHtml(s.description)}</p>
           <div class="service-meta" style="flex-wrap:wrap; gap:8px;">
             <span>⏱️ <strong>${dur} Menit</strong> · 40 Edit + 1 Min Video</span>
             <span class="service-price" style="color:var(--gold); font-weight:600;">Pilih Jadwal →</span>

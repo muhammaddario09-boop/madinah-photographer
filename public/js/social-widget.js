@@ -182,6 +182,10 @@
         .social-widget-wrap { right: 18px; bottom: 18px; }
         .social-popup { width: 300px; }
       }
+      @media (prefers-reduced-motion: reduce) {
+        .social-popup { animation: none; }
+        .social-btn-main, .social-item { transition: none; }
+      }
     `;
     document.head.appendChild(style);
 

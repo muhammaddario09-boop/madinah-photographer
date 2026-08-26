@@ -100,6 +100,7 @@
 <script>renderAdminNav('portfolio');</script>
 <div id="toast" class="toast">Saved successfully!</div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 function showToast(msg = 'Saved successfully!') {
   const t = document.getElementById('toast');
@@ -220,13 +221,13 @@ async function loadPortfolio() {
       <div class="portfolio-admin-grid">
         ${items.map(p => `
           <div class="photo-card" data-id="${p.id}">
-            <div class="photo-preview" style="background-image: url('${p.image_url}');">
+            <div class="photo-preview" style="background-image: url('${escapeHtml(p.image_url)}');">
               ${p.featured ? '<div class="featured-badge">Featured</div>' : ''}
             </div>
             <div class="photo-body">
               <div>
-                <strong style="font-size:0.95rem; display:block; margin-bottom:4px;">${p.title || 'Untitled'}</strong>
-                <span class="eyebrow" style="color:var(--charcoal-soft); font-size:0.7rem;">${p.category}</span>
+                <strong style="font-size:0.95rem; display:block; margin-bottom:4px;">${escapeHtml(p.title || 'Untitled')}</strong>
+                <span class="eyebrow" style="color:var(--charcoal-soft); font-size:0.7rem;">${escapeHtml(p.category)}</span>
               </div>
               <button class="btn btn-ghost" onclick="deletePhoto(${p.id})" style="width:100%; color:#c34b4b; border-color:#ebccd1; padding:6px; font-size:0.74rem; margin-top:14px;">Delete Photo</button>
             </div>

@@ -99,6 +99,7 @@
 
 <div id="toast" class="toast">Data berhasil disimpan!</div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 function showToast(msg = 'Data berhasil disimpan ke Supabase!') {
   const t = document.getElementById('toast');
@@ -173,8 +174,8 @@ function renderLocationsList() {
     <div class="location-card" id="loc-card-${loc.id}">
       <div>
         <span class="loc-badge">📍 Spot ID: #${loc.id}</span>
-        <h3 class="loc-title">${loc.name}</h3>
-        <p class="loc-desc">${loc.description || 'Spot dokumentasi profesional di area Madinah Al-Munawwarah.'}</p>
+        <h3 class="loc-title">${escapeHtml(loc.name)}</h3>
+        <p class="loc-desc">${escapeHtml(loc.description || 'Spot dokumentasi profesional di area Madinah Al-Munawwarah.')}</p>
         <div class="loc-meta">
           <span>⏱️ Buffer Antar Sesi: <strong>${loc.travel_buffer_minutes || 15} Menit</strong></span>
           <span>🟢 Status: <strong>${loc.active !== 0 ? 'Aktif' : 'Non-Aktif'}</strong></span>
@@ -182,7 +183,7 @@ function renderLocationsList() {
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
         <button class="btn btn-ghost" style="font-size:0.8rem; padding:8px 16px;" onclick="editLocation(${loc.id})">✏️ Edit</button>
-        <button class="btn btn-ghost" style="font-size:0.8rem; padding:8px 16px; color:#C82333; border-color:#F5C6CB;" onclick="deleteLocation(${loc.id}, '${loc.name.replace(/'/g, "\\'")}')">🗑️ Hapus</button>
+        <button class="btn btn-ghost" style="font-size:0.8rem; padding:8px 16px; color:#C82333; border-color:#F5C6CB;" onclick="deleteLocation(${loc.id}, ${escapeHtml(JSON.stringify(loc.name))})">🗑️ Hapus</button>
       </div>
     </div>
   `).join('');

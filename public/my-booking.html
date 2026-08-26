@@ -51,6 +51,7 @@
   <div id="result" style="margin-top:32px;" aria-live="polite"></div>
 </div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
 
@@ -78,7 +79,7 @@ async function lookup(code) {
   try {
     const res = await fetch(`/api/bookings/${code}`);
     if (!res.ok) {
-      result.innerHTML = `<div style="padding:16px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.9rem;">Booking tidak ditemukan. Pastikan Booking ID Anda benar (Contoh: MDN-2026-0001).</div>`;
+      result.innerHTML = `<div style="padding:16px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.9rem;">${escapeHtml('Booking tidak ditemukan. Pastikan Booking ID Anda benar (Contoh: MDN-2026-0001).')}</div>`;
       return;
     }
     const data = await res.json();
@@ -89,14 +90,14 @@ async function lookup(code) {
       <div style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:28px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
           <div>
-            <span class="status-badge status-${b.status}">${sInfo.label}</span>
-            <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-top:10px;">${b.booking_code}</h2>
+            <span class="status-badge status-${escapeHtml(b.status)}">${sInfo.label}</span>
+            <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-top:10px;">${escapeHtml(b.booking_code)}</h2>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="/invoice.html?code=${b.booking_code}" target="_blank" class="btn btn-ghost" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+            <a href="/invoice.html?code=${encodeURIComponent(b.booking_code)}" target="_blank" class="btn btn-ghost" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
               <span>🧾 Cetak Invoice / PDF</span>
             </a>
-            <a href="/gallery.html?code=${b.booking_code}" class="btn btn-primary" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+            <a href="/gallery.html?code=${encodeURIComponent(b.booking_code)}" class="btn btn-primary" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
               <span>📸 Buka Galeri Foto</span>
             </a>
           </div>
@@ -104,14 +105,14 @@ async function lookup(code) {
         ${sInfo.desc ? `<p style="font-size:0.86rem; color:var(--charcoal-soft); margin-bottom:20px; padding:10px 14px; background:var(--ivory); border-radius:4px;">ℹ️ ${sInfo.desc}</p>` : ''}
 
         <div style="margin-top:18px;">
-          <div class="summary-line"><span>Nama Klien</span><strong style="color:var(--charcoal);">${b.client_name || '—'}</strong></div>
-          <div class="summary-line"><span>Layanan</span><span>${data.service.name}</span></div>
-          <div class="summary-line"><span>Paket</span><span>${data.package.name}</span></div>
-          <div class="summary-line"><span>Tanggal Sesi</span><strong>${b.date}</strong></div>
-          <div class="summary-line"><span>Waktu Sesi</span><strong>${b.start_time} – ${b.end_time}</strong></div>
-          <div class="summary-line"><span>Lokasi</span><span>${data.location ? data.location.name : 'Madinah Area'}</span></div>
-          <div class="summary-line"><span>Studio Fotografer</span><span>${data.photographer.name}</span></div>
-          <div class="summary-line"><span>Status Pembayaran</span><span>${b.payment_status.replace('_',' ')} (Deposit: ${b.currency} ${b.deposit_amount})</span></div>
+          <div class="summary-line"><span>Nama Klien</span><strong style="color:var(--charcoal);">${escapeHtml(b.client_name || '—')}</strong></div>
+          <div class="summary-line"><span>Layanan</span><span>${escapeHtml(data.service.name)}</span></div>
+          <div class="summary-line"><span>Paket</span><span>${escapeHtml(data.package.name)}</span></div>
+          <div class="summary-line"><span>Tanggal Sesi</span><strong>${escapeHtml(b.date)}</strong></div>
+          <div class="summary-line"><span>Waktu Sesi</span><strong>${escapeHtml(b.start_time)} – ${escapeHtml(b.end_time)}</strong></div>
+          <div class="summary-line"><span>Lokasi</span><span>${escapeHtml(data.location ? data.location.name : 'Madinah Area')}</span></div>
+          <div class="summary-line"><span>Studio Fotografer</span><span>${escapeHtml(data.photographer.name)}</span></div>
+          <div class="summary-line"><span>Status Pembayaran</span><span>${escapeHtml(b.payment_status.replace('_',' '))} (Deposit: ${escapeHtml(b.currency)} ${escapeHtml(b.deposit_amount)})</span></div>
         </div>
 
         <div id="reschedule-box" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--line);">
@@ -147,7 +148,7 @@ async function lookup(code) {
       const rd = await r.json();
 
       if (!r.ok) {
-        alertBox.innerHTML = `<div style="padding:12px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.88rem;">${rd.error}</div>`;
+        alertBox.innerHTML = `<div style="padding:12px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.88rem;">${escapeHtml(rd.error)}</div>`;
         return;
       }
 
@@ -155,7 +156,7 @@ async function lookup(code) {
         <div style="padding:16px; background:#EBF5EC; border:1px solid #C3E6CB; border-radius:6px; color:#155724; font-size:0.9rem;">
           <h4 style="font-weight:600; margin-bottom:6px;">✅ Permintaan Berhasil Diajukan!</h4>
           <p style="margin-bottom:12px;">Status booking Anda kini <strong>Menunggu Persetujuan Reschedule</strong> untuk tanggal <strong>${date}</strong> pukul <strong>${startTime}</strong>.</p>
-          ${rd.whatsappUrl ? `
+          ${/^https:\/\/wa\.me\//.test(rd.whatsappUrl || '') ? `
             <a href="${rd.whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#fff; border-color:#25D366; text-decoration:none; padding:10px 18px; font-size:0.85rem;">
               <span>💬 Kirim Notifikasi ke WhatsApp Admin</span>
             </a>

@@ -23,6 +23,7 @@
 <body class="admin">
 <script src="/js/admin-nav.js"></script>
 <script>renderAdminNav('dashboard');</script>
+<script src="/js/escape-html.js"></script>
 <script>
 (async function () {
   const main = document.getElementById('admin-main');
@@ -152,12 +153,12 @@
       ? bookings.map(b => `
         <tr>
           <td><strong>${b.start_time} – ${b.end_time}</strong></td>
-          <td>${b.service_name}</td>
+          <td>${escapeHtml(b.service_name)}</td>
           <td>
-            ${b.client_name}
-            ${b.client_phone ? `<br><a href="https://wa.me/${b.client_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:0.76rem; color:#25D366;">📱 ${b.client_phone}</a>` : ''}
+            ${escapeHtml(b.client_name)}
+            ${b.client_phone ? `<br><a href="https://wa.me/${b.client_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:0.76rem; color:#25D366;">📱 ${escapeHtml(b.client_phone)}</a>` : ''}
           </td>
-          <td>${b.photographer_name || 'UMROH LENS'}</td>
+          <td>${escapeHtml(b.photographer_name || 'UMROH LENS')}</td>
           <td><span style="font-size:0.78rem; font-weight:600; color:${b.payment_status === 'PAID' ? '#2E5B1A' : b.payment_status === 'DEPOSIT_PAID' ? '#1a73e8' : '#856404'};">${b.payment_status?.replace('_',' ')}</span></td>
           <td><span class="status-tag status-${b.status}">${b.status.replace('_',' ')}</span></td>
         </tr>
@@ -173,10 +174,10 @@
       document.getElementById('pending-table').style.display = 'table';
       document.getElementById('pending-tbody').innerHTML = pending.map(b => `
         <tr>
-          <td><a href="/admin/bookings.html" style="font-family:monospace; font-weight:600; color:var(--charcoal);">${b.booking_code}</a></td>
-          <td>${b.client_name} ${b.client_phone ? `<br><a href="https://wa.me/${b.client_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:0.76rem; color:#25D366;">📱 ${b.client_phone}</a>` : ''}</td>
-          <td>${b.service_name}</td>
-          <td style="font-weight:700; color:#856404;">${b.currency || 'SAR'} ${b.deposit_amount}</td>
+          <td><a href="/admin/bookings.html" style="font-family:monospace; font-weight:600; color:var(--charcoal);">${escapeHtml(b.booking_code)}</a></td>
+          <td>${escapeHtml(b.client_name)} ${b.client_phone ? `<br><a href="https://wa.me/${b.client_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:0.76rem; color:#25D366;">📱 ${escapeHtml(b.client_phone)}</a>` : ''}</td>
+          <td>${escapeHtml(b.service_name)}</td>
+          <td style="font-weight:700; color:#856404;">${escapeHtml(b.currency || 'SAR')} ${escapeHtml(b.deposit_amount)}</td>
           <td>
             <a href="/admin/bookings.html" class="btn btn-primary" style="font-size:0.76rem; padding:4px 12px;">Verifikasi →</a>
           </td>

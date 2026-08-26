@@ -20,6 +20,7 @@
 <body class="admin">
 <script src="/js/admin-nav.js"></script>
 <script>renderAdminNav('calendar');</script>
+<script src="/js/escape-html.js"></script>
 <script>
 (async function () {
   const main = document.getElementById('admin-main');
@@ -48,7 +49,7 @@
             const dayBookings = bookings.filter(b => b.date === key);
             return `<div class="cal-day-col">
               <div class="cal-day-head"><strong>${d.toLocaleDateString('en',{weekday:'short', day:'numeric'})}</strong></div>
-              ${dayBookings.map(b => `<div class="cal-booking"><strong>${b.start_time}</strong> ${b.service_name || 'Photoshoot'}<br><span style="color:var(--charcoal-soft);">${b.client_name} (${b.photographer_name || 'UMROH LENS'})</span></div>`).join('') || '<div style="color:var(--charcoal-soft); font-size:0.76rem;">—</div>'}
+              ${dayBookings.map(b => `<div class="cal-booking"><strong>${b.start_time}</strong> ${escapeHtml(b.service_name || 'Photoshoot')}<br><span style="color:var(--charcoal-soft);">${escapeHtml(b.client_name)} (${escapeHtml(b.photographer_name || 'UMROH LENS')})</span></div>`).join('') || '<div style="color:var(--charcoal-soft); font-size:0.76rem;">—</div>'}
             </div>`;
           }).join('')}
         </div>

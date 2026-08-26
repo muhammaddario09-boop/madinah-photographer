@@ -25,6 +25,14 @@ const state = {
 
 const params = new URLSearchParams(location.search);
 
+// Warn before losing an in-progress booking (until confirmation shown)
+let bookingInProgress = false;
+window.addEventListener('beforeunload', (e) => {
+  if (!bookingInProgress || state.result) return;
+  e.preventDefault();
+  e.returnValue = '';
+});
+
 async function init() {
   const [services, photographers, locations, paymentInfo] = await Promise.all([
     fetch('/api/services').then(r => r.json()).catch(() => []),
@@ -52,6 +60,24 @@ async function init() {
       }
     }
   }
+
+  // Restore date/time selection from the URL (refresh-safe deep links)
+  if (state.service && state.step >= 2 && !state.package) {
+    state.package = (state.service.packages && state.service.packages[0]) || { duration_minutes: 90 };
+  }
+  const presetDate = params.get('date');
+  const presetTime = params.get('time');
+  if (presetDate && /^\d{4}-\d{2}-\d{2}$/.test(presetDate) && state.service && state.step >= 2) {
+    state.calYear = Number(presetDate.slice(0, 4));
+    state.calMonth = Number(presetDate.slice(5, 7));
+    state.date = presetDate;
+    if (presetTime && /^\d{2}:\d{2}/.test(presetTime)) {
+      state.time = presetTime.slice(0, 5);
+      state.step = Math.max(state.step, 4); // DETAILS
+    } else {
+      state.step = Math.max(state.step, 3); // TIME
+    }
+  }
   render();
 }
 
@@ -65,7 +91,28 @@ function renderSteps() {
   document.getElementById('steps').innerHTML = dots;
 }
 
-function goto(step) { state.step = step; state.error = null; if (step !== 4) state.detailErrors = null; render(); window.scrollTo(0,0); }
+function syncUrl() {
+  try {
+    const q = new URLSearchParams();
+    if (state.service) q.set('service', state.service.slug || state.service.id);
+    if (state.package) q.set('package', state.package.id);
+    if (state.date) q.set('date', state.date);
+    if (state.time) q.set('time', state.time);
+    q.set('step', STEPS[state.step].toLowerCase());
+    const qs = q.toString();
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+  } catch (e) { /* ignore */ }
+}
+
+function goto(step) {
+  state.step = step;
+  state.error = null;
+  if (step !== 4) state.detailErrors = null;
+  if (step >= 2) bookingInProgress = true;
+  render();
+  syncUrl();
+  window.scrollTo(0,0);
+}
 
 function render() {
   renderSteps();
@@ -93,9 +140,9 @@ function renderService() {
       const dur = isLong ? 120 : 90;
       return `
         <button type="button" class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;" aria-pressed="${state.service?.id === s.id}">
-          <div style="width:70px; height:70px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
+          <div style="width:70px; height:70px; border-radius:4px; background-image:url('${escapeHtml(s.cover_image || '/img/service-golden-hour.jpg')}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
           <div style="flex:1;">
-            <h3 style="font-size:1.05rem;">${s.name}</h3>
+            <h3 style="font-size:1.05rem;">${escapeHtml(s.name)}</h3>
             <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">
               ⏱️ ${dur} Menit · 📸 40 Foto Edit + RAW + 1 Min Video
             </p>
@@ -114,7 +161,7 @@ function renderPackage() {
 
   return `
     <div class="step-label">Step 2 — Konfirmasi Pilihan Paket Standar</div>
-    <h2 style="margin-bottom:24px;">${state.service.name}</h2>
+    <h2 style="margin-bottom:24px;">${escapeHtml(state.service.name)}</h2>
     
     <button type="button" class="option-card selected" data-id="${p.id}" style="display:flex; justify-content:space-between; align-items:center;" aria-pressed="true">
       <div>
@@ -248,7 +295,7 @@ function renderDetails() {
     <div class="field">
       <label for="f-location">Location in Madinah</label>
       <select id="f-location" name="location">
-        ${state.locations.map(l => `<option value="${l.id}" ${state.locationId == l.id ? 'selected' : ''}>${l.name}</option>`).join('')}
+        ${state.locations.map(l => `<option value="${l.id}" ${state.locationId == l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
       </select>
     </div>
     <div class="field">
@@ -315,11 +362,11 @@ function renderPayment() {
     <h2 style="margin-bottom:20px;">Ringkasan &amp; Cara Pembayaran</h2>
 
     <!-- Booking Summary -->
-    <div class="summary-line"><span>Layanan Sesi</span><strong>${state.service.name}</strong></div>
-    <div class="summary-line"><span>Paket</span><span>${p.name} (${p.duration_minutes} Menit)</span></div>
-    <div class="summary-line"><span>Tanggal &amp; Waktu</span><strong>${state.date} pukul ${state.time} (Madinah)</strong></div>
-    <div class="summary-line"><span>Nama Jemaah</span><span>${state.client.name || '—'}</span></div>
-    <div class="summary-line"><span>Kontak WhatsApp</span><span>${state.client.phone || '—'}</span></div>
+    <div class="summary-line"><span>Layanan Sesi</span><strong>${escapeHtml(state.service.name)}</strong></div>
+    <div class="summary-line"><span>Paket</span><span>${escapeHtml(p.name)} (${p.duration_minutes} Menit)</span></div>
+    <div class="summary-line"><span>Tanggal &amp; Waktu</span><strong>${escapeHtml(state.date)} pukul ${escapeHtml(state.time)} (Madinah)</strong></div>
+    <div class="summary-line"><span>Nama Jemaah</span><span>${escapeHtml(state.client.name || '—')}</span></div>
+    <div class="summary-line"><span>Kontak WhatsApp</span><span>${escapeHtml(state.client.phone || '—')}</span></div>
 
     <!-- Pricing Box -->
     <div style="background:linear-gradient(135deg,#2C1810,#3D2515); color:#F5EFE0; border-radius:10px; padding:20px 22px; margin:22px 0;">
@@ -436,8 +483,8 @@ function renderConfirmation() {
   return `
     <div style="text-align:center; margin-bottom:36px;">
       <div style="display:inline-block; background:#DCE8D0; color:#3E5B2A; font-size:0.76rem; font-weight:600; padding:4px 14px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;">Booking Received</div>
-      <h1 style="font-size:2.4rem; margin-top:4px; color:var(--charcoal);">${r.bookingCode}</h1>
-      <p style="color:var(--charcoal-soft); font-size:0.95rem; margin-top:8px;">Terima kasih ${state.client.name || ''}, reservasi sesi foto Anda telah terdata di sistem kami.</p>
+      <h1 style="font-size:2.4rem; margin-top:4px; color:var(--charcoal);">${escapeHtml(r.bookingCode)}</h1>
+      <p style="color:var(--charcoal-soft); font-size:0.95rem; margin-top:8px;">Terima kasih ${escapeHtml(state.client.name || '')}, reservasi sesi foto Anda telah terdata di sistem kami.</p>
     </div>
 
     <div style="text-align:center; margin:32px 0;">
