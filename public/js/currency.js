@@ -45,7 +45,7 @@
     const current = getCurrentCurrency();
     return `
       <div class="currency-dropdown" style="position:relative; display:inline-block;">
-        <button type="button" class="currency-btn" onclick="toggleCurrencyMenu(event)" style="background:rgba(28,24,20,0.05); border:1px solid var(--line); border-radius:30px; padding:6px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; color:var(--charcoal); display:flex; align-items:center; gap:6px; transition:all 0.2s;">
+        <button type="button" class="currency-btn" onclick="toggleCurrencyMenu(event)" style="background:rgba(28,24,20,0.05); border:1px solid var(--line); border-radius:30px; padding:6px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; color:var(--charcoal); display:flex; align-items:center; gap:6px; transition:background 0.2s, border-color 0.2s;">
           <span>${RATES[current].flag}</span>
           <span>${current}</span>
           <span style="font-size:0.65rem; opacity:0.6;">▼</span>

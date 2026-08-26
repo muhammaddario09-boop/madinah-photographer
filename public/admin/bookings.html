@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Bookings &amp; Reservasi — UMROH LENS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -11,6 +14,7 @@
 <body class="admin">
 <script src="/js/admin-nav.js"></script>
 <script>renderAdminNav('bookings');</script>
+<script src="/js/escape-html.js"></script>
 <script>
 const STATUSES = ['PENDING','AWAITING_PAYMENT','CONFIRMED','RESCHEDULE_REQUESTED','COMPLETED','CANCELLED','NO_SHOW'];
 const PAY_STATUSES = [
@@ -33,7 +37,7 @@ async function loadBookings(status) {
 
 async function draw(status) {
   const main = document.getElementById('admin-main');
-  main.innerHTML = `<h1 class="admin-h1">Bookings</h1><p class="admin-sub">Memuat daftar reservasi...</p>`;
+  main.innerHTML = `<h1 class="admin-h1">Bookings</h1><p class="admin-sub">Memuat daftar reservasi…</p>`;
   const bookings = await loadBookings(status);
 
   main.innerHTML = `
@@ -72,10 +76,12 @@ async function draw(status) {
         ${bookings.map(b => {
           const payBg = b.payment_status === 'PAID' ? '#DCE8D0' : (b.payment_status === 'DEPOSIT_PAID' ? '#EBF5EC' : '#FFF3CD');
           const payColor = b.payment_status === 'PAID' ? '#2E5B1A' : (b.payment_status === 'DEPOSIT_PAID' ? '#155724' : '#856404');
+          const safeCode = escapeHtml(b.booking_code);
+          const driveHref = safeUrl(b.drive_url, '');
           return `
             <tr>
               <td>
-                <strong style="color:var(--charcoal);">${b.booking_code}</strong>
+                <strong style="color:var(--charcoal);">${safeCode}</strong>
                 ${b.created_at ? `<div style="font-size:0.72rem; color:var(--charcoal-soft);">${new Date(b.created_at).toLocaleDateString('id-ID')}</div>` : ''}
               </td>
               <td>
@@ -83,14 +89,14 @@ async function draw(status) {
                 <span style="color:var(--charcoal-soft); font-size:0.78rem;">${b.start_time} - ${b.end_time}</span>
               </td>
               <td>
-                <strong>${b.client_name}</strong><br>
+                <strong>${escapeHtml(b.client_name)}</strong><br>
                 <a href="https://wa.me/${(b.client_phone||'').replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--gold); font-size:0.78rem; text-decoration:none;">
-                  📱 ${b.client_phone}
+                  📱 ${escapeHtml(b.client_phone)}
                 </a>
               </td>
               <td>
-                <strong>${b.service_name || 'Madinah Photo'}</strong>
-                <div style="font-size:0.74rem; color:var(--charcoal-soft);">${b.package_name || ''}</div>
+                <strong>${escapeHtml(b.service_name || 'Madinah Photo')}</strong>
+                <div style="font-size:0.74rem; color:var(--charcoal-soft);">${escapeHtml(b.package_name || '')}</div>
               </td>
               <td>
                 <div style="margin-bottom:4px; font-weight:600; font-size:0.85rem;">
@@ -103,7 +109,7 @@ async function draw(status) {
                 </select>
                 ${b.proof_url ? `
                   <div style="margin-top:4px;">
-                    <button type="button" onclick="showProof('${b.booking_code}', '${encodeURIComponent(b.proof_url)}')" style="padding:2px 6px; font-size:0.68rem; background:#DCE8D0; color:#3E5B2A; border:1px solid #c0d8ac; border-radius:2px; cursor:pointer;">
+                    <button type="button" onclick="showProof(${escapeHtml(JSON.stringify(b.booking_code))}, '${encodeURIComponent(b.proof_url)}')" style="padding:2px 6px; font-size:0.68rem; background:#DCE8D0; color:#3E5B2A; border:1px solid #c0d8ac; border-radius:2px; cursor:pointer;">
                       📸 Lihat Bukti Transfer
                     </button>
                   </div>
@@ -115,11 +121,11 @@ async function draw(status) {
                     <span style="display:inline-block; padding:2px 6px; background:#DCE8D0; color:#2E5B1A; font-size:0.68rem; font-weight:700; border-radius:3px; margin-bottom:4px;">
                       ✅ Tersambung
                     </span><br>
-                    <a href="${b.drive_url}" target="_blank" style="color:#1a73e8; font-size:0.75rem; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                    <a href="${driveHref}" target="_blank" rel="noopener" style="color:#1a73e8; font-size:0.75rem; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
                       🔗 Buka Folder Drive ↗
                     </a>
                   </div>
-                  <button onclick="openDriveModal('${b.id}', '${b.booking_code}', '${b.client_name}', '${encodeURIComponent(b.drive_url || '')}')" class="btn" style="background:#f1f3f4; color:#3c4043; border:1px solid #dadce0; padding:2px 6px; font-size:0.7rem; border-radius:3px; cursor:pointer;">
+                  <button onclick="openDriveModal(${JSON.stringify(b.id)}, ${escapeHtml(JSON.stringify(b.booking_code))}, ${escapeHtml(JSON.stringify(b.client_name))}, '${encodeURIComponent(b.drive_url || '')}')" class="btn" style="background:#f1f3f4; color:#3c4043; border:1px solid #dadce0; padding:2px 6px; font-size:0.7rem; border-radius:3px; cursor:pointer;">
                     ✏️ Edit Link
                   </button>
                 ` : `
@@ -128,7 +134,7 @@ async function draw(status) {
                       ⏳ Belum diinput
                     </span>
                   </div>
-                  <button onclick="openDriveModal('${b.id}', '${b.booking_code}', '${b.client_name}', '')" class="btn" style="background:#e8f0fe; color:#1a73e8; border:1px solid #c2d7fa; padding:3px 8px; font-size:0.72rem; border-radius:3px; cursor:pointer; font-weight:600;">
+                  <button onclick="openDriveModal(${JSON.stringify(b.id)}, ${escapeHtml(JSON.stringify(b.booking_code))}, ${escapeHtml(JSON.stringify(b.client_name))}, '')" class="btn" style="background:#e8f0fe; color:#1a73e8; border:1px solid #c2d7fa; padding:3px 8px; font-size:0.72rem; border-radius:3px; cursor:pointer; font-weight:600;">
                     ➕ Input Link Drive
                   </button>
                 `}
@@ -148,7 +154,7 @@ async function draw(status) {
                     <option value="">Status…</option>
                     ${STATUSES.map(s => `<option value="${s}">${s.replace('_',' ')}</option>`).join('')}
                   </select>
-                  <button onclick="deleteSingleBooking('${b.id}', '${b.booking_code}')" title="Hapus Booking" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:4px 8px; font-size:0.75rem; border-radius:3px; cursor:pointer;">
+                  <button onclick="deleteSingleBooking(${JSON.stringify(b.id)}, ${escapeHtml(JSON.stringify(b.booking_code))})" title="Hapus Booking" aria-label="Hapus booking ${escapeHtml(b.booking_code)}" style="background:#fff0f0; color:#c82333; border:1px solid #f5c6cb; padding:4px 8px; font-size:0.75rem; border-radius:3px; cursor:pointer;">
                     🗑️
                   </button>
                 </div>
@@ -161,7 +167,7 @@ async function draw(status) {
 
     <!-- Modal for Google Drive Link Manager -->
     <div id="drive-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
-      <div style="background:#fff; padding:28px; border-radius:8px; max-width:520px; width:92%; box-shadow:0 16px 48px rgba(0,0,0,0.2);">
+      <div style="background:#fff; padding:28px; border-radius:8px; max-width:520px; width:92%; box-shadow:0 16px 48px rgba(0,0,0,0.2); overscroll-behavior:contain;">
         <h3 style="margin-top:0; margin-bottom:6px; font-family:var(--font-display); font-size:1.3rem;">
           📁 Atur Link Google Drive Hasil Foto
         </h3>
@@ -173,7 +179,7 @@ async function draw(status) {
           <label style="display:block; font-size:0.8rem; font-weight:700; color:var(--charcoal-soft); margin-bottom:6px; text-transform:uppercase;">
             URL Folder Google Drive (Original RAW / Edited)
           </label>
-          <input type="url" id="drive-url-input" placeholder="https://drive.google.com/drive/folders/..." style="width:100%; box-sizing:border-box; padding:12px; border:1px solid var(--line); border-radius:4px; font-size:0.92rem;">
+          <input type="url" id="drive-url-input" placeholder="https://drive.google.com/drive/folders/…" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid var(--line); border-radius:4px; font-size:0.92rem;">
           <small style="color:var(--charcoal-soft); font-size:0.75rem; display:block; margin-top:4px;">
             Link ini akan terbuka saat jemaah mengklik tombol "Download Folder Google Drive" di halaman Galeri Foto Klien.
           </small>
@@ -192,11 +198,11 @@ async function draw(status) {
 
     <!-- Modal for Payment Proof Preview -->
     <div id="proof-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
-      <div style="background:#fff; padding:24px; border-radius:6px; max-width:500px; width:90%; max-height:85vh; overflow-y:auto; text-align:center; position:relative;">
+      <div style="background:#fff; padding:24px; border-radius:6px; max-width:500px; width:90%; max-height:85vh; overflow-y:auto; text-align:center; position:relative; overscroll-behavior:contain;">
         <h3 id="modal-title" style="margin-bottom:14px; font-family:var(--font-display);">Bukti Pembayaran</h3>
         <img id="modal-img" style="max-width:100%; max-height:60vh; border-radius:4px; border:1px solid var(--line); object-fit:contain;">
         <div style="margin-top:16px;">
-          <button class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Tutup Preview</button>
+          <button id="proof-close-btn" class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Tutup Preview</button>
         </div>
       </div>
     </div>
@@ -234,15 +240,34 @@ async function draw(status) {
 }
 
 function openDriveModal(id, code, clientName, encodedUrl) {
+  window._modalReturnFocus = document.activeElement;
   document.getElementById('drive-booking-id').value = id;
   document.getElementById('drive-modal-subtitle').textContent = `Jemaah: ${clientName} (Booking ID: ${code})`;
   document.getElementById('drive-url-input').value = decodeURIComponent(encodedUrl || '');
   document.getElementById('drive-modal').style.display = 'flex';
+  document.getElementById('drive-url-input').focus();
 }
 
 function closeDriveModal() {
   document.getElementById('drive-modal').style.display = 'none';
+  if (window._modalReturnFocus && document.contains(window._modalReturnFocus)) {
+    window._modalReturnFocus.focus();
+  }
 }
+
+// Close any open modal on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  ['drive-modal', 'proof-modal'].forEach(id => {
+    const m = document.getElementById(id);
+    if (m && m.style.display === 'flex') {
+      m.style.display = 'none';
+      if (window._modalReturnFocus && document.contains(window._modalReturnFocus)) {
+        window._modalReturnFocus.focus();
+      }
+    }
+  });
+});
 
 async function saveDriveUrl() {
   const id = document.getElementById('drive-booking-id').value;
@@ -300,12 +325,14 @@ async function resetAllDemoBookings() {
 }
 
 function showProof(code, proofUrl) {
+  window._modalReturnFocus = document.activeElement;
   const modal = document.getElementById('proof-modal');
   const title = document.getElementById('modal-title');
   const img = document.getElementById('modal-img');
   title.textContent = `Bukti Transfer Booking: ${code}`;
   img.src = decodeURIComponent(proofUrl);
   modal.style.display = 'flex';
+  document.getElementById('proof-close-btn').focus();
 }
 
 document.addEventListener('DOMContentLoaded', () => draw());

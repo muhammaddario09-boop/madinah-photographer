@@ -274,14 +274,14 @@ function renderLanguageSwitcher() {
 
   return `
     <div class="lang-switcher-wrapper" style="position:relative; display:inline-block; margin-left: 12px; margin-right: 12px;">
-      <button id="lang-select-btn" class="lang-btn" onclick="toggleLangMenu(event)" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: inherit; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: 0.82rem;">
+      <button id="lang-select-btn" class="lang-btn" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-expanded="false" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: inherit; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: 0.82rem;">
         ${current.flag} <span>${current.label}</span> ▾
       </button>
       <div id="lang-dropdown" class="lang-dropdown" style="display:none; position:absolute; top:calc(100% + 6px); right:0; background: #1f1f1d; border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; min-width: 130px; padding: 4px 0;">
         ${LANGUAGES.map(l => `
-          <div onclick="selectLanguage('${l.code}')" style="padding: 8px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: ${l.code === currentLang ? 'var(--gold)' : '#fff'}; background: ${l.code === currentLang ? 'rgba(255,255,255,0.06)' : 'transparent'};">
+          <button type="button" onclick="selectLanguage('${l.code}')" style="width:100%; text-align:left; padding: 8px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: ${l.code === currentLang ? 'var(--gold)' : '#fff'}; background: ${l.code === currentLang ? 'rgba(255,255,255,0.06)' : 'transparent'}; border:none;">
             ${l.flag} <span>${l.label}</span>
-          </div>
+          </button>
         `).join('')}
       </div>
     </div>
@@ -291,8 +291,34 @@ function renderLanguageSwitcher() {
 function toggleLangMenu(e) {
   e.stopPropagation();
   const dd = document.getElementById('lang-dropdown');
-  if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+  const btn = document.getElementById('lang-select-btn');
+  if (!dd) return;
+  const open = dd.style.display === 'block';
+  dd.style.display = open ? 'none' : 'block';
+  if (btn) btn.setAttribute('aria-expanded', String(!open));
 }
+
+function closeLangMenu(refocus) {
+  const dd = document.getElementById('lang-dropdown');
+  const btn = document.getElementById('lang-select-btn');
+  if (dd && dd.style.display === 'block') {
+    dd.style.display = 'none';
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'false');
+      if (refocus) btn.focus();
+    }
+  }
+}
+
+// Close when clicking outside the switcher
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.lang-switcher-wrapper')) closeLangMenu(false);
+});
+
+// Close on Escape and return focus to the trigger
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLangMenu(true);
+});
 
 function selectLanguage(code) {
   setLanguage(code);

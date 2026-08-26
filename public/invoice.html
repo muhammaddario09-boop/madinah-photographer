@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Official Booking Invoice — UMROH LENS Madinah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -184,10 +187,11 @@
 
 <div class="invoice-paper" id="invoice-content">
   <div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">
-    Memuat data kuitansi resmi...
+    Memuat data kuitansi resmi…
   </div>
 </div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const code = urlParams.get('code') || '';
@@ -233,7 +237,7 @@ async function loadInvoice() {
         <div class="invoice-title">
           <h1>OFFICIAL INVOICE</h1>
           <div style="font-family:monospace; font-size:0.95rem; font-weight:700; color:var(--gold); margin-bottom:6px;">
-            INV-${b.booking_code}
+            INV-${escapeHtml(b.booking_code)}
           </div>
           <span class="invoice-badge">${b.payment_status === 'DEPOSIT_PAID' || b.payment_status === 'PAID' ? '✅ Deposit Terverifikasi' : '⏳ Menunggu Verifikasi'}</span>
         </div>
@@ -243,17 +247,17 @@ async function loadInvoice() {
       <div class="grid-2">
         <div class="info-block">
           <h4>DATA JEMAAH / KLIEN</h4>
-          <p><strong>${b.client_name}</strong></p>
-          <p>📞 ${b.client_phone}</p>
-          <p>✉️ ${b.client_email || '-'}</p>
-          <p>🌍 Asal: ${b.client_country || 'Indonesia'}</p>
+          <p><strong>${escapeHtml(b.client_name)}</strong></p>
+          <p>📞 ${escapeHtml(b.client_phone)}</p>
+          <p>✉️ ${escapeHtml(b.client_email || '-')}</p>
+          <p>🌍 Asal: ${escapeHtml(b.client_country || 'Indonesia')}</p>
         </div>
         <div class="info-block">
           <h4>JADWAL & LOKASI PEMOTRETAN</h4>
-          <p>📅 <strong>${b.date}</strong></p>
-          <p>⏰ <strong>${b.start_time} - ${b.end_time} (Waktu Madinah)</strong></p>
-          <p>📍 Lokasi: <strong>${loc.name || 'Masjid Nabawi Area'}</strong></p>
-          <p>📸 Fotografer: ${photo.name || 'UMROH LENS OFFICIAL'}</p>
+          <p>📅 <strong>${escapeHtml(b.date)}</strong></p>
+          <p>⏰ <strong>${escapeHtml(b.start_time)} - ${escapeHtml(b.end_time)} (Waktu Madinah)</strong></p>
+          <p>📍 Lokasi: <strong>${escapeHtml(loc.name || 'Masjid Nabawi Area')}</strong></p>
+          <p>📸 Fotografer: ${escapeHtml(photo.name || 'UMROH LENS OFFICIAL')}</p>
         </div>
       </div>
 
@@ -270,8 +274,8 @@ async function loadInvoice() {
         <tbody>
           <tr>
             <td>
-              <strong>${s.name}</strong><br>
-              <span style="font-size:0.8rem; color:var(--charcoal-soft);">Paket: ${p.name || 'Signature'}</span>
+              <strong>${escapeHtml(s.name)}</strong><br>
+              <span style="font-size:0.8rem; color:var(--charcoal-soft);">Paket: ${escapeHtml(p.name || 'Signature')}</span>
             </td>
             <td>${p.duration_minutes || 60} Menit</td>
             <td>${p.edited_photos || 15} Foto Edit + Semua File RAW</td>
@@ -320,5 +324,6 @@ async function loadInvoice() {
 
 loadInvoice();
 </script>
+<script src="/js/nav.js"></script>
 </body>
 </html>

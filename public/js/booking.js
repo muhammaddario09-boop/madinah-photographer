@@ -25,6 +25,14 @@ const state = {
 
 const params = new URLSearchParams(location.search);
 
+// Warn before losing an in-progress booking (until confirmation shown)
+let bookingInProgress = false;
+window.addEventListener('beforeunload', (e) => {
+  if (!bookingInProgress || state.result) return;
+  e.preventDefault();
+  e.returnValue = '';
+});
+
 async function init() {
   const [services, photographers, locations, paymentInfo] = await Promise.all([
     fetch('/api/services').then(r => r.json()).catch(() => []),
@@ -52,6 +60,24 @@ async function init() {
       }
     }
   }
+
+  // Restore date/time selection from the URL (refresh-safe deep links)
+  if (state.service && state.step >= 2 && !state.package) {
+    state.package = (state.service.packages && state.service.packages[0]) || { duration_minutes: 90 };
+  }
+  const presetDate = params.get('date');
+  const presetTime = params.get('time');
+  if (presetDate && /^\d{4}-\d{2}-\d{2}$/.test(presetDate) && state.service && state.step >= 2) {
+    state.calYear = Number(presetDate.slice(0, 4));
+    state.calMonth = Number(presetDate.slice(5, 7));
+    state.date = presetDate;
+    if (presetTime && /^\d{2}:\d{2}/.test(presetTime)) {
+      state.time = presetTime.slice(0, 5);
+      state.step = Math.max(state.step, 4); // DETAILS
+    } else {
+      state.step = Math.max(state.step, 3); // TIME
+    }
+  }
   render();
 }
 
@@ -65,13 +91,34 @@ function renderSteps() {
   document.getElementById('steps').innerHTML = dots;
 }
 
-function goto(step) { state.step = step; state.error = null; render(); window.scrollTo(0,0); }
+function syncUrl() {
+  try {
+    const q = new URLSearchParams();
+    if (state.service) q.set('service', state.service.slug || state.service.id);
+    if (state.package) q.set('package', state.package.id);
+    if (state.date) q.set('date', state.date);
+    if (state.time) q.set('time', state.time);
+    q.set('step', STEPS[state.step].toLowerCase());
+    const qs = q.toString();
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+  } catch (e) { /* ignore */ }
+}
+
+function goto(step) {
+  state.step = step;
+  state.error = null;
+  if (step !== 4) state.detailErrors = null;
+  if (step >= 2) bookingInProgress = true;
+  render();
+  syncUrl();
+  window.scrollTo(0,0);
+}
 
 function render() {
   renderSteps();
   const el = document.getElementById('step-content');
   const stepName = STEPS[state.step];
-  el.innerHTML = state.error ? `<div class="error-msg">${state.error}</div>` : '';
+  el.innerHTML = state.error ? `<div class="error-msg" role="alert">${state.error}</div>` : '';
   el.innerHTML += ({
     SERVICE: renderService,
     PACKAGE: renderPackage,
@@ -92,16 +139,16 @@ function renderService() {
       const isLong = (s.slug || '').includes('family') || (s.slug || '').includes('tour');
       const dur = isLong ? 120 : 90;
       return `
-        <div class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;">
-          <div style="width:70px; height:70px; border-radius:4px; background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
+        <button type="button" class="option-card ${state.service?.id === s.id ? 'selected' : ''}" data-id="${s.id}" style="display:flex; gap:16px; align-items:center;" aria-pressed="${state.service?.id === s.id}">
+          <div style="width:70px; height:70px; border-radius:4px; background-image:url('${escapeHtml(s.cover_image || '/img/service-golden-hour.jpg')}'); background-size:cover; background-position:center; flex-shrink:0; border:1px solid var(--line);"></div>
           <div style="flex:1;">
-            <h3 style="font-size:1.05rem;">${s.name}</h3>
+            <h3 style="font-size:1.05rem;">${escapeHtml(s.name)}</h3>
             <p style="color:var(--charcoal-soft); font-size:0.86rem; margin-top:4px;">
               ⏱️ ${dur} Menit · 📸 40 Foto Edit + RAW + 1 Min Video
             </p>
           </div>
           <span style="font-size:1.1rem; color:var(--gold); font-weight:600;">Pilih ›</span>
-        </div>
+        </button>
       `;
     }).join('')}
   `;
@@ -114,9 +161,9 @@ function renderPackage() {
 
   return `
     <div class="step-label">Step 2 — Konfirmasi Pilihan Paket Standar</div>
-    <h2 style="margin-bottom:24px;">${state.service.name}</h2>
+    <h2 style="margin-bottom:24px;">${escapeHtml(state.service.name)}</h2>
     
-    <div class="option-card selected" data-id="${p.id}" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+    <button type="button" class="option-card selected" data-id="${p.id}" style="display:flex; justify-content:space-between; align-items:center;" aria-pressed="true">
       <div>
         <h3 style="font-size:1.1rem; color:var(--charcoal);">Standard Bespoke Session</h3>
         <p style="color:var(--charcoal-soft); font-size:0.88rem; margin-top:6px; line-height:1.5;">
@@ -127,7 +174,7 @@ function renderPackage() {
       <span style="font-size:0.85rem; font-weight:700; color:var(--gold); background:var(--ivory); padding:6px 14px; border-radius:4px; border:1px solid var(--line); white-space:nowrap;">
         Paket Terpilih ✓
       </span>
-    </div>
+    </button>
 
     <div class="actions-row">
       <button class="btn btn-ghost" id="back">Kembali</button>
@@ -145,9 +192,9 @@ function renderDate() {
     <div class="step-label">Step 3 — Select Date</div>
     <h2 style="margin-bottom:24px;">Choose a date</h2>
     <div class="cal-nav">
-      <button class="btn btn-ghost" id="prev-month" style="padding:8px 14px;">←</button>
+      <button class="btn btn-ghost" id="prev-month" style="padding:8px 14px;" aria-label="Bulan sebelumnya">←</button>
       <strong style="font-family:var(--font-display); font-size:1.2rem;">${monthName} ${y}</strong>
-      <button class="btn btn-ghost" id="next-month" style="padding:8px 14px;">→</button>
+      <button class="btn btn-ghost" id="next-month" style="padding:8px 14px;" aria-label="Bulan berikutnya">→</button>
     </div>
     <div class="cal-grid" id="cal-dow">
       ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-dow">${d}</div>`).join('')}
@@ -185,7 +232,8 @@ function renderCalGrid() {
     else if (status === 'LIMITED') cls += ' limited';
     else cls += ' available';
     if (state.date === dateStr) cls += ' selected';
-    cells += `<div class="${cls}" data-date="${dateStr}">${d}</div>`;
+    const unavailable = dateStr < todayStr || status === 'OFF' || status === 'BOOKED';
+    cells += `<button type="button" class="${cls}" data-date="${dateStr}"${unavailable ? ' disabled' : ''}${state.date === dateStr ? ' aria-pressed="true"' : ''}>${d}</button>`;
   }
   document.getElementById('cal-grid').innerHTML = cells;
   document.querySelectorAll('.cal-day[data-date]').forEach(elm => {
@@ -216,45 +264,54 @@ async function loadSlots() {
     return;
   }
   manifest.innerHTML = state.slots.map(s => `
-    <div class="manifest-row ${s.status === 'AVAILABLE' ? '' : 'disabled'}" data-time="${s.start}" style="${s.status === 'AVAILABLE' ? 'cursor:pointer;' : 'opacity:0.35;'}">
+    <button type="button" class="manifest-row ${s.status === 'AVAILABLE' ? '' : 'disabled'}" data-time="${s.start}"${s.status === 'AVAILABLE' ? '' : ' disabled'} style="${s.status === 'AVAILABLE' ? '' : 'opacity:0.35;'}">
       <div class="manifest-time">${s.start}</div>
       <div style="color:var(--charcoal-soft); font-size:0.85rem;">${s.start} – ${s.end}</div>
       <div class="manifest-status"><span class="dot ${s.status === 'AVAILABLE' ? 'dot-available' : 'dot-booked'}"></span>${s.status}</div>
-    </div>
+    </button>
   `).join('');
-  manifest.querySelectorAll('.manifest-row[data-time]:not(.disabled)').forEach(row => {
+  manifest.querySelectorAll('.manifest-row[data-time]:not(:disabled)').forEach(row => {
     row.addEventListener('click', () => { state.time = row.dataset.time; goto(4); });
   });
 }
 
 function renderDetails() {
+  const err = state.detailErrors || {};
   return `
     <div class="step-label">Step 5 — Your Details</div>
     <h2 style="margin-bottom:24px;">Tell us about the session</h2>
-    <div class="field"><label>Full Name *</label><input id="f-name" value="${state.client.name || ''}" placeholder="e.g. Ahmad Fauzi"></div>
-    <div class="field"><label>WhatsApp / Phone Number *</label><input id="f-phone" value="${state.client.phone || ''}" placeholder="+62 812 3456 7890 / +966 50 123 4567"></div>
-    <div class="field"><label>Email (optional)</label><input id="f-email" value="${state.client.email || ''}" placeholder="name@example.com"></div>
-    <div class="field"><label>Country of Residence</label><input id="f-country" value="${state.client.country || ''}" placeholder="Indonesia / Malaysia / Saudi Arabia"></div>
     <div class="field">
-      <label>Location in Madinah</label>
-      <select id="f-location">
-        ${state.locations.map(l => `<option value="${l.id}" ${state.locationId == l.id ? 'selected' : ''}>${l.name}</option>`).join('')}
+      <label for="f-name">Full Name *</label>
+      <input id="f-name" name="name" autocomplete="name" value="${state.client.name || ''}" placeholder="e.g. Ahmad Fauzi…" ${err.name ? 'aria-invalid="true" aria-describedby="err-f-name"' : ''}>
+      ${err.name ? '<p class="field-error" id="err-f-name">Please enter your full name.</p>' : ''}
+    </div>
+    <div class="field">
+      <label for="f-phone">WhatsApp / Phone Number *</label>
+      <input id="f-phone" type="tel" inputmode="tel" name="phone" autocomplete="tel" value="${state.client.phone || ''}" placeholder="e.g. +62 812 3456 7890…" ${err.phone ? 'aria-invalid="true" aria-describedby="err-f-phone"' : ''}>
+      ${err.phone ? '<p class="field-error" id="err-f-phone">Please enter your WhatsApp / phone number.</p>' : ''}
+    </div>
+    <div class="field"><label for="f-email">Email (optional)</label><input id="f-email" type="email" name="email" autocomplete="email" spellcheck="false" value="${state.client.email || ''}" placeholder="e.g. name@example.com…"></div>
+    <div class="field"><label for="f-country">Country of Residence</label><input id="f-country" name="country" autocomplete="country-name" value="${state.client.country || ''}" placeholder="e.g. Indonesia…"></div>
+    <div class="field">
+      <label for="f-location">Location in Madinah</label>
+      <select id="f-location" name="location">
+        ${state.locations.map(l => `<option value="${l.id}" ${state.locationId == l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
       </select>
     </div>
     <div class="field">
-      <label>What are you celebrating?</label>
-      <select id="f-occasion">
+      <label for="f-occasion">What are you celebrating?</label>
+      <select id="f-occasion" name="occasion">
         ${['Umrah','Anniversary','Honeymoon','Family Trip','Birthday','Couple Trip','Personal Memories','Other'].map(o => `<option ${state.photoshoot.occasion===o?'selected':''}>${o}</option>`).join('')}
       </select>
     </div>
-    <div class="field"><label>Number of People</label><input id="f-people" type="number" min="1" value="${state.photoshoot.people || 1}"></div>
+    <div class="field"><label for="f-people">Number of People</label><input id="f-people" type="number" min="1" name="people" value="${state.photoshoot.people || 1}"></div>
     <div class="field">
-      <label>Preferred Style</label>
-      <select id="f-style">
+      <label for="f-style">Preferred Style</label>
+      <select id="f-style" name="style">
         ${['Editorial','Natural','Cinematic','Candid','Traditional'].map(o => `<option ${state.photoshoot.style===o?'selected':''}>${o}</option>`).join('')}
       </select>
     </div>
-    <div class="field"><label>Special Requests / Notes</label><textarea id="f-request" placeholder="Hotel pickup, specific timing, or props needed...">${state.photoshoot.request || ''}</textarea></div>
+    <div class="field"><label for="f-request">Special Requests / Notes</label><textarea id="f-request" name="request" placeholder="Hotel pickup, specific timing, or props needed…">${state.photoshoot.request || ''}</textarea></div>
     <div class="actions-row"><button class="btn btn-ghost" id="back">Back</button><button class="btn btn-primary" id="next">Continue to Payment</button></div>
   `;
 }
@@ -305,11 +362,11 @@ function renderPayment() {
     <h2 style="margin-bottom:20px;">Ringkasan &amp; Cara Pembayaran</h2>
 
     <!-- Booking Summary -->
-    <div class="summary-line"><span>Layanan Sesi</span><strong>${state.service.name}</strong></div>
-    <div class="summary-line"><span>Paket</span><span>${p.name} (${p.duration_minutes} Menit)</span></div>
-    <div class="summary-line"><span>Tanggal &amp; Waktu</span><strong>${state.date} pukul ${state.time} (Madinah)</strong></div>
-    <div class="summary-line"><span>Nama Jemaah</span><span>${state.client.name || '—'}</span></div>
-    <div class="summary-line"><span>Kontak WhatsApp</span><span>${state.client.phone || '—'}</span></div>
+    <div class="summary-line"><span>Layanan Sesi</span><strong>${escapeHtml(state.service.name)}</strong></div>
+    <div class="summary-line"><span>Paket</span><span>${escapeHtml(p.name)} (${p.duration_minutes} Menit)</span></div>
+    <div class="summary-line"><span>Tanggal &amp; Waktu</span><strong>${escapeHtml(state.date)} pukul ${escapeHtml(state.time)} (Madinah)</strong></div>
+    <div class="summary-line"><span>Nama Jemaah</span><span>${escapeHtml(state.client.name || '—')}</span></div>
+    <div class="summary-line"><span>Kontak WhatsApp</span><span>${escapeHtml(state.client.phone || '—')}</span></div>
 
     <!-- Pricing Box -->
     <div style="background:linear-gradient(135deg,#2C1810,#3D2515); color:#F5EFE0; border-radius:10px; padding:20px 22px; margin:22px 0;">
@@ -397,7 +454,7 @@ function renderPayment() {
         <div style="font-size:0.88rem; font-weight:600; color:var(--charcoal);">Pilih Foto / Screenshot Bukti Transfer dari Perangkat</div>
         <div style="font-size:0.76rem; color:var(--charcoal-soft); margin-top:2px;">JPG, PNG, WEBP · Maks 10MB</div>
         <div>
-          <img id="proof-preview" src="${paymentProof}" style="max-height:140px; max-width:100%; border-radius:4px; margin-top:12px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
+          <img id="proof-preview" src="${paymentProof}" alt="Preview bukti transfer" style="max-height:140px; max-width:100%; border-radius:4px; margin-top:12px; display:${paymentProof ? 'inline-block' : 'none'}; object-fit:cover; border:1px solid var(--line);">
         </div>
       </label>
     </div>
@@ -426,8 +483,8 @@ function renderConfirmation() {
   return `
     <div style="text-align:center; margin-bottom:36px;">
       <div style="display:inline-block; background:#DCE8D0; color:#3E5B2A; font-size:0.76rem; font-weight:600; padding:4px 14px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;">Booking Received</div>
-      <h1 style="font-size:2.4rem; margin-top:4px; color:var(--charcoal);">${r.bookingCode}</h1>
-      <p style="color:var(--charcoal-soft); font-size:0.95rem; margin-top:8px;">Terima kasih ${state.client.name || ''}, reservasi sesi foto Anda telah terdata di sistem kami.</p>
+      <h1 style="font-size:2.4rem; margin-top:4px; color:var(--charcoal);">${escapeHtml(r.bookingCode)}</h1>
+      <p style="color:var(--charcoal-soft); font-size:0.95rem; margin-top:8px;">Terima kasih ${escapeHtml(state.client.name || '')}, reservasi sesi foto Anda telah terdata di sistem kami.</p>
     </div>
 
     <div style="text-align:center; margin:32px 0;">
@@ -521,8 +578,13 @@ function bindStep(stepName) {
         request: document.getElementById('f-request').value,
       };
       if (!state.client.name || !state.client.phone) {
-        state.error = 'Please provide your full name and WhatsApp / phone number.';
+        state.detailErrors = {
+          name: !state.client.name,
+          phone: !state.client.phone,
+        };
         render();
+        const firstInvalid = document.querySelector('#step-content [aria-invalid="true"]');
+        firstInvalid?.focus();
         return;
       }
       goto(5);

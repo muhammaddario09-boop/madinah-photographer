@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Portfolio & Photos — UMROH LENS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/admin.css">
@@ -62,7 +65,7 @@
     text-align: center;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     margin-bottom: 16px;
   }
   .upload-dropzone:hover, .upload-dropzone.dragover {
@@ -97,6 +100,7 @@
 <script>renderAdminNav('portfolio');</script>
 <div id="toast" class="toast">Saved successfully!</div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 function showToast(msg = 'Saved successfully!') {
   const t = document.getElementById('toast');
@@ -146,7 +150,7 @@ function compressImage(file, maxWidth = 900, quality = 0.75) {
 
 async function loadPortfolio() {
   const main = document.getElementById('admin-main');
-  main.innerHTML = `<h1 class="admin-h1">Portfolio & Photo Gallery Manager</h1><p class="admin-sub">Loading gallery...</p>`;
+  main.innerHTML = `<h1 class="admin-h1">Portfolio & Photo Gallery Manager</h1><p class="admin-sub">Loading gallery…</p>`;
 
   try {
     const res = await adminFetch('/api/admin/portfolio');
@@ -217,13 +221,13 @@ async function loadPortfolio() {
       <div class="portfolio-admin-grid">
         ${items.map(p => `
           <div class="photo-card" data-id="${p.id}">
-            <div class="photo-preview" style="background-image: url('${p.image_url}');">
+            <div class="photo-preview" style="background-image: url('${escapeHtml(p.image_url)}');">
               ${p.featured ? '<div class="featured-badge">Featured</div>' : ''}
             </div>
             <div class="photo-body">
               <div>
-                <strong style="font-size:0.95rem; display:block; margin-bottom:4px;">${p.title || 'Untitled'}</strong>
-                <span class="eyebrow" style="color:var(--charcoal-soft); font-size:0.7rem;">${p.category}</span>
+                <strong style="font-size:0.95rem; display:block; margin-bottom:4px;">${escapeHtml(p.title || 'Untitled')}</strong>
+                <span class="eyebrow" style="color:var(--charcoal-soft); font-size:0.7rem;">${escapeHtml(p.category)}</span>
               </div>
               <button class="btn btn-ghost" onclick="deletePhoto(${p.id})" style="width:100%; color:#c34b4b; border-color:#ebccd1; padding:6px; font-size:0.74rem; margin-top:14px;">Delete Photo</button>
             </div>
@@ -265,7 +269,7 @@ async function loadPortfolio() {
 
       const uploadBtn = document.getElementById('upload-btn');
       uploadBtn.disabled = true;
-      uploadBtn.textContent = 'Uploading...';
+      uploadBtn.textContent = 'Uploading…';
 
       const title = document.getElementById('new-title').value.trim();
       const category = document.getElementById('new-cat').value;

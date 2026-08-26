@@ -2,9 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Portofolio & Galeri — UMROH LENS Madinah</title>
 <meta name="description" content="Koleksi foto portofolio resmi UMROH LENS di Madinah Al-Munawwarah. Momen sakral jemaah Umrah, pasangan, dan keluarga dengan pencahayaan golden hour alami.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .portfolio-grid-warm {
@@ -92,7 +95,7 @@
     background: #FFFFFF;
     color: var(--charcoal);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .filter-btn-warm:hover, .filter-btn-warm.active {
     background: var(--charcoal);
@@ -115,8 +118,13 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overscroll-behavior: contain;
   }
   .lightbox-modal.active { display: flex; }
+  .lightbox-close-btn:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+  }
   .lightbox-content-box {
     max-width: 900px;
     width: 100%;
@@ -212,21 +220,21 @@
 <!-- Category Filter -->
 <div class="container">
   <div class="category-filter-bar">
-    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)">✨ Semua Foto</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Nabawi', this)">🕌 Masjid Nabawi</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)">💍 Pasangan / Couple</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Family', this)">👨‍👩‍👧‍👦 Keluarga</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)">🕋 Ibadah Umrah</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)">⛰️ Jabal Uhud &amp; Quba</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)">🎬 4K Cinematic Reels</button>
+    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)" aria-pressed="true">✨ Semua Foto</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Nabawi', this)" aria-pressed="false">🕌 Masjid Nabawi</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)" aria-pressed="false">💍 Pasangan / Couple</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Family', this)" aria-pressed="false">👨‍👩‍👧‍👦 Keluarga</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)" aria-pressed="false">🕋 Ibadah Umrah</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)" aria-pressed="false">⛰️ Jabal Uhud &amp; Quba</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)" aria-pressed="false">🎬 4K Cinematic Reels</button>
   </div>
 </div>
 
 <!-- Gallery Grid (Live Supabase) -->
 <section class="section" style="padding-top:20px;">
   <div class="container">
-    <div class="portfolio-grid-warm" id="gallery-grid">
-      <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat galeri dari Supabase...</div>
+    <div class="portfolio-grid-warm" id="gallery-grid" aria-live="polite">
+      <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat galeri dari Supabase…</div>
     </div>
   </div>
 </section>
@@ -234,7 +242,7 @@
 <!-- Lightbox Modal with Interactive WhatsApp Inquire Button -->
 <div class="lightbox-modal" id="lightbox" onclick="closeLightbox(event)">
   <div class="lightbox-content-box" onclick="event.stopPropagation()">
-    <div class="lightbox-close-btn" onclick="closeLightboxDirect()">×</div>
+    <button type="button" class="lightbox-close-btn" onclick="closeLightboxDirect()" aria-label="Tutup foto">×</button>
     <img class="lightbox-img-el" id="lightbox-img" src="" alt="Full view">
     <div class="lightbox-info-bar">
       <div>
@@ -263,6 +271,7 @@
   </div>
 </footer>
 
+<script src="/js/escape-html.js"></script>
 <script>
 let allPhotos = [];
 let adminWa = '6282175272547';
@@ -281,6 +290,18 @@ fetch('/api/portfolio')
   .then(r => r.json())
   .then(items => {
     allPhotos = items || [];
+
+    // Restore category from URL (?category=...) on first load
+    const catParam = new URLSearchParams(location.search).get('category');
+    if (catParam && catParam !== 'ALL') {
+      filterGallery(catParam, null);
+      document.querySelectorAll('.filter-btn-warm').forEach(b => {
+        const isActive = b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${catParam}'`);
+        b.classList.toggle('active', !!isActive);
+        b.setAttribute('aria-pressed', String(!!isActive));
+      });
+      return;
+    }
     renderGallery(allPhotos);
   })
   .catch(err => {
@@ -296,15 +317,15 @@ function renderGallery(photos) {
   }
 
   grid.innerHTML = photos.map((p, idx) => `
-    <div class="portfolio-card-warm" onclick="openLightbox(${idx})">
-      <div class="portfolio-thumb-warm" style="background-image:url('${p.image_url}');">
-        <span class="portfolio-badge-warm">${p.category || 'Madinah'}</span>
+    <div class="portfolio-card-warm" role="button" tabindex="0" data-idx="${idx}" aria-haspopup="dialog">
+      <div class="portfolio-thumb-warm" style="background-image:url('${escapeHtml(p.image_url)}');">
+        <span class="portfolio-badge-warm">${escapeHtml(p.category || 'Madinah')}</span>
       </div>
       <div class="portfolio-body-warm">
-        <h3>${p.title}</h3>
-        <p>${p.description || 'Dokumentasi eksklusif di sudut suci Madinah Al-Munawwarah.'}</p>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.description || 'Dokumentasi eksklusif di sudut suci Madinah Al-Munawwarah.')}</p>
         <div class="portfolio-loc-warm">
-          📍 <span>${p.location || 'Masjid Nabawi, Madinah'}</span>
+          📍 <span>${escapeHtml(p.location || 'Masjid Nabawi, Madinah')}</span>
         </div>
       </div>
     </div>
@@ -313,9 +334,28 @@ function renderGallery(photos) {
 
 let activeFilteredPhotos = [];
 
+// Keyboard + click handling for portfolio cards (role="button")
+document.getElementById('gallery-grid').addEventListener('click', (e) => {
+  const card = e.target.closest('.portfolio-card-warm');
+  if (card) openLightbox(Number(card.dataset.idx));
+});
+document.getElementById('gallery-grid').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('.portfolio-card-warm');
+  if (!card) return;
+  e.preventDefault();
+  openLightbox(Number(card.dataset.idx));
+});
+
 function filterGallery(category, btn) {
-  document.querySelectorAll('.filter-btn-warm').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.filter-btn-warm').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  if (btn) {
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  }
 
   if (category === 'ALL') {
     activeFilteredPhotos = allPhotos;
@@ -328,7 +368,17 @@ function filterGallery(category, btn) {
     );
     renderGallery(activeFilteredPhotos);
   }
+
+  // Keep filter state in the URL (shareable / refresh-safe)
+  try {
+    const u = new URL(location.href);
+    if (category === 'ALL') u.searchParams.delete('category');
+    else u.searchParams.set('category', category);
+    history.replaceState(null, '', u);
+  } catch (e) { /* ignore */ }
 }
+
+let lightboxLastFocus = null;
 
 function openLightbox(idx) {
   const list = activeFilteredPhotos.length > 0 ? activeFilteredPhotos : allPhotos;
@@ -343,11 +393,17 @@ function openLightbox(idx) {
   const waMsg = encodeURIComponent(`Assalamu'alaikum Admin UMROH LENS Madinah, saya tertarik dengan konsep foto referensi "${p.title}" (${p.location || 'Madinah'}). Boleh info ketersediaan slot fotografer & penawaran paket resminya? Terima kasih.`);
   document.getElementById('lightbox-wa-btn').href = `https://wa.me/${adminWa}?text=${waMsg}`;
 
-  document.getElementById('lightbox').classList.add('active');
+  lightboxLastFocus = document.activeElement;
+  const lb = document.getElementById('lightbox');
+  lb.classList.add('active');
+  lb.querySelector('.lightbox-close-btn')?.focus();
 }
 
 function closeLightboxDirect() {
   document.getElementById('lightbox').classList.remove('active');
+  if (lightboxLastFocus && document.contains(lightboxLastFocus)) {
+    lightboxLastFocus.focus();
+  }
 }
 
 function closeLightbox(e) {
@@ -355,7 +411,27 @@ function closeLightbox(e) {
     closeLightboxDirect();
   }
 }
+
+document.addEventListener('keydown', (e) => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('active')) return;
+  if (e.key === 'Escape') {
+    closeLightboxDirect();
+  } else if (e.key === 'Tab') {
+    // Keep focus cycling between close button and WA link inside the lightbox
+    const focusables = [lb.querySelector('.lightbox-close-btn'), lb.querySelector('#lightbox-wa-btn')];
+    const idxF = focusables.indexOf(document.activeElement);
+    if (e.shiftKey && (idxF === 0 || idxF === -1)) {
+      e.preventDefault();
+      focusables[1]?.focus();
+    } else if (!e.shiftKey && idxF >= focusables.length - 1) {
+      e.preventDefault();
+      focusables[0]?.focus();
+    }
+  }
+});
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>My Booking — UMROH LENS Madinah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -40,13 +43,15 @@
 <div class="wrap">
   <p class="eyebrow" data-i18n="nav_my_booking">My Booking</p>
   <h1 style="font-size:1.9rem; margin-top:12px; margin-bottom:28px;" data-i18n="btn_lookup">Find your reservation</h1>
-  <div class="field" style="display:flex; gap:10px;">
-    <input id="code-input" placeholder="Booking ID, e.g. MDN-2026-0001">
-    <button class="btn btn-primary" id="lookup-btn" data-i18n="btn_lookup">Find</button>
-  </div>
-  <div id="result" style="margin-top:32px;"></div>
+  <form id="lookup-form" class="field" style="display:flex; gap:10px;">
+    <label for="code-input" style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;">Booking ID</label>
+    <input id="code-input" name="booking_code" autocomplete="off" spellcheck="false" autocapitalize="characters" placeholder="Booking ID, e.g. MDN-2026-0001">
+    <button type="submit" class="btn btn-primary" id="lookup-btn" data-i18n="btn_lookup">Find</button>
+  </form>
+  <div id="result" style="margin-top:32px;" aria-live="polite"></div>
 </div>
 
+<script src="/js/escape-html.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
 
@@ -70,11 +75,11 @@ function getStatusInfo(status) {
 
 async function lookup(code) {
   const result = document.getElementById('result');
-  result.innerHTML = '<p style="color:var(--charcoal-soft);">Mencari data reservasi...</p>';
+  result.innerHTML = '<p style="color:var(--charcoal-soft);">Mencari data reservasi…</p>';
   try {
     const res = await fetch(`/api/bookings/${code}`);
     if (!res.ok) {
-      result.innerHTML = `<div style="padding:16px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.9rem;">Booking tidak ditemukan. Pastikan Booking ID Anda benar (Contoh: MDN-2026-0001).</div>`;
+      result.innerHTML = `<div style="padding:16px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.9rem;">${escapeHtml('Booking tidak ditemukan. Pastikan Booking ID Anda benar (Contoh: MDN-2026-0001).')}</div>`;
       return;
     }
     const data = await res.json();
@@ -85,14 +90,14 @@ async function lookup(code) {
       <div style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:28px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
           <div>
-            <span class="status-badge status-${b.status}">${sInfo.label}</span>
-            <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-top:10px;">${b.booking_code}</h2>
+            <span class="status-badge status-${escapeHtml(b.status)}">${sInfo.label}</span>
+            <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-top:10px;">${escapeHtml(b.booking_code)}</h2>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="/invoice.html?code=${b.booking_code}" target="_blank" class="btn btn-ghost" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+            <a href="/invoice.html?code=${encodeURIComponent(b.booking_code)}" target="_blank" class="btn btn-ghost" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
               <span>🧾 Cetak Invoice / PDF</span>
             </a>
-            <a href="/gallery.html?code=${b.booking_code}" class="btn btn-primary" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+            <a href="/gallery.html?code=${encodeURIComponent(b.booking_code)}" class="btn btn-primary" style="padding:8px 16px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
               <span>📸 Buka Galeri Foto</span>
             </a>
           </div>
@@ -100,14 +105,14 @@ async function lookup(code) {
         ${sInfo.desc ? `<p style="font-size:0.86rem; color:var(--charcoal-soft); margin-bottom:20px; padding:10px 14px; background:var(--ivory); border-radius:4px;">ℹ️ ${sInfo.desc}</p>` : ''}
 
         <div style="margin-top:18px;">
-          <div class="summary-line"><span>Nama Klien</span><strong style="color:var(--charcoal);">${b.client_name || '—'}</strong></div>
-          <div class="summary-line"><span>Layanan</span><span>${data.service.name}</span></div>
-          <div class="summary-line"><span>Paket</span><span>${data.package.name}</span></div>
-          <div class="summary-line"><span>Tanggal Sesi</span><strong>${b.date}</strong></div>
-          <div class="summary-line"><span>Waktu Sesi</span><strong>${b.start_time} – ${b.end_time}</strong></div>
-          <div class="summary-line"><span>Lokasi</span><span>${data.location ? data.location.name : 'Madinah Area'}</span></div>
-          <div class="summary-line"><span>Studio Fotografer</span><span>${data.photographer.name}</span></div>
-          <div class="summary-line"><span>Status Pembayaran</span><span>${b.payment_status.replace('_',' ')} (Deposit: ${b.currency} ${b.deposit_amount})</span></div>
+          <div class="summary-line"><span>Nama Klien</span><strong style="color:var(--charcoal);">${escapeHtml(b.client_name || '—')}</strong></div>
+          <div class="summary-line"><span>Layanan</span><span>${escapeHtml(data.service.name)}</span></div>
+          <div class="summary-line"><span>Paket</span><span>${escapeHtml(data.package.name)}</span></div>
+          <div class="summary-line"><span>Tanggal Sesi</span><strong>${escapeHtml(b.date)}</strong></div>
+          <div class="summary-line"><span>Waktu Sesi</span><strong>${escapeHtml(b.start_time)} – ${escapeHtml(b.end_time)}</strong></div>
+          <div class="summary-line"><span>Lokasi</span><span>${escapeHtml(data.location ? data.location.name : 'Madinah Area')}</span></div>
+          <div class="summary-line"><span>Studio Fotografer</span><span>${escapeHtml(data.photographer.name)}</span></div>
+          <div class="summary-line"><span>Status Pembayaran</span><span>${escapeHtml(b.payment_status.replace('_',' '))} (Deposit: ${escapeHtml(b.currency)} ${escapeHtml(b.deposit_amount)})</span></div>
         </div>
 
         <div id="reschedule-box" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--line);">
@@ -118,7 +123,7 @@ async function lookup(code) {
             <input id="new-time" type="time" value="${b.start_time}" style="flex:1; min-width:120px; padding:11px; border:1px solid var(--line); border-radius:4px;">
             <button class="btn btn-primary" id="reschedule-btn" style="padding:11px 20px;">Ajukan Perubahan</button>
           </div>
-          <div id="reschedule-alert" style="margin-top:16px; display:none;"></div>
+          <div id="reschedule-alert" style="margin-top:16px; display:none;" aria-live="polite"></div>
         </div>
       </div>
     `;
@@ -133,7 +138,7 @@ async function lookup(code) {
 
       const alertBox = document.getElementById('reschedule-alert');
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '<p style="color:var(--charcoal-soft);">Mengirim permintaan reschedule...</p>';
+      alertBox.innerHTML = '<p style="color:var(--charcoal-soft);">Mengirim permintaan reschedule…</p>';
 
       const r = await fetch(`/api/bookings/${b.booking_code}/reschedule`, {
         method: 'POST',
@@ -143,7 +148,7 @@ async function lookup(code) {
       const rd = await r.json();
 
       if (!r.ok) {
-        alertBox.innerHTML = `<div style="padding:12px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.88rem;">${rd.error}</div>`;
+        alertBox.innerHTML = `<div style="padding:12px; background:#FDE8E8; color:#9B1C1C; border-radius:4px; font-size:0.88rem;">${escapeHtml(rd.error)}</div>`;
         return;
       }
 
@@ -151,7 +156,7 @@ async function lookup(code) {
         <div style="padding:16px; background:#EBF5EC; border:1px solid #C3E6CB; border-radius:6px; color:#155724; font-size:0.9rem;">
           <h4 style="font-weight:600; margin-bottom:6px;">✅ Permintaan Berhasil Diajukan!</h4>
           <p style="margin-bottom:12px;">Status booking Anda kini <strong>Menunggu Persetujuan Reschedule</strong> untuk tanggal <strong>${date}</strong> pukul <strong>${startTime}</strong>.</p>
-          ${rd.whatsappUrl ? `
+          ${/^https:\/\/wa\.me\//.test(rd.whatsappUrl || '') ? `
             <a href="${rd.whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#fff; border-color:#25D366; text-decoration:none; padding:10px 18px; font-size:0.85rem;">
               <span>💬 Kirim Notifikasi ke WhatsApp Admin</span>
             </a>
@@ -168,12 +173,16 @@ async function lookup(code) {
   }
 }
 
-document.getElementById('lookup-btn').addEventListener('click', () => lookup(document.getElementById('code-input').value.trim()));
+document.getElementById('lookup-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  lookup(document.getElementById('code-input').value.trim());
+});
 if (params.get('code')) {
   document.getElementById('code-input').value = params.get('code');
   lookup(params.get('code'));
 }
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>

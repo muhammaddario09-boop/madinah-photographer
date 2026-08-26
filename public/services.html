@@ -2,9 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F5EE">
 <title>Layanan & Paket Dokumentasi — UMROH LENS Madinah</title>
 <meta name="description" content="Katalog layanan sesi foto & video profesional di Madinah Al-Munawwarah untuk jemaah Umrah, pasangan, dan keluarga. Dapatkan Rate Card resmi via WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .service-row-warm {
@@ -123,7 +126,7 @@
 
     <!-- Live Services Grid -->
     <div id="services-list">
-      <div style="text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat daftar layanan...</div>
+      <div style="text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat daftar layanan…</div>
     </div>
   </div>
 </section>
@@ -136,6 +139,7 @@
   </div>
 </footer>
 
+<script src="/js/escape-html.js"></script>
 <script>
 fetch('/api/services')
   .then(r => r.json())
@@ -151,14 +155,14 @@ fetch('/api/services')
       const waMsg = encodeURIComponent(`Halo Admin UMROH LENS Madinah, saya tertarik dengan layanan "${s.name}". Boleh minta informasi harga paket dan Rate Card PDF resminya? Terima kasih.`);
       const waLink = `https://wa.me/6282175272547?text=${waMsg}`;
 
-      return `
+        return `
         <div class="service-row-warm">
-          <div class="service-thumb-warm" style="background-image:url('${s.cover_image || '/img/service-golden-hour.jpg'}');"></div>
+          <div class="service-thumb-warm" style="background-image:url('${escapeHtml(s.cover_image || '/img/service-golden-hour.jpg')}');"></div>
           <div>
             <div class="eyebrow" style="margin-bottom:6px;">UMROH LENS MADINAH</div>
-            <h2 style="font-size:1.75rem; margin-bottom:8px;">${s.name}</h2>
+            <h2 style="font-size:1.75rem; margin-bottom:8px;">${escapeHtml(s.name)}</h2>
             <p style="color:var(--charcoal-soft); font-size:0.92rem; line-height:1.6; max-width:660px; margin-bottom:18px;">
-              ${s.description}
+              ${escapeHtml(s.description)}
             </p>
 
             <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;">
@@ -183,7 +187,7 @@ fetch('/api/services')
 
             <!-- Action Buttons -->
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-              <a class="btn btn-primary" href="/booking.html?service=${s.slug}" style="padding:10px 20px; font-size:0.84rem;">
+              <a class="btn btn-primary" href="/booking.html?service=${encodeURIComponent(s.slug)}" style="padding:10px 20px; font-size:0.84rem;">
                 📅 Pilih Jadwal Sesi →
               </a>
               <a class="btn" href="${waLink}" target="_blank" rel="noopener" style="background:#25D366; color:#fff; text-decoration:none; padding:10px 18px; font-size:0.84rem; border-radius:4px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
@@ -203,6 +207,7 @@ fetch('/api/services')
     document.getElementById('services-list').innerHTML = '<p style="color:var(--charcoal-soft); text-align:center;">Gagal memuat layanan.</p>';
   });
 </script>
+<script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>
 </body>
 </html>
