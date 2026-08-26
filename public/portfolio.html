@@ -118,8 +118,13 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overscroll-behavior: contain;
   }
   .lightbox-modal.active { display: flex; }
+  .lightbox-close-btn:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+  }
   .lightbox-content-box {
     max-width: 900px;
     width: 100%;
@@ -215,20 +220,20 @@
 <!-- Category Filter -->
 <div class="container">
   <div class="category-filter-bar">
-    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)">✨ Semua Foto</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Nabawi', this)">🕌 Masjid Nabawi</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)">💍 Pasangan / Couple</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Family', this)">👨‍👩‍👧‍👦 Keluarga</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)">🕋 Ibadah Umrah</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)">⛰️ Jabal Uhud &amp; Quba</button>
-    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)">🎬 4K Cinematic Reels</button>
+    <button class="filter-btn-warm active" onclick="filterGallery('ALL', this)" aria-pressed="true">✨ Semua Foto</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Nabawi', this)" aria-pressed="false">🕌 Masjid Nabawi</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Couple', this)" aria-pressed="false">💍 Pasangan / Couple</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Family', this)" aria-pressed="false">👨‍👩‍👧‍👦 Keluarga</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Umrah', this)" aria-pressed="false">🕋 Ibadah Umrah</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Uhud', this)" aria-pressed="false">⛰️ Jabal Uhud &amp; Quba</button>
+    <button class="filter-btn-warm" onclick="filterGallery('Cinematic', this)" aria-pressed="false">🎬 4K Cinematic Reels</button>
   </div>
 </div>
 
 <!-- Gallery Grid (Live Supabase) -->
 <section class="section" style="padding-top:20px;">
   <div class="container">
-    <div class="portfolio-grid-warm" id="gallery-grid">
+    <div class="portfolio-grid-warm" id="gallery-grid" aria-live="polite">
       <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--charcoal-soft);">Memuat galeri dari Supabase…</div>
     </div>
   </div>
@@ -299,7 +304,7 @@ function renderGallery(photos) {
   }
 
   grid.innerHTML = photos.map((p, idx) => `
-    <div class="portfolio-card-warm" onclick="openLightbox(${idx})">
+    <div class="portfolio-card-warm" role="button" tabindex="0" data-idx="${idx}" aria-haspopup="dialog">
       <div class="portfolio-thumb-warm" style="background-image:url('${p.image_url}');">
         <span class="portfolio-badge-warm">${p.category || 'Madinah'}</span>
       </div>
@@ -316,9 +321,28 @@ function renderGallery(photos) {
 
 let activeFilteredPhotos = [];
 
+// Keyboard + click handling for portfolio cards (role="button")
+document.getElementById('gallery-grid').addEventListener('click', (e) => {
+  const card = e.target.closest('.portfolio-card-warm');
+  if (card) openLightbox(Number(card.dataset.idx));
+});
+document.getElementById('gallery-grid').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('.portfolio-card-warm');
+  if (!card) return;
+  e.preventDefault();
+  openLightbox(Number(card.dataset.idx));
+});
+
 function filterGallery(category, btn) {
-  document.querySelectorAll('.filter-btn-warm').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.filter-btn-warm').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  if (btn) {
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  }
 
   if (category === 'ALL') {
     activeFilteredPhotos = allPhotos;
@@ -333,6 +357,8 @@ function filterGallery(category, btn) {
   }
 }
 
+let lightboxLastFocus = null;
+
 function openLightbox(idx) {
   const list = activeFilteredPhotos.length > 0 ? activeFilteredPhotos : allPhotos;
   const p = list[idx] || allPhotos[idx];
@@ -346,11 +372,17 @@ function openLightbox(idx) {
   const waMsg = encodeURIComponent(`Assalamu'alaikum Admin UMROH LENS Madinah, saya tertarik dengan konsep foto referensi "${p.title}" (${p.location || 'Madinah'}). Boleh info ketersediaan slot fotografer & penawaran paket resminya? Terima kasih.`);
   document.getElementById('lightbox-wa-btn').href = `https://wa.me/${adminWa}?text=${waMsg}`;
 
-  document.getElementById('lightbox').classList.add('active');
+  lightboxLastFocus = document.activeElement;
+  const lb = document.getElementById('lightbox');
+  lb.classList.add('active');
+  lb.querySelector('.lightbox-close-btn')?.focus();
 }
 
 function closeLightboxDirect() {
   document.getElementById('lightbox').classList.remove('active');
+  if (lightboxLastFocus && document.contains(lightboxLastFocus)) {
+    lightboxLastFocus.focus();
+  }
 }
 
 function closeLightbox(e) {
@@ -358,6 +390,25 @@ function closeLightbox(e) {
     closeLightboxDirect();
   }
 }
+
+document.addEventListener('keydown', (e) => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('active')) return;
+  if (e.key === 'Escape') {
+    closeLightboxDirect();
+  } else if (e.key === 'Tab') {
+    // Keep focus cycling between close button and WA link inside the lightbox
+    const focusables = [lb.querySelector('.lightbox-close-btn'), lb.querySelector('#lightbox-wa-btn')];
+    const idxF = focusables.indexOf(document.activeElement);
+    if (e.shiftKey && (idxF === 0 || idxF === -1)) {
+      e.preventDefault();
+      focusables[1]?.focus();
+    } else if (!e.shiftKey && idxF >= focusables.length - 1) {
+      e.preventDefault();
+      focusables[0]?.focus();
+    }
+  }
+});
 </script>
 <script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>

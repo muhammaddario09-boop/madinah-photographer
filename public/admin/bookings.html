@@ -164,7 +164,7 @@ async function draw(status) {
 
     <!-- Modal for Google Drive Link Manager -->
     <div id="drive-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
-      <div style="background:#fff; padding:28px; border-radius:8px; max-width:520px; width:92%; box-shadow:0 16px 48px rgba(0,0,0,0.2);">
+      <div style="background:#fff; padding:28px; border-radius:8px; max-width:520px; width:92%; box-shadow:0 16px 48px rgba(0,0,0,0.2); overscroll-behavior:contain;">
         <h3 style="margin-top:0; margin-bottom:6px; font-family:var(--font-display); font-size:1.3rem;">
           📁 Atur Link Google Drive Hasil Foto
         </h3>
@@ -195,11 +195,11 @@ async function draw(status) {
 
     <!-- Modal for Payment Proof Preview -->
     <div id="proof-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
-      <div style="background:#fff; padding:24px; border-radius:6px; max-width:500px; width:90%; max-height:85vh; overflow-y:auto; text-align:center; position:relative;">
+      <div style="background:#fff; padding:24px; border-radius:6px; max-width:500px; width:90%; max-height:85vh; overflow-y:auto; text-align:center; position:relative; overscroll-behavior:contain;">
         <h3 id="modal-title" style="margin-bottom:14px; font-family:var(--font-display);">Bukti Pembayaran</h3>
         <img id="modal-img" style="max-width:100%; max-height:60vh; border-radius:4px; border:1px solid var(--line); object-fit:contain;">
         <div style="margin-top:16px;">
-          <button class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Tutup Preview</button>
+          <button id="proof-close-btn" class="btn btn-ghost" onclick="document.getElementById('proof-modal').style.display='none'">Tutup Preview</button>
         </div>
       </div>
     </div>
@@ -237,15 +237,34 @@ async function draw(status) {
 }
 
 function openDriveModal(id, code, clientName, encodedUrl) {
+  window._modalReturnFocus = document.activeElement;
   document.getElementById('drive-booking-id').value = id;
   document.getElementById('drive-modal-subtitle').textContent = `Jemaah: ${clientName} (Booking ID: ${code})`;
   document.getElementById('drive-url-input').value = decodeURIComponent(encodedUrl || '');
   document.getElementById('drive-modal').style.display = 'flex';
+  document.getElementById('drive-url-input').focus();
 }
 
 function closeDriveModal() {
   document.getElementById('drive-modal').style.display = 'none';
+  if (window._modalReturnFocus && document.contains(window._modalReturnFocus)) {
+    window._modalReturnFocus.focus();
+  }
 }
+
+// Close any open modal on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  ['drive-modal', 'proof-modal'].forEach(id => {
+    const m = document.getElementById(id);
+    if (m && m.style.display === 'flex') {
+      m.style.display = 'none';
+      if (window._modalReturnFocus && document.contains(window._modalReturnFocus)) {
+        window._modalReturnFocus.focus();
+      }
+    }
+  });
+});
 
 async function saveDriveUrl() {
   const id = document.getElementById('drive-booking-id').value;
@@ -303,12 +322,14 @@ async function resetAllDemoBookings() {
 }
 
 function showProof(code, proofUrl) {
+  window._modalReturnFocus = document.activeElement;
   const modal = document.getElementById('proof-modal');
   const title = document.getElementById('modal-title');
   const img = document.getElementById('modal-img');
   title.textContent = `Bukti Transfer Booking: ${code}`;
   img.src = decodeURIComponent(proofUrl);
   modal.style.display = 'flex';
+  document.getElementById('proof-close-btn').focus();
 }
 
 document.addEventListener('DOMContentLoaded', () => draw());

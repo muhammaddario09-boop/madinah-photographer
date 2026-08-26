@@ -185,9 +185,9 @@
     
     <!-- Multi-Language Switcher (ID / EN / AR) -->
     <div class="lang-switcher-bar">
-      <button class="lang-btn active" onclick="setLanguage('id', this)">🇮🇩 ID</button>
-      <button class="lang-btn" onclick="setLanguage('en', this)">🇬🇧 EN</button>
-      <button class="lang-btn" onclick="setLanguage('ar', this)">🇸🇦 العربية</button>
+      <button class="lang-btn active" onclick="setLanguage('id', this)" aria-pressed="true">🇮🇩 ID</button>
+      <button class="lang-btn" onclick="setLanguage('en', this)" aria-pressed="false">🇬🇧 EN</button>
+      <button class="lang-btn" onclick="setLanguage('ar', this)" aria-pressed="false">🇸🇦 العربية</button>
     </div>
   </div>
 
@@ -522,8 +522,14 @@ function renderTableRows(tableId, rows) {
 }
 
 function setLanguage(lang, btn) {
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  if (btn) {
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  }
 
   const dict = I18N_RC[lang] || I18N_RC.id;
   const paper = document.getElementById('rc-paper');

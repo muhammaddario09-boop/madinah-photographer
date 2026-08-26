@@ -94,8 +94,13 @@
     justify-content: center;
     padding: 24px;
     box-sizing: border-box;
+    overscroll-behavior: contain;
   }
   .lightbox-modal.active { display: flex; }
+  .lightbox-close-btn:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+  }
   .lightbox-img-el {
     max-width: 90vw;
     max-height: 85vh;
@@ -154,7 +159,7 @@
 
 <!-- Main Gallery Content -->
 <section class="section" style="padding-top:40px;">
-  <div class="container" id="gallery-container">
+  <div class="container" id="gallery-container" aria-live="polite">
     <div style="text-align:center; padding:60px 0; color:var(--charcoal-soft);">
       Masukkan Kode Booking di atas untuk membuka album foto Anda.
     </div>
@@ -236,7 +241,9 @@ async function lookupGallery(codeParam) {
       <div class="client-masonry">
         ${samplePhotos.map(p => `
           <div class="client-photo-card">
-            <img src="${p.url}" alt="${p.title}" class="client-photo-img" onclick="openLightbox('${p.url}')">
+            <button type="button" onclick="openLightbox('${p.url}')" style="display:block; width:100%; padding:0; border:none; background:none; cursor:pointer;" aria-label="Perbesar ${p.title}">
+              <img src="${p.url}" alt="${p.title}" class="client-photo-img" loading="lazy">
+            </button>
             <div class="client-photo-body">
               <span style="font-size:0.84rem; font-weight:600; color:var(--charcoal);">${p.title}</span>
               <a href="${p.url}" download class="btn btn-ghost" style="padding:4px 10px; font-size:0.75rem;">⬇ HD</a>
@@ -256,16 +263,43 @@ async function lookupGallery(codeParam) {
   }
 }
 
+let lightboxLastFocus = null;
+
 function openLightbox(url) {
+  lightboxLastFocus = document.activeElement;
   document.getElementById('lightbox-img').src = url;
-  document.getElementById('lightbox').classList.add('active');
+  const lb = document.getElementById('lightbox');
+  lb.classList.add('active');
+  lb.querySelector('.lightbox-close-btn')?.focus();
+}
+
+function closeLightboxDirect() {
+  document.getElementById('lightbox').classList.remove('active');
+  if (lightboxLastFocus && document.contains(lightboxLastFocus)) {
+    lightboxLastFocus.focus();
+  }
 }
 
 function closeLightbox(e) {
   if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close-btn')) {
-    document.getElementById('lightbox').classList.remove('active');
+    closeLightboxDirect();
   }
 }
+
+document.addEventListener('keydown', (e) => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('active')) return;
+  if (e.key === 'Escape') {
+    closeLightboxDirect();
+  } else if (e.key === 'Tab') {
+    // Single interactive element inside — keep focus on the close button
+    const closeBtn = lb.querySelector('.lightbox-close-btn');
+    if (document.activeElement !== closeBtn) {
+      e.preventDefault();
+      closeBtn?.focus();
+    }
+  }
+});
 </script>
 <script src="/js/nav.js"></script>
 <script src="/js/social-widget.js"></script>

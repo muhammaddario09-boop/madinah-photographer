@@ -129,6 +129,7 @@
     width: 92%;
     max-height: 90vh;
     overflow-y: auto;
+    overscroll-behavior: contain;
     box-shadow: 0 16px 48px rgba(0,0,0,0.25);
   }
 </style>
@@ -174,6 +175,21 @@ function compressImage(file, maxWidth = 1200, quality = 0.85) {
 }
 
 let catalogServices = [];
+let _modalReturnFocus = null;
+
+// Close any open modal on Escape and restore focus to its opener
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  ['add-service-modal', 'add-pkg-modal'].forEach(id => {
+    const m = document.getElementById(id);
+    if (m && m.style.display === 'flex') {
+      m.style.display = 'none';
+      if (_modalReturnFocus && document.contains(_modalReturnFocus)) {
+        _modalReturnFocus.focus();
+      }
+    }
+  });
+});
 
 async function loadCatalog() {
   const main = document.getElementById('admin-main');
@@ -464,12 +480,16 @@ async function saveService(id) {
 }
 
 function openAddServiceModal() {
+  _modalReturnFocus = document.activeElement;
   document.getElementById('add-service-modal').style.display = 'flex';
   document.getElementById('new-svc-name').focus();
 }
 
 function closeAddServiceModal() {
   document.getElementById('add-service-modal').style.display = 'none';
+  if (_modalReturnFocus && document.contains(_modalReturnFocus)) {
+    _modalReturnFocus.focus();
+  }
 }
 
 async function submitNewService() {
@@ -525,6 +545,7 @@ async function deleteService(id, name) {
 
 // Package Actions
 function openAddPackageModal(serviceId, serviceName) {
+  _modalReturnFocus = document.activeElement;
   document.getElementById('new-pkg-svcid').value = serviceId;
   document.getElementById('add-pkg-subtitle').textContent = `Layanan: ${serviceName}`;
   document.getElementById('add-pkg-modal').style.display = 'flex';
@@ -533,6 +554,9 @@ function openAddPackageModal(serviceId, serviceName) {
 
 function closeAddPackageModal() {
   document.getElementById('add-pkg-modal').style.display = 'none';
+  if (_modalReturnFocus && document.contains(_modalReturnFocus)) {
+    _modalReturnFocus.focus();
+  }
 }
 
 async function submitNewPackage() {

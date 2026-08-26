@@ -284,13 +284,13 @@ fetch('/api/portfolio')
     if (!items || items.length === 0 || !track) return;
     const loopItems = [...items, ...items];
     track.innerHTML = loopItems.map(p => `
-      <div class="h-marquee-card" onclick="window.location.href='/portfolio.html'">
+      <a class="h-marquee-card" href="/portfolio.html">
         <img src="${p.image_url}" alt="${p.title}" loading="lazy">
         <div class="h-marquee-overlay">
           <div class="h-marquee-tag">${p.category || 'Madinah'}</div>
           <h4 class="h-marquee-title">${p.title}</h4>
         </div>
-      </div>
+      </a>
     `).join('');
   })
   .catch(() => {});
